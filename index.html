@@ -26,9 +26,9 @@
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button type="button" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm cursor-pointer">📦 倉位資料</button>
-                <button type="button" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">📄 生成報價單</button>
-                <button type="button" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">💰 生成請款單</button>
+                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm cursor-pointer">📦 倉位資料</button>
+                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">📄 生成報價單</button>
+                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">💰 生成請款單</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
                 資料已永久儲存於本機瀏覽器
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全域強制掛載版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (極速靈敏版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -60,20 +60,20 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button type="button" id="btn-upload" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">一鍵智慧匯入資料</button>
+                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">一鍵智慧匯入資料</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                             <div class="flex items-center gap-3 w-full sm:w-auto">
                                 <h3 class="text-lg font-bold text-slate-700">📋 已載入的倉位清單</h3>
-                                <select id="storage-branch-filter" class="border rounded-lg px-3 py-1.5 text-sm bg-slate-50 font-semibold text-amber-900">
+                                <select id="storage-branch-filter" onchange="renderStorageTable()" class="border rounded-lg px-3 py-1.5 text-sm bg-slate-50 font-semibold text-amber-900">
                                     <option value="all">全部據點</option>
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button type="button" id="btn-delete-branch" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition cursor-pointer">🗑️ 刪除目前選取的分店</button>
-                                <button type="button" id="btn-clear-all" class="text-xs text-slate-400 hover:text-red-500 hover:underline cursor-pointer">清空全部本機資料</button>
+                                <button onclick="deleteSelectedBranchData()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition cursor-pointer">🗑️ 刪除目前選取的分店</button>
+                                <button onclick="clearStorageData()" class="text-xs text-slate-400 hover:text-red-500 hover:underline cursor-pointer">清空全部本機資料</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -149,13 +149,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
-                                <select id="quote-branch-select" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
                                     <option value="">-- 全部據點 / 不限分店 --</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
-                                <input type="text" id="quote-search-input" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
+                                <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
                             </div>
                         </div>
 
@@ -184,7 +184,7 @@
                             </div>
                         </div>
 
-                        <button type="button" id="btn-generate-quote" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
+                        <button onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
                     </div>
 
                     <!-- 公司標準正式報價單預覽區 -->
@@ -252,8 +252,8 @@
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
                         <div class="flex justify-end gap-3 no-print">
-                            <button type="button" id="btn-export-quote-excel" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
-                            <button type="button" id="btn-print-quote" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
+                            <button onclick="exportQuoteExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
+                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -308,13 +308,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
-                                <select id="invoice-branch-select" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
                                     <option value="">-- 全部據點 / 不限分店 --</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
-                                <input type="text" id="invoice-search-input" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
+                                <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
                             </div>
                         </div>
 
@@ -343,7 +343,7 @@
                             </div>
                         </div>
 
-                        <button type="button" id="btn-generate-invoice" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
+                        <button onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
                     </div>
 
                     <!-- 會計版正式請款單預覽區 -->
@@ -408,8 +408,8 @@
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
                         <div class="flex justify-end gap-3 no-print">
-                            <button type="button" id="btn-export-invoice-excel" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
-                            <button type="button" id="btn-print-invoice" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
+                            <button onclick="exportInvoiceExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
+                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -419,233 +419,151 @@
     </div>
 
     <script>
-        let storageData = [];
-        try {
-            storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        } catch(e) {
-            storageData = [];
-        }
-
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let selectedQuoteItems = {}; 
         let selectedInvoiceItems = {}; 
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // 綁定側邊欄切換
-            const btnTabStorage = document.getElementById('btn-tab-storage');
-            const btnTabQuote = document.getElementById('btn-tab-quote');
-            const btnTabInvoice = document.getElementById('btn-tab-invoice');
-
-            if (btnTabStorage) btnTabStorage.addEventListener('click', () => switchTab('tab-storage'));
-            if (btnTabQuote) btnTabQuote.addEventListener('click', () => switchTab('tab-quote'));
-            if (btnTabInvoice) btnTabInvoice.addEventListener('click', () => switchTab('tab-invoice'));
-
-            // 綁定其他按鈕動作
-            const btnUpload = document.getElementById('btn-upload');
-            if (btnUpload) btnUpload.addEventListener('click', handleSmartExcelUpload);
-
-            const btnDelBranch = document.getElementById('btn-delete-branch');
-            if (btnDelBranch) btnDelBranch.addEventListener('click', deleteSelectedBranchData);
-
-            const btnClearAll = document.getElementById('btn-clear-all');
-            if (btnClearAll) btnClearAll.addEventListener('click', clearStorageData);
-
-            const btnGenQuote = document.getElementById('btn-generate-quote');
-            if (btnGenQuote) btnGenQuote.addEventListener('click', generateQuote);
-
-            const btnGenInv = document.getElementById('btn-generate-invoice');
-            if (btnGenInv) btnGenInv.addEventListener('click', generateInvoice);
-
-            const btnExpQEx = document.getElementById('btn-export-quote-excel');
-            if (btnExpQEx) btnExpQEx.addEventListener('click', exportQuoteExcel);
-
-            const btnPrintQ = document.getElementById('btn-print-quote');
-            if (btnPrintQ) btnPrintQ.addEventListener('click', () => window.print());
-
-            const btnExpIEx = document.getElementById('btn-export-invoice-excel');
-            if (btnExpIEx) btnExpIEx.addEventListener('click', exportInvoiceExcel);
-
-            const btnPrintI = document.getElementById('btn-print-invoice');
-            if (btnPrintI) btnPrintI.addEventListener('click', () => window.print());
-
-            // 綁定即時搜尋監聽
-            const qSearch = document.getElementById('quote-search-input');
-            if (qSearch) qSearch.addEventListener('input', renderQuoteSelectableItems);
-            const qBranch = document.getElementById('quote-branch-select');
-            if (qBranch) qBranch.addEventListener('change', renderQuoteSelectableItems);
-
-            const iSearch = document.getElementById('invoice-search-input');
-            if (iSearch) iSearch.addEventListener('input', renderInvoiceSelectableItems);
-            const iBranch = document.getElementById('invoice-branch-select');
-            if (iBranch) iBranch.addEventListener('change', renderInvoiceSelectableItems);
-
-            renderStorageTable();
-        });
-
         function switchTab(tabId) {
-            try {
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('aside nav button').forEach(el => {
-                    el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
-                    el.classList.add('hover:bg-slate-800', 'text-slate-300');
-                });
-                const targetTab = document.getElementById(tabId);
-                if (targetTab) targetTab.classList.remove('hidden');
-                
-                const activeBtn = document.getElementById('btn-' + tabId);
-                if (activeBtn) {
-                    activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-                    activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
-                }
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('aside nav button').forEach(el => {
+                el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
+                el.classList.add('hover:bg-slate-800', 'text-slate-300');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
+            activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
-                const titleMap = {
-                    'tab-storage': '📦 倉位資料',
-                    'tab-quote': '📄 生成報價單',
-                    'tab-invoice': '💰 生成請款單'
-                };
-                const pageTitle = document.getElementById('page-title');
-                if (pageTitle) pageTitle.innerText = titleMap[tabId] || '營運管理工具';
+            const titleMap = {
+                'tab-storage': '📦 倉位資料',
+                'tab-quote': '📄 生成報價單',
+                'tab-invoice': '💰 生成請款單'
+            };
+            document.getElementById('page-title').innerText = titleMap[tabId] || '營運管理工具';
 
-                if (tabId === 'tab-quote') {
-                    initQuoteTab();
-                } else if (tabId === 'tab-invoice') {
-                    initInvoiceTab();
-                }
-            } catch(err) {
-                console.error("Tab switch error:", err);
+            if (tabId === 'tab-quote') {
+                initQuoteTab();
+            } else if (tabId === 'tab-invoice') {
+                initInvoiceTab();
             }
         }
-        window.switchTab = switchTab;
 
         function handleSmartExcelUpload() {
-            try {
-                const fileInput = document.getElementById('excelFile');
-                if (!fileInput || fileInput.files.length === 0) {
-                    alert('請先選擇一個 Excel 檔案！');
+            const fileInput = document.getElementById('excelFile');
+            if (fileInput.files.length === 0) {
+                alert('請先選擇一個 Excel 檔案！');
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                if (jsonSheet.length < 2) {
+                    alert('Excel 檔案內容不足！');
                     return;
                 }
-                const file = fileInput.files[0];
-                const reader = new FileReader();
 
-                reader.onload = function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, {type: 'array'});
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
+                let newItems = [];
 
-                        if (!jsonSheet || jsonSheet.length < 2) {
-                            alert('Excel 檔案內容不足或格式不支援！');
-                            return;
+                for (let i = 0; i < jsonSheet.length; i++) {
+                    let row = jsonSheet[i];
+                    if (!row || row.length === 0) continue;
+
+                    let code = '';
+                    let size = '-';
+                    let unit = '-';
+                    let price1 = NaN;
+
+                    for (let c = 0; c < row.length; c++) {
+                        let val = row[c];
+                        if (val === undefined || val === null) continue;
+                        let sVal = String(val).trim();
+
+                        if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
+                            code = sVal;
+                            if (!isNaN(row[c+1])) code += row[c+1];
+                        } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                            size = sVal;
+                        } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
+                            price1 = Number(sVal);
                         }
-
-                        let inputBranchField = document.getElementById('upload-branch-name');
-                        let inputBranch = inputBranchField ? inputBranchField.value.trim() : '土城店';
-                        if (!inputBranch) inputBranch = '土城店';
-
-                        let newItems = [];
-
-                        for (let i = 0; i < jsonSheet.length; i++) {
-                            let row = jsonSheet[i];
-                            if (!row || row.length === 0) continue;
-
-                            let code = '';
-                            let size = '-';
-                            let unit = '-';
-                            let price1 = NaN;
-
-                            for (let c = 0; c < row.length; c++) {
-                                let val = row[c];
-                                if (val === undefined || val === null) continue;
-                                let sVal = String(val).trim();
-
-                                if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
-                                    code = sVal;
-                                    if (!isNaN(row[c+1])) code += row[c+1];
-                                } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
-                                    size = sVal;
-                                } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
-                                    price1 = Number(sVal);
-                                }
-                            }
-
-                            if (!code) {
-                                for (let c = 0; c < row.length; c++) {
-                                    let s = String(row[c] || '').trim();
-                                    if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
-                                        code = s;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (isNaN(price1)) {
-                                for (let c = 0; c < row.length; c++) {
-                                    let n = Number(row[c]);
-                                    if (!isNaN(n) && n >= 500 && n < 100000) {
-                                        price1 = n;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (unit === '-') {
-                                for (let c = 0; c < row.length; c++) {
-                                    let n = Number(row[c]);
-                                    if (!isNaN(n) && n >= 10 && n <= 500) {
-                                        unit = String(n);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (code && !isNaN(price1) && price1 > 200) {
-                                let price3 = Math.round((price1 * 0.95) / 10) * 10;
-                                let price6 = Math.round((price1 * 0.90) / 10) * 10;
-                                let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
-                                let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
-
-                                newItems.push({
-                                    branch: inputBranch,
-                                    code: code,
-                                    size: size !== '-' ? size : '標準尺寸',
-                                    unit: unit !== '-' ? unit : '50',
-                                    price1: price1,
-                                    price3: price3,
-                                    price6: price6,
-                                    price12_85: price12_85,
-                                    price12_80: price12_80
-                                });
-                            }
-                        }
-
-                        if (newItems.length === 0) {
-                            alert('未能自動抓取到有效資料，請確認 Excel 內容格式。');
-                            return;
-                        }
-
-                        let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
-                        if (existingBranchIndex !== -1) {
-                            let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
-                            if (choice) {
-                                storageData = storageData.filter(item => item.branch !== inputBranch);
-                            }
-                        }
-
-                        storageData = storageData.concat(newItems);
-                        localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                        renderStorageTable();
-                        alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
-                    } catch (err) {
-                        console.error(err);
-                        alert('解析 Excel 檔案時發生錯誤。');
                     }
-                };
-                reader.readAsArrayBuffer(file);
-            } catch (err) {
-                console.error(err);
-                alert('上傳檔案發生異常。');
-            }
+
+                    if (!code) {
+                        for (let c = 0; c < row.length; c++) {
+                            let s = String(row[c] || '').trim();
+                            if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
+                                code = s;
+                                break;
+                            }
+                        }
+                    }
+                    if (isNaN(price1)) {
+                        for (let c = 0; c < row.length; c++) {
+                            let n = Number(row[c]);
+                            if (!isNaN(n) && n >= 500 && n < 100000) {
+                                price1 = n;
+                                break;
+                            }
+                        }
+                    }
+                    if (unit === '-') {
+                        for (let c = 0; c < row.length; c++) {
+                            let n = Number(row[c]);
+                            if (!isNaN(n) && n >= 10 && n <= 500) {
+                                unit = String(n);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (code && !isNaN(price1) && price1 > 200) {
+                        let price3 = Math.round((price1 * 0.95) / 10) * 10;
+                        let price6 = Math.round((price1 * 0.90) / 10) * 10;
+                        let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
+                        let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
+
+                        newItems.push({
+                            branch: inputBranch,
+                            code: code,
+                            size: size !== '-' ? size : '標準尺寸',
+                            unit: unit !== '-' ? unit : '50',
+                            price1: price1,
+                            price3: price3,
+                            price6: price6,
+                            price12_85: price12_85,
+                            price12_80: price12_80
+                        });
+                    }
+                }
+
+                if (newItems.length === 0) {
+                    alert('未能自動抓取到有效資料！');
+                    return;
+                }
+
+                let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
+                if (existingBranchIndex !== -1) {
+                    let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
+                    if (choice) {
+                        storageData = storageData.filter(item => item.branch !== inputBranch);
+                    }
+                }
+
+                storageData = storageData.concat(newItems);
+                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                renderStorageTable();
+                alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
+            };
+            reader.readAsArrayBuffer(file);
         }
-        window.handleSmartExcelUpload = handleSmartExcelUpload;
 
         function updateBranchFilter() {
             const branchCounts = {};
@@ -667,44 +585,36 @@
         }
 
         function renderStorageTable() {
-            try {
-                updateBranchFilter();
-                const filterEl = document.getElementById('storage-branch-filter');
-                const filterVal = filterEl ? filterEl.value : 'all';
-                const tbody = document.getElementById('storage-table-body');
-                if (!tbody) return;
-                
-                let filtered = storageData;
-                if (filterVal && filterVal !== 'all') {
-                    filtered = storageData.filter(item => item.branch === filterVal);
-                }
-
-                if (filtered.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = filtered.map(item => `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-medium text-amber-800">${item.branch}</td>
-                        <td class="p-3 font-bold">${item.code}</td>
-                        <td class="p-3">${item.size}</td>
-                        <td class="p-3 text-slate-500">${item.unit}</td>
-                        <td class="p-3 font-semibold text-amber-600">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-3">NT$ ${item.price3.toLocaleString()}</td>
-                        <td class="p-3">NT$ ${item.price6.toLocaleString()}</td>
-                        <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td class="p-3 text-emerald-700 font-semibold">NT$ ${item.price12_80.toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            } catch(e) {
-                console.error(e);
+            updateBranchFilter();
+            const filterVal = document.getElementById('storage-branch-filter').value;
+            const tbody = document.getElementById('storage-table-body');
+            
+            let filtered = storageData;
+            if (filterVal && filterVal !== 'all') {
+                filtered = storageData.filter(item => item.branch === filterVal);
             }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-medium text-amber-800">${item.branch}</td>
+                    <td class="p-3 font-bold">${item.code}</td>
+                    <td class="p-3">${item.size}</td>
+                    <td class="p-3 text-slate-500">${item.unit}</td>
+                    <td class="p-3 font-semibold text-amber-600">NT$ ${item.price1.toLocaleString()}</td>
+                    <td class="p-3">NT$ ${item.price3.toLocaleString()}</td>
+                    <td class="p-3">NT$ ${item.price6.toLocaleString()}</td>
+                    <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <td class="p-3 text-emerald-700 font-semibold">NT$ ${item.price12_80.toLocaleString()}</td>
+                </tr>
+            `).join('');
         }
-        window.renderStorageTable = renderStorageTable;
 
         function deleteSelectedBranchData() {
-            const filterEl = document.getElementById('storage-branch-filter');
-            const filterVal = filterEl ? filterEl.value : 'all';
+            const filterVal = document.getElementById('storage-branch-filter').value;
             if (!filterVal || filterVal === 'all') {
                 alert('請先在上方選擇您想要刪除的「特定分店」！');
                 return;
@@ -716,7 +626,6 @@
                 alert(`已成功刪除 ${filterVal} 的資料！`);
             }
         }
-        window.deleteSelectedBranchData = deleteSelectedBranchData;
 
         function clearStorageData() {
             if (confirm('確定要清空全部本機的所有倉位資料嗎？')) {
@@ -725,17 +634,13 @@
                 renderStorageTable();
             }
         }
-        window.clearStorageData = clearStorageData;
 
         // --- 報價單專屬據點與搜尋勾選 ---
         function initQuoteTab() {
-            const qDate = document.getElementById('quote-date');
-            const iDate = document.getElementById('inv-date');
-            if (qDate && !qDate.value) qDate.valueAsDate = new Date();
-            if (iDate && !iDate.value) iDate.valueAsDate = new Date();
+            document.getElementById('quote-date').valueAsDate = new Date();
+            document.getElementById('inv-date').valueAsDate = new Date();
             
             const branchSelect = document.getElementById('quote-branch-select');
-            if (!branchSelect) return;
             const branches = [...new Set(storageData.map(item => item.branch))];
             
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
@@ -747,12 +652,9 @@
         }
 
         function renderQuoteSelectableItems() {
-            const selectedBranchEl = document.getElementById('quote-branch-select');
-            const searchKwEl = document.getElementById('quote-search-input');
-            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
-            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
+            const selectedBranch = document.getElementById('quote-branch-select').value;
+            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
             const tbody = document.getElementById('quote-selectable-body');
-            if (!tbody) return;
 
             if (storageData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
@@ -791,7 +693,6 @@
                 `;
             }).join('');
         }
-        window.renderQuoteSelectableItems = renderQuoteSelectableItems;
 
         function toggleQuoteItem(globalIndex) {
             const chk = document.querySelector(`input.q-item-chk[data-index="${globalIndex}"]`);
@@ -803,21 +704,20 @@
             renderSelectedQuoteSummary();
         }
 
-        window.updateItemTerm = function(globalIndex, termVal) {
+        function updateItemTerm(globalIndex, termVal) {
             if (selectedQuoteItems[globalIndex]) {
                 selectedQuoteItems[globalIndex].term = termVal;
             }
-        };
+        }
 
-        window.removeQuoteItem = function(globalIndex) {
+        function removeQuoteItem(globalIndex) {
             delete selectedQuoteItems[globalIndex];
             renderQuoteSelectableItems();
             renderSelectedQuoteSummary();
-        };
+        }
 
         function renderSelectedQuoteSummary() {
             const summaryEl = document.getElementById('selected-items-summary');
-            if (!summaryEl) return;
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
                 summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何項目</span>';
@@ -842,7 +742,7 @@
                                 <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
                                 <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算 (僅列出價格)</option>
                             </select>
-                            <button type="button" onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
+                            <button onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
                         </div>
                     </div>
                 `;
@@ -854,7 +754,6 @@
         // --- 請款單專屬據點與搜尋勾選 (獨立工具) ---
         function initInvoiceTab() {
             const branchSelect = document.getElementById('invoice-branch-select');
-            if (!branchSelect) return;
             const branches = [...new Set(storageData.map(item => item.branch))];
             
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
@@ -866,12 +765,9 @@
         }
 
         function renderInvoiceSelectableItems() {
-            const selectedBranchEl = document.getElementById('invoice-branch-select');
-            const searchKwEl = document.getElementById('invoice-search-input');
-            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
-            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
+            const selectedBranch = document.getElementById('invoice-branch-select').value;
+            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
             const tbody = document.getElementById('invoice-selectable-body');
-            if (!tbody) return;
 
             if (storageData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
@@ -910,7 +806,6 @@
                 `;
             }).join('');
         }
-        window.renderInvoiceSelectableItems = renderInvoiceSelectableItems;
 
         function toggleInvoiceItem(globalIndex) {
             const chk = document.querySelector(`input.i-item-chk[data-index="${globalIndex}"]`);
@@ -922,21 +817,20 @@
             renderSelectedInvoiceSummary();
         }
 
-        window.updateInvoiceItemTerm = function(globalIndex, termVal) {
+        function updateInvoiceItemTerm(globalIndex, termVal) {
             if (selectedInvoiceItems[globalIndex]) {
                 selectedInvoiceItems[globalIndex].term = termVal;
             }
-        };
+        }
 
-        window.removeInvoiceItem = function(globalIndex) {
+        function removeInvoiceItem(globalIndex) {
             delete selectedInvoiceItems[globalIndex];
             renderInvoiceSelectableItems();
             renderSelectedInvoiceSummary();
-        };
+        }
 
         function renderSelectedInvoiceSummary() {
             const summaryEl = document.getElementById('invoice-selected-summary');
-            if (!summaryEl) return;
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) {
                 summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何請款項目</span>';
@@ -961,7 +855,7 @@
                                 <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
                                 <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款 (僅列出價格)</option>
                             </select>
-                            <button type="button" onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
+                            <button onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
                         </div>
                     </div>
                 `;
@@ -1046,7 +940,6 @@
 
             alert('正式報價單已成功生成！');
         }
-        window.generateQuote = generateQuote;
 
         function generateInvoice() {
             const branch = document.getElementById('i-branch').value;
@@ -1130,7 +1023,6 @@
 
             alert('會計版請款單已成功套用！');
         }
-        window.generateInvoice = generateInvoice;
 
         // 完美自訂格式 Excel 匯出 (報價單)
         function exportQuoteExcel() {
@@ -1142,7 +1034,7 @@
 
             let aoa = [
                 ["收多易迷你倉庫 - 報價單"],
-                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client').innerText],
+                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client'].innerText],
                 ["店長:", document.getElementById('v-q-manager'].innerText, "客戶電話:", document.getElementById('v-q-client-phone'].innerText],
                 ["分店名稱:", document.getElementById('v-q-branch'].innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
                 ["聯繫電話:", document.getElementById('v-q-tel'].innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
@@ -1177,7 +1069,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "報價單");
             XLSX.writeFile(wb, "Storeasy_報價單.xlsx");
         }
-        window.exportQuoteExcel = exportQuoteExcel;
 
         // 完美自訂格式 Excel 匯出 (請款單)
         function exportInvoiceExcel() {
@@ -1237,7 +1128,8 @@
             XLSX.utils.book_append_sheet(wb, ws, "請款單");
             XLSX.writeFile(wb, "Storeasy_請款單.xlsx");
         }
-        window.exportInvoiceExcel = exportInvoiceExcel;
+
+        renderStorageTable();
     </script>
 </body>
 </html>
