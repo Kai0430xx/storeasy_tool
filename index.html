@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全自動特徵辨識版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全自動欄位特徵智慧辨識版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">店長只需選擇檔案與分店名稱，系統會自動辨識英數字倉位編號、尺寸與各方案金額，免改檔案、一秒完成！</p>
+                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識 Excel 中的倉位編號、尺寸、材積、單價與各折扣方案（95折、9折、85折、8折、季繳、半年繳、年繳），零手動、秒完成！</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -60,7 +60,7 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button onclick="handlePatternSmartUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入資料</button>
+                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入資料</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -79,13 +79,13 @@
                                     <tr class="bg-slate-50 border-b text-slate-600 text-sm">
                                         <th class="p-3">據點名稱</th>
                                         <th class="p-3">倉位編號</th>
-                                        <th class="p-3">尺寸規格</th>
+                                        <th class="p-3">尺寸 (W*L*H)</th>
                                         <th class="p-3">材積 (呎)</th>
-                                        <th class="p-3">月繳原價</th>
-                                        <th class="p-3">季繳</th>
-                                        <th class="p-3">半年繳</th>
-                                        <th class="p-3">年繳(85折)</th>
-                                        <th class="p-3">年繳(8折)</th>
+                                        <th class="p-3">月繳/原價</th>
+                                        <th class="p-3">季繳/95折</th>
+                                        <th class="p-3">半年繳/9折</th>
+                                        <th class="p-3">年繳/85折</th>
+                                        <th class="p-3">年繳/8折</th>
                                     </tr>
                                 </thead>
                                 <tbody id="storage-table-body" class="text-sm divide-y">
@@ -340,7 +340,7 @@
                         <table id="invoice-export-table" class="w-full text-left border-collapse mb-6 text-sm">
                             <thead>
                                 <tr class="bg-slate-900 text-white text-center">
-                                    <th class="p-2.5 border border-slate-700">倉位尺寸</th>
+                                    <th class="p-2.5 border border-slate-700">倉位編號</th>
                                     <th class="p-2.5 border border-slate-700">材積</th>
                                     <th class="p-2.5 border border-slate-700 text-right">原價租金</th>
                                     <th class="p-2.5 border border-slate-700 text-right">優惠租金</th>
@@ -411,8 +411,8 @@
             XLSX.writeFile(wb, filename);
         }
 
-        // 全自動特徵辨識引擎 (Data-Driven Pattern Matching)
-        function handlePatternSmartUpload() {
+        // 精準關鍵字比對的智慧上傳引擎
+        function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
                 alert('請先選擇一個 Excel 檔案！');
@@ -435,27 +435,27 @@
 
                 let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
 
-                // 步驟 1：掃描表頭文字以鎖定各欄位
+                // 步驟 1：尋找表頭列並對應各欄位索引
                 let headerRowIdx = 0;
                 let colMap = { code: -1, size: -1, unit: -1, p1: -1, p3: -1, p6: -1, p12_85: -1, p12_80: -1 };
 
                 for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
                     let row = jsonSheet[r];
                     if (!row) continue;
-                    let matchFound = false;
+                    let foundCount = 0;
                     for (let c = 0; c < row.length; c++) {
                         let text = String(row[c] || '').trim();
-                        if (/編號|代號|倉位/.test(text) && !/尺寸|規格/.test(text)) { colMap.code = c; matchFound = true; }
-                        else if (/尺寸|規格/.test(text)) { colMap.size = c; matchFound = true; }
-                        else if (/材積|立方英尺|單位/.test(text)) { colMap.unit = c; matchFound = true; }
-                        else if (/月繳|原價/.test(text) && !/季繳|半年|年繳|折/.test(text)) { colMap.p1 = c; matchFound = true; }
-                        else if (/季繳/.test(text)) { colMap.p3 = c; matchFound = true; }
-                        else if (/半年繳/.test(name = text)) { colMap.p6 = c; matchFound = true; }
-                        else if (/85折|年繳.*85/.test(text)) { colMap.p12_85 = c; matchFound = true; }
-                        else if (/80折|8折|年繳.*80/.test(text)) { colMap.p12_80 = c; matchFound = true; }
-                        else if (/年繳/.test(text) && colMap.p12_85 === -1) { colMap.p12_85 = c; matchFound = true; }
+                        if (/倉位|編號|代號/.test(text)) { colMap.code = c; foundCount++; }
+                        else if (/尺寸|規格|w\*l\*h/i.test(text)) { colMap.size = c; foundCount++; }
+                        else if (/材積|立方英尺|單位/.test(text)) { colMap.unit = c; foundCount++; }
+                        else if (/月繳|原價|單價/.test(text) && !/季繳|半年|年繳|折/.test(text)) { colMap.p1 = c; foundCount++; }
+                        else if (/季繳|95折/.test(text)) { colMap.p3 = c; foundCount++; }
+                        else if (/半年繳|9折/.test(text)) { colMap.p6 = c; foundCount++; }
+                        else if (/85折|年繳.*85/.test(text)) { colMap.p12_85 = c; foundCount++; }
+                        else if (/80折|8折|年繳.*80/.test(text)) { colMap.p12_80 = c; foundCount++; }
+                        else if (/年繳/.test(text) && colMap.p12_85 === -1) { colMap.p12_85 = c; foundCount++; }
                     }
-                    if (matchFound) {
+                    if (foundCount >= 2) {
                         headerRowIdx = r;
                         break;
                     }
@@ -469,63 +469,45 @@
                     let code = '';
                     let size = '';
                     let unit = '-';
-                    let prices = [];
+                    let price1 = 0, price3 = 0, price6 = 0, price12_85 = 0, price12_80 = 0;
 
-                    // 步驟 2：利用特徵辨識來智慧分類每一個儲存格
+                    // 若有對應到欄位則直接讀取
+                    if (colMap.code !== -1 && row[colMap.code] !== undefined) code = String(row[colMap.code]).trim();
+                    if (colMap.size !== -1 && row[colMap.size] !== undefined) size = String(row[colMap.size]).trim();
+                    if (colMap.unit !== -1 && row[colMap.unit] !== undefined) unit = String(row[colMap.unit]).trim();
+                    if (colMap.p1 !== -1 && !isNaN(Number(row[colMap.p1]))) price1 = Number(row[colMap.p1]);
+                    if (colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3]))) price3 = Number(row[colMap.p3]);
+                    if (colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6]))) price6 = Number(row[colMap.p6]);
+                    if (colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85]))) price12_85 = Number(row[colMap.p12_85]);
+                    if (colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80]))) price12_80 = Number(row[colMap.p12_80]);
+
+                    // 智慧備用掃描（防止部分欄位沒對應到）
                     for (let c = 0; c < row.length; c++) {
                         let valStr = String(row[c] || '').trim();
-                        if (!valStr || valStr === 'undefined') continue;
-
-                        // 判斷是否為倉位編號 (包含英文字母且帶數字，例如 QD335、TR023)
-                        if (!code && c === colMap.code) {
-                            code = valStr;
-                        } else if (!code && /^[A-Za-z]+\d+/.test(valStr)) {
-                            code = valStr;
-                        }
-
-                        // 判斷是否為尺寸規格 (包含乘號 '*')
-                        if (!size && c === colMap.size) {
-                            size = valStr;
-                        } else if (!size && valStr.includes('*')) {
-                            size = valStr;
-                        }
-
-                        // 判斷是否為材積/單位 (數字帶小數點，或者明確對應)
-                        if (unit === '-' && c === colMap.unit) {
-                            unit = valStr;
-                        } else if (unit === '-' && !valStr.includes('*') && !/[A-Za-z]/.test(valStr) && !isNaN(Number(valStr)) && Number(valStr) < 100) {
-                            unit = valStr;
-                        }
-
-                        // 收集數值當作價格
-                        let num = Number(valStr.replace(/[^\d.]/g, ''));
-                        if (!isNaN(num) && num > 0) {
-                            prices.push({ col: c, val: num });
-                        }
+                        if (!valStr) continue;
+                        if (!code && /^[A-Za-z]+\d+/.test(valStr)) code = valStr;
+                        if (!size && valStr.includes('*')) size = valStr;
                     }
-
-                    // 如果沒抓到編號，退而求其次抓第一欄有文字的
-                    if (!code) {
+                    if (!code) code = `R${i}`;
+                    if (!size) size = '-';
+                    if (price1 <= 0) {
+                        // 找尋行內第一個合理的數字作為月繳原價
                         for (let c = 0; c < row.length; c++) {
-                            let s = String(row[c] || '').trim();
-                            if (s && isNaN(Number(s)) && !s.includes('*')) {
-                                code = s;
+                            let num = Number(row[c]);
+                            if (!isNaN(num) && num > 10 && num < 50000) {
+                                price1 = num;
                                 break;
                             }
                         }
                     }
-                    if (!code) code = `R${i}`;
-                    if (!size) size = '-';
 
-                    // 排序價格：依據欄位順序或數值大小推導 (原價通常最高或在前面，其次季繳、半年繳、年繳)
-                    // 若有對應到明確欄位就直接對應，否則依據prices陣列順序指派
-                    let price1 = colMap.p1 !== -1 && !isNaN(Number(row[colMap.p1])) ? Number(row[colMap.p1]) : (prices[0] ? prices[0].val : 0);
-                    let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) ? Number(row[colMap.p3]) : (prices[1] ? prices[1].val : Math.round(price1 * 0.95));
-                    let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) ? Number(row[colMap.p6]) : (prices[2] ? prices[2].val : Math.round(price1 * 0.90));
-                    let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) ? Number(row[colMap.p12_85]) : (prices[3] ? prices[3].val : Math.round(price1 * 0.85));
-                    let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) ? Number(row[colMap.p12_80]) : Math.round(price1 * 0.80);
-
+                    // 自動補算未提供的折扣金額
                     if (price1 > 0) {
+                        if (price3 <= 0) price3 = Math.round(price1 * 0.95);
+                        if (price6 <= 0) price6 = Math.round(price1 * 0.90);
+                        if (price12_85 <= 0) price12_85 = Math.round(price1 * 0.85);
+                        if (price12_80 <= 0) price12_80 = Math.round(price1 * 0.80);
+
                         newItems.push({
                             branch: inputBranch,
                             code: code,
@@ -541,7 +523,7 @@
                 }
 
                 if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料，請確認該 Excel 內容。');
+                    alert('未能自動抓取到有效資料，請確認 Excel 內容格式。');
                     return;
                 }
 
@@ -591,7 +573,7 @@
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">目前尚無資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>`;
                 return;
             }
             tbody.innerHTML = filtered.map(item => `
@@ -723,6 +705,7 @@
                 const p12_80 = Number(cb.getAttribute('data-p12_80'));
                 const itemBranch = cb.getAttribute('data-branch');
 
+                // 報價單表格不顯示「單價」，直接呈現 單位(立方英尺)、尺寸、月繳、季繳、半年繳、年繳金額
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700">${unit}</td>
@@ -833,10 +816,11 @@
                 totalRentInc += incSubtotal;
                 totalDeposit += deposit;
 
+                // 請款單格式：倉位編號、材積、原價租金、優惠租金、承租月份、未稅小計、稅金、含稅小計、保證金、小計
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700 font-bold">${code}</td>
-                        <td class="p-2.5 border border-slate-700">${unit}</td>
+                        <td class="p-2.5 border border-slate-700">${unit}呎</td>
                         <td class="p-2.5 border border-slate-700 text-right">${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">${monthlyRate.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-center">${termMonths}</td>
