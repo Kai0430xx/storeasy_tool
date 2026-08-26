@@ -26,9 +26,9 @@
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料與一鍵智慧匯入</button>
-                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 正式報價單生成</button>
-                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 會計版請款單生成</button>
+                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料</button>
+                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 生成報價單</button>
+                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 生成請款單</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
                 資料已永久儲存於本機瀏覽器
@@ -38,8 +38,8 @@
         <!-- 主內容區 -->
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
-                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (報價單移除折數標示版)</div>
+                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (選單精簡與頂部標題連動版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -212,7 +212,6 @@
                             <div class="col-span-2"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
                         </div>
 
-                        <!-- 報價單表格標題已移除折數文字 -->
                         <table id="quote-export-table" class="w-full text-left border-collapse mb-6 text-sm">
                             <thead>
                                 <tr class="bg-slate-900 text-white text-center">
@@ -383,7 +382,6 @@
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let selectedQuoteItems = {}; 
-        let selectedInvoiceItems = {}; 
         let rawExcelJson = [];
 
         function switchTab(tabId) {
@@ -396,6 +394,14 @@
             const activeBtn = document.getElementById('btn-' + tabId);
             activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
             activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+
+            // 動態連動頂部標題文字
+            const titleMap = {
+                'tab-storage': '📦 倉位資料',
+                'tab-quote': '📄 生成報價單',
+                'tab-invoice': '💰 生成請款單'
+            };
+            document.getElementById('page-title').innerText = titleMap[tabId] || '營運管理工具';
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
@@ -711,29 +717,9 @@
             summaryEl.innerHTML = html;
         }
 
-        // --- 會計版請款單設定 (同步報價單勾選項目) ---
+        // --- 會計版請款單設定 ---
         function initInvoiceTab() {
-            const tbody = document.getElementById('invoice-selectable-body');
-            const keys = Object.keys(selectedQuoteItems);
-            
-            if (keys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未在報價單頁面勾選項目</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = keys.map((idx) => {
-                let item = selectedQuoteItems[idx];
-                let termName = item.term === '1' ? '月繳' : item.term === '3' ? '季繳' : item.term === '6' ? '半年繳' : item.term === '12' ? '年繳(85折)' : item.term === '12_80' ? '年繳(8折)' : '不列入試算';
-                return `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-2 text-center">✅</td>
-                        <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
-                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-2 text-emerald-600 font-semibold">方案: ${termName}</td>
-                    </tr>
-                `;
-            }).join('');
+            // 請款單直接沿用報價單已勾選的項目
         }
 
         function generateQuote() {
@@ -806,8 +792,6 @@
 
             tbody.innerHTML = html;
 
-            document.getElementById('v-q-calc-mode').innerText = '多據點綜合加總';
-            document.getElementById('v-q-term-text').innerText = '各項目獨立方案';
             document.getElementById('v-q-rent').innerText = targetRent.toLocaleString();
             document.getElementById('v-q-deposit').innerText = targetDeposit.toLocaleString();
             document.getElementById('v-q-fee').innerText = targetFee.toLocaleString();
