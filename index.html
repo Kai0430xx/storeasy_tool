@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全自動智慧辨識版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (按鈕修復與精準智慧版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">店長只需選擇檔案與分店名稱，系統自動看懂表頭並精準分類匯入！</p>
+                        <p class="text-sm text-slate-500 mb-4">店長只需選擇檔案與分店名稱，系統自動看懂表頭並精準對應編號、尺寸、材積、原價與各方案金額！</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -60,7 +60,7 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button onclick="handleOneClickSmartUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入資料</button>
+                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入資料</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -411,8 +411,8 @@
             XLSX.writeFile(wb, filename);
         }
 
-        // 全自動字對字智慧解析 Excel 上傳
-        function handleOneClickSmartUpload() {
+        // 徹底修復且精準的「一鍵智慧自動辨識」引擎
+        function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
                 alert('請先選擇一個 Excel 檔案！');
@@ -435,27 +435,27 @@
 
                 let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
 
-                // 搜尋表頭列，精準以關鍵字字對字辨識欄位
+                // 搜尋表頭列，精準以關鍵字辨識各欄位索引
                 let headerRowIdx = 0;
                 let colMap = { code: -1, size: -1, unit: -1, p1: -1, p3: -1, p6: -1, p12_85: -1, p12_80: -1 };
 
                 for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
                     let row = jsonSheet[r];
                     if (!row) continue;
-                    let found = false;
+                    let foundAny = false;
                     for (let c = 0; c < row.length; c++) {
                         let name = String(row[c] || '').trim();
-                        if (/編號|倉位代號/.test(name)) { colMap.code = c; found = true; }
-                        else if (/尺寸|規格/.test(name)) { colMap.size = c; found = true; }
-                        else if (/單位|材積|立方英尺/.test(name)) { colMap.unit = c; found = true; }
-                        else if (/月繳|原價/.test(name) && !/季繳|半年|年繳/.test(name)) { colMap.p1 = c; found = true; }
-                        else if (/季繳/.test(name)) { colMap.p3 = c; found = true; }
-                        else if (/半年繳/.test(name)) { colMap.p6 = c; found = true; }
-                        else if (/85折|年繳.*85/.test(name)) { colMap.p12_85 = c; found = true; }
-                        else if (/80折|8折|年繳.*80/.test(name)) { colMap.p12_80 = c; found = true; }
-                        else if (/年繳/.test(name) && colMap.p12_85 === -1) { colMap.p12_85 = c; found = true; }
+                        if (/編號|倉位代號/.test(name)) { colMap.code = c; foundAny = true; }
+                        else if (/尺寸|規格/.test(name)) { colMap.size = c; foundAny = true; }
+                        else if (/單位|材積|立方英尺/.test(name)) { colMap.unit = c; foundAny = true; }
+                        else if (/月繳|原價/.test(name) && !/季繳|半年|年繳/.test(name)) { colMap.p1 = c; foundAny = true; }
+                        else if (/季繳/.test(name)) { colMap.p3 = c; foundAny = true; }
+                        else if (/半年繳/.test(name)) { colMap.p6 = c; foundAny = true; }
+                        else if (/85折|年繳.*85/.test(name)) { colMap.p12_85 = c; foundAny = true; }
+                        else if (/80折|8折|年繳.*80/.test(name)) { colMap.p12_80 = c; foundAny = true; }
+                        else if (/年繳/.test(name) && colMap.p12_85 === -1) { colMap.p12_85 = c; foundAny = true; }
                     }
-                    if (found) {
+                    if (foundAny) {
                         headerRowIdx = r;
                         break;
                     }
@@ -466,27 +466,27 @@
                     let row = jsonSheet[i];
                     if (!row || row.length === 0) continue;
 
-                    let code = colMap.code !== -1 && row[colMap.code] !== undefined ? String(row[colMap.code]).trim() : `P${i}`;
-                    let size = colMap.size !== -1 && row[colMap.size] !== undefined ? String(row[colMap.size]).trim() : '-';
+                    let code = colMap.code !== -1 && row[colMap.code] !== undefined ? String(row[colMap.code]).trim() : '';
+                    let size = colMap.size !== -1 && row[colMap.size] !== undefined ? String(row[colMap.size]).trim() : '';
                     let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]).trim() : '-';
                     let price1 = colMap.p1 !== -1 ? Number(row[colMap.p1]) : NaN;
 
-                    // 若未找到原價但整行有數字，嘗試找第一個合適的數字
+                    // 若未直接抓到，嘗試智慧掃描整行找出合適的數值
                     if (isNaN(price1) || price1 <= 0) {
                         for (let c = 0; c < row.length; c++) {
                             let val = Number(row[c]);
-                            if (!isNaN(val) && val > 100 && val < 50000) {
+                            if (!isNaN(val) && val > 10 && val < 50000 && c !== colMap.code && c !== colMap.size && c !== colMap.unit) {
                                 price1 = val;
                                 break;
                             }
                         }
                     }
 
-                    if (!isNaN(price1) && price1 > 0) {
+                    if (code && !isNaN(price1) && price1 > 0) {
                         let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) ? Number(row[colMap.p3]) : Math.round(price1 * 0.95);
                         let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) ? Number(row[colMap.p6]) : Math.round(price1 * 0.90);
                         let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) ? Number(row[colMap.p12_85]) : Math.round(price1 * 0.85);
-                        let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) ? Number(row[p12_80]) : Math.round(price1 * 0.80);
+                        let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) ? Number(row[colMap.p12_80]) : Math.round(price1 * 0.80);
 
                         newItems.push({
                             branch: inputBranch,
@@ -503,7 +503,7 @@
                 }
 
                 if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料，請確認 Excel 表頭是否有明確寫出「編號」、「尺寸」、「材積」、「月繳/原價」。');
+                    alert('未能自動抓取到有效資料，請確認該 Excel 表頭是否有明確寫出「編號」、「尺寸」、「材積」、「月繳/原價」。');
                     return;
                 }
 
@@ -601,7 +601,7 @@
                         <tr class="hover:bg-slate-50 border-b">
                             <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-code="${item.code}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12_85="${item.price12_85}" data-p12_80="${item.price12_80}"></td>
                             <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                            <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}呎)</td>
+                            <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
                             <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
                             <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
                         </tr>
