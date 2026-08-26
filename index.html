@@ -92,7 +92,7 @@
     <main>
         <header>
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (最終完美版)</div>
+            <div class="version">系統版本：2026.09 (極致穩定版)</div>
         </header>
 
         <div class="content-body">
@@ -359,16 +359,16 @@
                     <table>
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">倉位尺寸<br>(寬*深*高 m)</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">材積</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">原價租金</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">優惠租金</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">承租月份</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">未稅小計</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">稅金</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">含稅小計</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">保證金</th>
-                                <th style="border: 1px solid #334155; text-align: right; color: #0f172a !important; font-weight: bold; padding: 10px;">小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸<br>(寬*深*高 m)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">材積</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">原價租金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">優惠租金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">承租月份</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">未稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">稅金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">含稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">保證金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">小計</th>
                             </tr>
                         </thead>
                         <tbody id="v-i-items" style="text-align: center;">
@@ -1081,7 +1081,7 @@
                 ["租金總計:", document.getElementById('v-q-rent').innerText],
                 ["保證金總計:", document.getElementById('v-q-deposit').innerText],
                 ["保險文書處理費總計:", document.getElementById('v-q-fee').innerText],
-                ["合計:", document.getElementById('v-q-total'].innerText]
+                ["合計:", document.getElementById('v-q-total').innerText]
             );
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -1100,9 +1100,9 @@
             let aoa = [
                 ["收多易股份有限公司 - 請款單"],
                 ["日期:", document.getElementById('v-i-date').innerText, "客戶名稱:", document.getElementById('v-i-client').innerText],
-                ["店長:", document.getElementById('v-i-manager'].innerText, "客戶電話:", document.getElementById('v-i-client-phone').innerText],
+                ["店長:", document.getElementById('v-i-manager'].innerText, "客戶電話:", document.getElementById('v-i-client-phone'].innerText],
                 ["分店名稱:", document.getElementById('v-i-branch').innerText, "公司抬頭:", document.getElementById('v-i-company'].innerText],
-                ["聯繫電話:", document.getElementById('v-i-tel').innerText, "統一編號:", document.getElementById('v-i-taxid'].innerText],
+                ["聯繫電話:", document.getElementById('v-i-tel'].innerText, "統一編號:", document.getElementById('v-i-taxid'].innerText],
                 ["分店地址:", document.getElementById('v-i-address'].innerText],
                 [],
                 ["倉位尺寸(寬*深*高 m)", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "小計"]
