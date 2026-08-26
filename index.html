@@ -26,7 +26,7 @@
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料與多據點管理</button>
+                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料與智慧上傳</button>
                 <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 正式報價單生成</button>
                 <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 會計版請款單生成</button>
             </nav>
@@ -38,8 +38,8 @@
         <!-- 主內容區 -->
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
-                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與多據點管理</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (據點聯動與持久化版)</div>
+                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與智慧上傳</h2>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全自動智慧辨識與跨據點合併版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -47,12 +47,12 @@
                 <!-- 1. 倉位資料與多據點管理頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">上傳後請指定分店名稱，系統會自動儲存至本機，重新整理也不會遺失。</p>
+                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 智慧上傳各店空倉表 Excel (自動辨識欄位)</h3>
+                        <p class="text-sm text-slate-500 mb-4">系統會自動抓取分店名稱與各方案價格，免手動對應！</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium mb-1">分店名稱</label>
+                                <label class="block text-sm font-medium mb-1">分店名稱 (若Excel未寫可在此指定)</label>
                                 <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店" placeholder="例如: 士林店、土城店">
                             </div>
                             <div class="md:col-span-2">
@@ -60,41 +60,7 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button onclick="handleExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">上傳並讀取表頭</button>
-                    </div>
-
-                    <!-- 欄位對應設定區 -->
-                    <div id="column-mapping-box" class="bg-amber-50 p-6 rounded-xl shadow-sm border border-amber-200 hidden space-y-4">
-                        <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">單位 / 材積欄位</label>
-                                <select id="map-unit" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
-                            </div>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">倉位尺寸 / 規格欄位</label>
-                                <select id="map-size" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
-                            </div>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-900 font-bold">⭐ 月繳/月 (原價) 欄位</label>
-                                <select id="map-price-1" class="w-full border rounded-lg px-3 py-2 bg-white font-bold text-amber-700"></select>
-                            </div>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">季繳/月 (95折) 欄位 (選填)</label>
-                                <select id="map-price-3" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
-                            </div>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">半年繳/月 (9折) 欄位 (選填)</label>
-                                <select id="map-price-6" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
-                            </div>
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">年繳/月 (85折/8折) 欄位 (選填)</label>
-                                <select id="map-price-12" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
-                            </div>
-                        </div>
-                        <div class="pt-2">
-                            <button onclick="confirmAndImportExcel()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">確認對應並加入資料庫</button>
-                        </div>
+                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -131,14 +97,8 @@
                 <!-- 2. 生成正式報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與據點選擇</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與跨據點勾選</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">選擇要報價的分店據點</label>
-                                <select id="quote-select-branch" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
-                                    <option value="">-- 請先選擇分店據點 --</option>
-                                </select>
-                            </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
                                 <input type="text" id="q-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店">
@@ -151,9 +111,13 @@
                                 <label class="block text-sm font-medium mb-1">聯繫電話</label>
                                 <input type="text" id="q-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="02-2882-8008">
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">報價日期</label>
+                                <input type="date" id="quote-date" class="w-full border rounded-lg px-3 py-2 text-sm">
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium mb-1">分店地址</label>
                                 <input type="text" id="q-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
@@ -166,9 +130,6 @@
                                 <label class="block text-sm font-medium mb-1">客戶聯繫電話</label>
                                 <input type="text" id="q-client-tel" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客電">
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium mb-1">公司抬頭</label>
                                 <input type="text" id="q-company" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="抬頭">
@@ -177,25 +138,22 @@
                                 <label class="block text-sm font-medium mb-1">統一編號</label>
                                 <input type="text" id="q-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">報價日期</label>
-                                <input type="date" id="quote-date" class="w-full border rounded-lg px-3 py-2 text-sm">
-                            </div>
                         </div>
 
-                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目：</h4>
-                        <div class="max-h-72 overflow-y-auto border rounded-lg p-2 mb-4">
+                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目（支援跨據點複選與合併計算）：</h4>
+                        <div class="max-h-80 overflow-y-auto border rounded-lg p-2 mb-4">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-slate-50 sticky top-0">
                                     <tr>
                                         <th class="p-2 w-10">選取</th>
+                                        <th class="p-2">據點</th>
                                         <th class="p-2">尺寸 / 材積</th>
                                         <th class="p-2">月繳原價</th>
                                         <th class="p-2">年繳優惠價</th>
                                     </tr>
                                 </thead>
                                 <tbody id="quote-selectable-body">
-                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -306,14 +264,8 @@
                 <!-- 3. 生成請款單頁籤 -->
                 <div id="tab-invoice" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定與據點選擇</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">選擇要請款的分店據點</label>
-                                <select id="inv-select-branch" onchange="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
-                                    <option value="">-- 請先選擇分店據點 --</option>
-                                </select>
-                            </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
                                 <input type="text" id="i-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店">
@@ -326,9 +278,13 @@
                                 <label class="block text-sm font-medium mb-1">聯繫電話</label>
                                 <input type="text" id="i-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="02-2882-8008">
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">請款日期</label>
+                                <input type="date" id="inv-date" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium mb-1">分店地址</label>
                                 <input type="text" id="i-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
@@ -341,9 +297,6 @@
                                 <label class="block text-sm font-medium mb-1">客戶聯繫電話</label>
                                 <input type="text" id="i-client-phone" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="客電">
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium mb-1">公司抬頭</label>
                                 <input type="text" id="i-company" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="抬頭">
@@ -352,27 +305,6 @@
                                 <label class="block text-sm font-medium mb-1">統一編號</label>
                                 <input type="text" id="i-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">請款日期</label>
-                                <input type="date" id="inv-date" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
-                            </div>
-                        </div>
-
-                        <h4 class="font-bold text-sm mb-2 text-slate-600">請款單品項勾選：</h4>
-                        <div class="max-h-72 overflow-y-auto border rounded-lg p-2 mb-4">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 sticky top-0">
-                                    <tr>
-                                        <th class="p-2 w-10">選取</th>
-                                        <th class="p-2">尺寸 / 材積</th>
-                                        <th class="p-2">月繳原價</th>
-                                        <th class="p-2">年繳優惠價</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="invoice-selectable-body">
-                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
-                                </tbody>
-                            </table>
                         </div>
 
                         <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用會計版正式請款單</button>
@@ -418,7 +350,7 @@
                                 </tr>
                             </thead>
                             <tbody id="v-i-items" class="divide-y text-center">
-                                <tr><td colspan="10" class="p-4 text-center text-slate-400">請先於請款單頁面勾選項目與繳費方式</td></tr>
+                                <tr><td colspan="10" class="p-4 text-center text-slate-400">請先於報價單頁面勾選項目與繳費方式</td></tr>
                             </tbody>
                         </table>
 
@@ -467,8 +399,6 @@
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
-            } else if (tabId === 'tab-invoice') {
-                initInvoiceTab();
             }
         }
 
@@ -478,7 +408,8 @@
             XLSX.writeFile(wb, filename);
         }
 
-        function handleExcelUpload() {
+        // 智慧自動辨識 Excel 欄位並匯入
+        function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
                 alert('請先選擇一個 Excel 檔案！');
@@ -492,100 +423,89 @@
                 const workbook = XLSX.read(data, {type: 'array'});
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                rawExcelJson = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
-                if (rawExcelJson.length < 2) {
+                if (jsonSheet.length < 2) {
                     alert('Excel 檔案內容不足！');
                     return;
                 }
 
+                let inputBranch = document.getElementById('upload-branch-name').value.trim() || '士林店';
+
+                // 自動掃描表頭列
                 let headerRowIdx = 0;
-                let maxCols = 0;
-                for (let r = 0; r < Math.min(rawExcelJson.length, 5); r++) {
-                    let nonNullCount = rawExcelJson[r].filter(cell => cell !== undefined && cell !== '').length;
-                    if (nonNullCount > maxCols) {
-                        maxCols = nonNullCount;
+                let colMap = { unit: -1, size: -1, p1: -1, p3: -1, p6: -1, p12: -1 };
+
+                for (let r = 0; r < Math.min(jsonSheet.length, 5); r++) {
+                    let row = jsonSheet[r];
+                    if (!row) continue;
+                    for (let c = 0; c < row.length; c++) {
+                        let name = String(row[c] || '').trim();
+                        if (/單位|材積|立方英尺/.test(name)) colMap.unit = c;
+                        if (/尺寸|規格|倉位/.test(name)) colMap.size = c;
+                        if (/月繳|原價|租金/.test(name) && !/季繳|半年|年繳/.test(name)) colMap.p1 = c;
+                        if (/季繳/.test(name)) colMap.p3 = c;
+                        if (/半年繳/.test(name)) colMap.p6 = c;
+                        if (/年繳/.test(name)) colMap.p12 = c;
+                    }
+                    if (colMap.p1 !== -1) {
                         headerRowIdx = r;
+                        break;
                     }
                 }
 
-                let headerRow = rawExcelJson[headerRowIdx] || [];
-                let optionsHtml = headerRow.map((colName, idx) => `<option value="${idx}">第 ${idx + 1} 欄: ${colName || '(空白)'}</option>`).join('');
-                
-                ['map-unit', 'map-size', 'map-price-1', 'map-price-3', 'map-price-6', 'map-price-12'].forEach(id => {
-                    document.getElementById(id).innerHTML = `<option value="-1">-- 無 --</option>` + optionsHtml;
-                });
+                // 若找不到精準表頭，預設預設欄位
+                if (colMap.p1 === -1) {
+                    colMap = { unit: 0, size: 1, p1: 2, p3: 3, p6: 4, p12: 5 };
+                    headerRowIdx = 0;
+                }
 
-                headerRow.forEach((colName, idx) => {
-                    let name = String(colName || '');
-                    if (/單位|材積|立方英尺/.test(name)) document.getElementById('map-unit').value = idx;
-                    if (/尺寸|規格|倉位/.test(name)) document.getElementById('map-size').value = idx;
-                    if (/月繳|原價|租金/.test(name) && !/季繳|半年|年繳/.test(name)) document.getElementById('map-price-1').value = idx;
-                    if (/季繳/.test(name)) document.getElementById('map-price-3').value = idx;
-                    if (/半年繳/.test(name)) document.getElementById('map-price-6').value = idx;
-                    if (/年繳/.test(name)) document.getElementById('map-price-12').value = idx;
-                });
+                let newItems = [];
+                for (let i = headerRowIdx + 1; i < jsonSheet.length; i++) {
+                    let row = jsonSheet[i];
+                    if (!row || row.length === 0) continue;
 
-                document.getElementById('column-mapping-box').classList.remove('hidden');
-                alert('Excel 讀取成功！請設定各方案欄位對應。');
+                    let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]) : '-';
+                    let size = colMap.size !== -1 && row[colMap.size] !== undefined ? String(row[colMap.size]) : '';
+                    let price1 = colMap.p1 !== -1 ? Number(row[colMap.p1]) : NaN;
+
+                    if (size && size !== 'undefined' && !isNaN(price1) && price1 > 0) {
+                        let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) ? Number(row[colMap.p3]) : Math.round(price1 * 0.95);
+                        let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) ? Number(row[colMap.p6]) : Math.round(price1 * 0.90);
+                        let price12 = colMap.p12 !== -1 && !isNaN(Number(row[colMap.p12])) ? Number(row[colMap.p12]) : Math.round(price1 * 0.85);
+
+                        newItems.push({
+                            branch: inputBranch,
+                            unit: unit.trim(),
+                            size: size.trim(),
+                            price1: price1,
+                            price3: price3,
+                            price6: price6,
+                            price12: price12
+                        });
+                    }
+                }
+
+                if (newItems.length === 0) {
+                    alert('未能自動抓取到有效資料，請確認 Excel 格式。');
+                    return;
+                }
+
+                // 檢查是否重複據點並詢問覆蓋
+                let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
+                if (existingBranchIndex !== -1) {
+                    let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
+                    if (choice) {
+                        storageData = storageData.filter(item => item.branch !== inputBranch);
+                    }
+                }
+
+                storageData = storageData.concat(newItems);
+                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                renderStorageTable();
+                alert('成功智慧匯入 ' + newItems.length + ' 筆倉位資料！');
             };
             reader.readAsArrayBuffer(file);
-        }
-
-        function confirmAndImportExcel() {
-            let inputBranch = document.getElementById('upload-branch-name').value.trim() || '未分類分店';
-            let uIdx = Number(document.getElementById('map-unit').value);
-            let sIdx = Number(document.getElementById('map-size').value);
-            let p1Idx = Number(document.getElementById('map-price-1').value);
-            let p3Idx = Number(document.getElementById('map-price-3').value);
-            let p6Idx = Number(document.getElementById('map-price-6').value);
-            let p12Idx = Number(document.getElementById('map-price-12').value);
-
-            let newItems = [];
-            for (let i = 1; i < rawExcelJson.length; i++) {
-                let row = rawExcelJson[i];
-                if (!row || row.length === 0) continue;
-
-                let unit = uIdx !== -1 && row[uIdx] !== undefined ? String(row[uIdx]) : '-';
-                let size = sIdx !== -1 && row[sIdx] !== undefined ? String(row[sIdx]) : '';
-                let price1 = p1Idx !== -1 ? Number(row[p1Idx]) : NaN;
-
-                if (size && size !== 'undefined' && !isNaN(price1) && price1 > 0) {
-                    let price3 = p3Idx !== -1 && !isNaN(Number(row[p3Idx])) ? Number(row[p3Idx]) : Math.round(price1 * 0.95);
-                    let price6 = p6Idx !== -1 && !isNaN(Number(row[p6Idx])) ? Number(row[p6Idx]) : Math.round(price1 * 0.90);
-                    let price12 = p12Idx !== -1 && !isNaN(Number(row[p12Idx])) ? Number(row[p12Idx]) : Math.round(price1 * 0.85);
-
-                    newItems.push({
-                        branch: inputBranch,
-                        unit: unit.trim(),
-                        size: size.trim(),
-                        price1: price1,
-                        price3: price3,
-                        price6: price6,
-                        price12: price12
-                    });
-                }
-            }
-
-            if (newItems.length === 0) {
-                alert('未能抓取到有效資料！');
-                return;
-            }
-
-            let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
-            if (existingBranchIndex !== -1) {
-                let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留並合併。`);
-                if (choice) {
-                    storageData = storageData.filter(item => item.branch !== inputBranch);
-                }
-            }
-
-            storageData = storageData.concat(newItems);
-            localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-            updateBranchFilter();
-            renderStorageTable();
-            document.getElementById('column-mapping-box').classList.add('hidden');
-            alert('成功匯入 ' + newItems.length + ' 筆倉位資料！');
         }
 
         function updateBranchFilter() {
@@ -636,76 +556,35 @@
             document.getElementById('quote-date').valueAsDate = new Date();
             document.getElementById('inv-date').valueAsDate = new Date();
             
-            const branches = [...new Set(storageData.map(item => item.branch))];
-            let optHtml = '<option value="">-- 請先選擇分店據點 --</option>';
-            branches.forEach(b => {
-                optHtml += `<option value="${b}">${b}</option>`;
-            });
-            document.getElementById('quote-select-branch').innerHTML = optHtml;
-            document.getElementById('invoice-select-branch').innerHTML = optHtml;
-            renderQuoteSelectableItems();
-            renderInvoiceSelectableItems();
-        }
-
-        function initInvoiceTab() {
-            initQuoteTab();
-        }
-
-        function renderQuoteSelectableItems() {
-            const selectedBranch = document.getElementById('quote-select-branch').value;
             const tbody = document.getElementById('quote-selectable-body');
-
-            if (!selectedBranch) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
+            if (storageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
                 return;
             }
 
-            let filtered = storageData.filter(item => item.branch === selectedBranch);
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">該據點尚無倉位資料</td></tr>`;
-                return;
-            }
+            // 依據點群組顯示所有已上傳的倉位供跨據點勾選
+            let html = '';
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            
+            branches.forEach(branch => {
+                html += `<tr class="bg-slate-100 font-bold text-slate-700"><td colspan="5" class="p-2">📍 ${branch} 分店</td></tr>`;
+                let branchItems = storageData.filter(item => item.branch === branch);
+                branchItems.forEach((item) => {
+                    let globalIndex = storageData.indexOf(item);
+                    html += `
+                        <tr class="hover:bg-slate-50 border-b">
+                            <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
+                            <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
+                            <td class="p-2 font-medium">${item.size} (${item.unit}呎)</td>
+                            <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
+                            <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+            });
 
-            tbody.innerHTML = filtered.map((item, index) => {
-                let globalIndex = storageData.indexOf(item);
-                return `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
-                        <td class="p-2 font-medium">${item.size} (${item.unit}呎)</td>
-                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = html;
             updateCalcTargetOptions();
-        }
-
-        function renderInvoiceSelectableItems() {
-            const selectedBranch = document.getElementById('invoice-select-branch').value;
-            const tbody = document.getElementById('invoice-selectable-body');
-
-            if (!selectedBranch) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
-                return;
-            }
-
-            let filtered = storageData.filter(item => item.branch === selectedBranch);
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">該據點尚無倉位資料</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filtered.map((item, index) => {
-                let globalIndex = storageData.indexOf(item);
-                return `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-2"><input type="checkbox" class="inv-checkbox w-4 h-4 text-amber-600 rounded" data-index="${globalIndex}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
-                        <td class="p-2 font-medium">${item.size} (${item.unit}呎)</td>
-                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
         }
 
         function updateCalcTargetOptions() {
@@ -773,7 +652,7 @@
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700">${unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium">${size}</td>
+                        <td class="p-2.5 border border-slate-700 font-medium">[${itemBranch}] ${size}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
@@ -828,7 +707,7 @@
             const taxid = document.getElementById('i-taxid').value || '---';
             const date = document.getElementById('inv-date').value;
             const calcTerm = Number(document.getElementById('q-calc-term').value);
-            const checkboxes = document.querySelectorAll('.inv-checkbox:checked');
+            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
 
             document.getElementById('v-i-date').innerText = date;
             document.getElementById('v-i-client').innerText = client;
@@ -842,7 +721,7 @@
 
             const tbody = document.getElementById('v-i-items');
             if (checkboxes.length === 0) {
-                alert('請至少於請款單勾選一個項目！');
+                alert('請先於報價單頁面勾選項目！');
                 return;
             }
 
@@ -879,7 +758,7 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">${size}</td>
+                        <td class="p-2.5 border border-slate-700 font-bold">[${itemBranch}] ${size}</td>
                         <td class="p-2.5 border border-slate-700">${unit}呎</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${monthlyRate.toLocaleString()}</td>
