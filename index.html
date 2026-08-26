@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
+    <!-- SheetJS 用於解析 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -1068,261 +1068,75 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 🏆 專業精緻美化版 Excel 匯出：具備大標題、灰底表頭、精準欄寬與全表格黑線格線
+        // 🏆 終極精準 HTML 匯出法：強制內嵌 CSS 框線與背景色，完美對齊網頁預覽
         function exportQuoteExcel() {
-            const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) {
-                alert('目前尚無報價單內容可匯出！');
+            const previewEl = document.getElementById('quote-preview');
+            if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
+                alert('目前尚無生成的報價單內容可供匯出！');
                 return;
             }
 
-            const qDate = document.getElementById('v-q-date').innerText;
-            const qClient = document.getElementById('v-q-client').innerText;
-            const qManager = document.getElementById('v-q-manager').innerText;
-            const qClientPhone = document.getElementById('v-q-client-phone').innerText;
-            const qBranch = document.getElementById('v-q-branch').innerText;
-            const qCompany = document.getElementById('v-q-company').innerText;
-            const qTel = document.getElementById('v-q-tel').innerText;
-            const qTaxid = document.getElementById('v-q-taxid').innerText;
-            const qAddress = document.getElementById('v-q-address').innerText;
-            const qRent = document.getElementById('v-q-rent').innerText;
-            const qDeposit = document.getElementById('v-q-deposit').innerText;
-            const qFee = document.getElementById('v-q-fee').innerText;
-            const qTotal = document.getElementById('v-q-total').innerText;
+            let htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="utf-8"><style>
+                    body { font-family: sans-serif; background-color: #ffffff; padding: 20px; }
+                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; }
+                    .preview-info { background-color: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-size: 10pt; }
+                    .summary-box { background-color: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-size: 10pt; }
+                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; line-height: 1.4; margin-bottom: 20px; }
+                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-bottom: 20px; }
+                    th, td { border: 1px solid #000000 !important; padding: 10px; vertical-align: middle; }
+                    th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                    .num { text-align: right; }
+                    .center { text-align: center; }
+                </style></head>
+                <body>
+                    ${previewEl.innerHTML}
+                </body>
+                </html>
+            `;
 
-            let aoa = [
-                ["收多易迷你倉庫", "", "", "", "", "報價有效期限 7 天"],
-                ["Storeasy Storage Solution", "", "", "", "", "報 價 單"],
-                [""],
-                ["日期：", qDate, "", "客戶名稱：", qClient],
-                ["店長：", qManager, "", "客戶電話：", qClientPhone],
-                ["分店名稱：", qBranch, "", "公司抬頭：", qCompany],
-                ["聯繫電話：", qTel, "", "統一編號：", qTaxid],
-                ["分店地址：", qAddress, "", "", ""],
-                [""],
-                ["單位(材)", "倉位尺寸(寬*深*高 m)", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
-            ];
-
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                let term = item.term || '12';
-                let selectedMonthlyRate = item.price1;
-                if (term === '3') selectedMonthlyRate = item.price3;
-                else if (term === '6') selectedMonthlyRate = item.price6;
-                else if (term === '12') selectedMonthlyRate = item.price12_85;
-                else if (term === '12_80') selectedMonthlyRate = item.price12_80;
-
-                let noteStr = item.extraNote ? ` (${item.extraNote})` : '';
-
-                aoa.push([
-                    item.unit,
-                    `[${item.branch}] ${item.size}${noteStr}`,
-                    `NT$ ${item.price1.toLocaleString()}`,
-                    `NT$ ${item.price3.toLocaleString()}`,
-                    `NT$ ${item.price6.toLocaleString()}`,
-                    `NT$ ${selectedMonthlyRate.toLocaleString()}`
-                ]);
-            });
-
-            aoa.push(
-                [""],
-                ["費用試算表 (此試算不含額外優惠)"],
-                ["租金總計 (NT$)：", "", "", "", "", `NT$ ${qRent}`],
-                ["保證金總計 (NT$)：", "", "", "", "", `NT$ ${qDeposit}`],
-                ["保險文書處理費總計 (NT$)：", "", "", "", "", `NT$ ${qFee}`],
-                ["合計 (NT$)：", "", "", "", "", `NT$ ${qTotal}`],
-                [""],
-                ["匯款資訊："],
-                ["戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________"],
-                ["備註："],
-                ["1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。"],
-                ["2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。"],
-                ["3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。"],
-                ["4. 付款方式: 轉帳、即期支票。"],
-                ["5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。"],
-                [""],
-                ["THANK YOU FOR YOUR BUSINESS!"]
-            );
-
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            ws['!views'] = [{ showGridLines: true }];
-
-            // 專業排版與邊框樣式設定
-            const thinBorder = {
-                top: { style: "thin", color: { rgb: "CBD5E1" } },
-                bottom: { style: "thin", color: { rgb: "CBD5E1" } },
-                left: { style: "thin", color: { rgb: "CBD5E1" } },
-                right: { style: "thin", color: { rgb: "CBD5E1" } }
-            };
-
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let cellAddress = XLSX.utils.encode_cell({r: R, c: C});
-                    if (!ws[cellAddress]) continue;
-                    if (!ws[cellAddress].s) ws[cellAddress].s = {};
-                    
-                    // 美化標題
-                    if (R === 0 && C === 0) {
-                        ws[cellAddress].s.font = { sz: 16, bold: true, color: { rgb: "0F172A" } };
-                    } else if (R === 1 && C === 5) {
-                        ws[cellAddress].s.font = { sz: 14, bold: true, color: { rgb: "1E293B" } };
-                        ws[cellAddress].s.alignment = { horizontal: "right" };
-                    } else if (R === 0 && C === 5) {
-                        ws[cellAddress].s.font = { bold: true, color: { rgb: "DC2626" } };
-                        ws[cellAddress].s.alignment = { horizontal: "right" };
-                    }
-
-                    // 為報價品項表格加上精緻外框與對齊
-                    if (R >= 9 && R <= 9 + keys.length) {
-                        ws[cellAddress].s.border = thinBorder;
-                        if (R === 9) {
-                            ws[cellAddress].s.font = { bold: true, color: { rgb: "0F172A" } };
-                            ws[cellAddress].s.fill = { fgColor: { rgb: "F1F5F9" } };
-                            ws[cellAddress].s.alignment = { horizontal: "center", vertical: "center" };
-                        } else {
-                            if (C === 0) ws[cellAddress].s.alignment = { horizontal: "center" };
-                            else if (C >= 2) ws[cellAddress].s.alignment = { horizontal: "right" };
-                        }
-                    }
-
-                    // 費用試算區塊樣式
-                    if (R === 11 + keys.length) {
-                        ws[cellAddress].s.font = { bold: true, color: { rgb: "334155" } };
-                    }
-                    if (R >= 12 + keys.length && R <= 15 + keys.length) {
-                        if (C === 5) {
-                            ws[cellAddress].s.font = { bold: R === 15 + keys.length, color: { rgb: R === 15 + keys.length ? "B45309" : "1E293B" } };
-                            ws[cellAddress].s.alignment = { horizontal: "right" };
-                        }
-                    }
-                }
-            }
-
-            ws['!cols'] = [{wch: 12}, {wch: 35}, {wch: 16}, {wch: 16}, {wch: 16}, {wch: 16}];
-
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "報價單");
-            XLSX.writeFile(wb, "Storeasy_報價單.xlsx");
+            let blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'Storeasy_報價單.xls';
+            a.click();
         }
 
         function exportInvoiceExcel() {
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                alert('目前尚無請款單內容可匯出！');
+            const previewEl = document.getElementById('invoice-preview');
+            if (!previewEl || document.getElementById('v-i-items').innerText.includes('請先於')) {
+                alert('目前尚無生成的請款單內容可供匯出！');
                 return;
             }
 
-            const iDate = document.getElementById('v-i-date').innerText;
-            const iClient = document.getElementById('v-i-client').innerText;
-            const iManager = document.getElementById('v-i-manager').innerText;
-            const iClientPhone = document.getElementById('v-i-client-phone').innerText;
-            const iBranch = document.getElementById('v-i-branch').innerText;
-            const iCompany = document.getElementById('v-i-company').innerText;
-            const iTel = document.getElementById('v-i-tel').innerText;
-            const iTaxid = document.getElementById('v-i-taxid').innerText;
-            const iAddress = document.getElementById('v-i-address').innerText;
-            const iSubtotal = document.getElementById('v-i-subtotal').innerText;
-            const iDeposit = document.getElementById('v-i-deposit').innerText;
-            const iTotal = document.getElementById('v-i-total').innerText;
+            let htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="utf-8"><style>
+                    body { font-family: sans-serif; background-color: #ffffff; padding: 20px; }
+                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; }
+                    .preview-info { background-color: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-size: 10pt; }
+                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; line-height: 1.4; margin-bottom: 20px; }
+                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-bottom: 20px; }
+                    th, td { border: 1px solid #000000 !important; padding: 10px; vertical-align: middle; }
+                    th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                    .num { text-align: right; }
+                    .center { text-align: center; }
+                </style></head>
+                <body>
+                    ${previewEl.innerHTML}
+                </body>
+                </html>
+            `;
 
-            let aoa = [
-                ["收多易股份有限公司", "", "", "", "", "", "", "", "", "請 款 單"],
-                ["Storeasy Storage Invoice Statement", "", "", "", "", "", "", "", "", ""],
-                [""],
-                ["日期：", iDate, "", "客戶名稱：", iClient],
-                ["店長：", iManager, "", "客戶電話：", iClientPhone],
-                ["分店名稱：", iBranch, "", "公司抬頭：", iCompany],
-                ["聯繫電話：", iTel, "", "統一編號：", iTaxid],
-                ["分店地址：", iAddress, "", "", ""],
-                [""],
-                ["倉位尺寸(寬*深*高 m)", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "小計"]
-            ];
-
-            keys.forEach(idx => {
-                let item = selectedInvoiceItems[idx];
-                let term = item.term || '12';
-                if (term === 'none') return;
-
-                let p1 = item.price1;
-                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
-                let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
-                let incSub = monthlyRate * termMonths;
-                let exSub = Math.round(incSub / 1.05);
-                let tax = incSub - exSub;
-                let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                let lineTotal = incSub + dep;
-
-                aoa.push([
-                    `[${item.branch}] ${item.size}`,
-                    item.unit + "材",
-                    p1,
-                    monthlyRate,
-                    termMonths,
-                    exSub,
-                    tax,
-                    incSub,
-                    dep,
-                    lineTotal
-                ]);
-            });
-
-            aoa.push(
-                [""],
-                ["租金合計：", "", "", "", "", "", "", "", "", iSubtotal],
-                ["保證金合計：", "", "", "", "", "", "", "", "", iDeposit],
-                ["請款總金額 (TWD)：", "", "", "", "", "", "", "", "", iTotal],
-                [""],
-                ["付款資料："],
-                ["戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________"],
-                ["支票付款抬頭請開：收多易股份有限公司"],
-                ["請於請款日起7個工作日內完成入款"],
-                [""],
-                ["THANK YOU FOR YOUR BUSINESS!"]
-            );
-
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            ws['!views'] = [{ showGridLines: true }];
-
-            const thinBorder = {
-                top: { style: "thin", color: { rgb: "CBD5E1" } },
-                bottom: { style: "thin", color: { rgb: "CBD5E1" } },
-                left: { style: "thin", color: { rgb: "CBD5E1" } },
-                right: { style: "thin", color: { rgb: "CBD5E1" } }
-            };
-
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let cellAddress = XLSX.utils.encode_cell({r: R, c: C});
-                    if (!ws[cellAddress]) continue;
-                    if (!ws[cellAddress].s) ws[cellAddress].s = {};
-                    
-                    if (R === 0 && C === 0) ws[cellAddress].s.font = { sz: 16, bold: true, color: { rgb: "0F172A" } };
-                    if (R === 0 && C === 9) { ws[cellAddress].s.font = { sz: 14, bold: true }; ws[cellAddress].s.alignment = { horizontal: "right" }; }
-
-                    if (R >= 9 && R <= 9 + keys.length) {
-                        ws[cellAddress].s.border = thinBorder;
-                        if (R === 9) {
-                            ws[cellAddress].s.font = { bold: true, color: { rgb: "0F172A" } };
-                            ws[cellAddress].s.fill = { fgColor: { rgb: "F1F5F9" } };
-                            ws[cellAddress].s.alignment = { horizontal: "center", vertical: "center" };
-                        } else {
-                            if (C === 1 || C === 4) ws[cellAddress].s.alignment = { horizontal: "center" };
-                            else if (C >= 2) ws[cellAddress].s.alignment = { horizontal: "right" };
-                        }
-                    }
-                }
-            }
-
-            ws['!cols'] = [
-                {wch: 25}, {wch: 10}, {wch: 14}, {wch: 14}, {wch: 12}, 
-                {wch: 14}, {wch: 12}, {wch: 14}, {wch: 14}, {wch: 18}
-            ];
-
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "請款單");
-            XLSX.writeFile(wb, "Storeasy_請款單.xlsx");
+            let blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+            let url = URL.createObjectURL(blob);
+            let a = URL.createObjectURL(blob);
+            let link = document.createElement('a');
+            link.href = url;
+            link.download = 'Storeasy_請款單.xls';
+            link.click();
         }
 
         renderStorageTable();
