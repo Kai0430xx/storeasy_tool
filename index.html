@@ -93,7 +93,7 @@
     <main>
         <header>
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (純原生極速穩定版)</div>
+            <div class="version">系統版本：2026.09 (鐵壁防護版)</div>
         </header>
 
         <div class="content-body">
@@ -168,6 +168,7 @@
                         <div class="form-group"><label>統一編號</label><input type="text" id="q-taxid" placeholder="統編"></div>
                     </div>
 
+                    <!-- 據點選擇與搜尋框 -->
                     <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
                         <div class="form-group">
                             <label>選擇分店據點：</label>
@@ -404,7 +405,18 @@
     </main>
 
     <script>
-        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let storageData = [];
+        try {
+            let saved = localStorage.getItem('storeasy_storage_data');
+            if (saved) {
+                let parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) storageData = parsed;
+            }
+        } catch(e) {
+            storageData = [];
+            try { localStorage.removeItem('storeasy_storage_data'); } catch(err) {}
+        }
+
         let selectedQuoteItems = {}; 
         let selectedInvoiceItems = {}; 
 
@@ -434,125 +446,133 @@
         }
 
         function handleSmartExcelUpload() {
-            const fileInput = document.getElementById('excelFile');
-            if (!fileInput || fileInput.files.length === 0) {
-                alert('請先選擇一個 Excel 檔案！');
-                return;
-            }
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-
-                    if (!jsonSheet || jsonSheet.length < 2) {
-                        alert('Excel 檔案內容不足！');
-                        return;
-                    }
-
-                    let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
-                    let newItems = [];
-
-                    for (let i = 0; i < jsonSheet.length; i++) {
-                        let row = jsonSheet[i];
-                        if (!row || row.length === 0) continue;
-
-                        let code = '';
-                        let size = '-';
-                        let unit = '-';
-                        let price1 = NaN;
-
-                        for (let c = 0; c < row.length; c++) {
-                            let val = row[c];
-                            if (val === undefined || val === null) continue;
-                            let sVal = String(val).trim();
-
-                            if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
-                                code = sVal;
-                                if (!isNaN(row[c+1])) code += row[c+1];
-                            } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
-                                size = sVal;
-                            } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
-                                price1 = Number(sVal);
-                            }
-                        }
-
-                        if (!code) {
-                            for (let c = 0; c < row.length; c++) {
-                                let s = String(row[c] || '').trim();
-                                if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
-                                    code = s;
-                                    break;
-                                }
-                            }
-                        }
-                        if (isNaN(price1)) {
-                            for (let c = 0; c < row.length; c++) {
-                                let n = Number(row[c]);
-                                if (!isNaN(n) && n >= 500 && n < 100000) {
-                                    price1 = n;
-                                    break;
-                                }
-                            }
-                        }
-                        if (unit === '-') {
-                            for (let c = 0; c < row.length; c++) {
-                                let n = Number(row[c]);
-                                if (!isNaN(n) && n >= 10 && n <= 500) {
-                                    unit = String(n);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (code && !isNaN(price1) && price1 > 200) {
-                            let price3 = Math.round((price1 * 0.95) / 10) * 10;
-                            let price6 = Math.round((price1 * 0.90) / 10) * 10;
-                            let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
-                            let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
-
-                            newItems.push({
-                                branch: inputBranch,
-                                code: code,
-                                size: size !== '-' ? size + ' m' : '標準尺寸',
-                                unit: unit !== '-' ? unit : '50',
-                                price1: price1,
-                                price3: price3,
-                                price6: price6,
-                                price12_85: price12_85,
-                                price12_80: price12_80
-                            });
-                        }
-                    }
-
-                    if (newItems.length === 0) {
-                        alert('未能自動抓取到有效資料！');
-                        return;
-                    }
-
-                    let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
-                    if (existingBranchIndex !== -1) {
-                        let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
-                        if (choice) {
-                            storageData = storageData.filter(item => item.branch !== inputBranch);
-                        }
-                    }
-
-                    storageData = storageData.concat(newItems);
-                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                    renderStorageTable();
-                    alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
-                } catch (err) {
-                    console.error(err);
-                    alert('解析 Excel 檔案時發生錯誤。');
+            try {
+                const fileInput = document.getElementById('excelFile');
+                if (!fileInput || fileInput.files.length === 0) {
+                    alert('請先選擇一個 Excel 檔案！');
+                    return;
                 }
-            };
-            reader.readAsArrayBuffer(file);
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                        if (!jsonSheet || jsonSheet.length < 2) {
+                            alert('Excel 檔案內容不足！');
+                            return;
+                        }
+
+                        let inputBranchField = document.getElementById('upload-branch-name');
+                        let inputBranch = inputBranchField ? inputBranchField.value.trim() : '土城店';
+                        if (!inputBranch) inputBranch = '土城店';
+
+                        let newItems = [];
+
+                        for (let i = 0; i < jsonSheet.length; i++) {
+                            let row = jsonSheet[i];
+                            if (!row || row.length === 0) continue;
+
+                            let code = '';
+                            let size = '-';
+                            let unit = '-';
+                            let price1 = NaN;
+
+                            for (let c = 0; c < row.length; c++) {
+                                let val = row[c];
+                                if (val === undefined || val === null) continue;
+                                let sVal = String(val).trim();
+
+                                if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
+                                    code = sVal;
+                                    if (!isNaN(row[c+1])) code += row[c+1];
+                                } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                                    size = sVal;
+                                } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
+                                    price1 = Number(sVal);
+                                }
+                            }
+
+                            if (!code) {
+                                for (let c = 0; c < row.length; c++) {
+                                    let s = String(row[c] || '').trim();
+                                    if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
+                                        code = s;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (isNaN(price1)) {
+                                for (let c = 0; c < row.length; c++) {
+                                    let n = Number(row[c]);
+                                    if (!isNaN(n) && n >= 500 && n < 100000) {
+                                        price1 = n;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (unit === '-') {
+                                for (let c = 0; c < row.length; c++) {
+                                    let n = Number(row[c]);
+                                    if (!isNaN(n) && n >= 10 && n <= 500) {
+                                        unit = String(n);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (code && !isNaN(price1) && price1 > 200) {
+                                let price3 = Math.round((price1 * 0.95) / 10) * 10;
+                                let price6 = Math.round((price1 * 0.90) / 10) * 10;
+                                let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
+                                let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
+
+                                newItems.push({
+                                    branch: inputBranch,
+                                    code: code,
+                                    size: size !== '-' ? size + ' m' : '標準尺寸',
+                                    unit: unit !== '-' ? unit : '50',
+                                    price1: price1,
+                                    price3: price3,
+                                    price6: price6,
+                                    price12_85: price12_85,
+                                    price12_80: price12_80
+                                });
+                            }
+                        }
+
+                        if (newItems.length === 0) {
+                            alert('未能自動抓取到有效資料！');
+                            return;
+                        }
+
+                        let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
+                        if (existingBranchIndex !== -1) {
+                            let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
+                            if (choice) {
+                                storageData = storageData.filter(item => item.branch !== inputBranch);
+                            }
+                        }
+
+                        storageData = storageData.concat(newItems);
+                        try { localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData)); } catch(err) {}
+                        renderStorageTable();
+                        alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
+                    } catch (err) {
+                        console.error(err);
+                        alert('解析 Excel 檔案時發生錯誤。');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                console.error(err);
+                alert('上傳檔案發生異常。');
+            }
         }
 
         function updateBranchFilter() {
@@ -575,45 +595,50 @@
         }
 
         function renderStorageTable() {
-            updateBranchFilter();
-            const filterEl = document.getElementById('storage-branch-filter');
-            const filterVal = filterEl ? filterEl.value : 'all';
-            const tbody = document.getElementById('storage-table-body');
-            if (!tbody) return;
-            
-            let filtered = storageData;
-            if (filterVal && filterVal !== 'all') {
-                filtered = storageData.filter(item => item.branch === filterVal);
-            }
+            try {
+                updateBranchFilter();
+                const filterEl = document.getElementById('storage-branch-filter');
+                const filterVal = filterEl ? filterEl.value : 'all';
+                const tbody = document.getElementById('storage-table-body');
+                if (!tbody) return;
+                
+                let filtered = storageData;
+                if (filterVal && filterVal !== 'all') {
+                    filtered = storageData.filter(item => item.branch === filterVal);
+                }
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`;
-                return;
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = filtered.map(item => `
+                    <tr>
+                        <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
+                        <td style="font-weight: bold;">${item.code}</td>
+                        <td>${item.size}</td>
+                        <td style="color: #64748b;">${item.unit}</td>
+                        <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td>NT$ ${item.price3.toLocaleString()}</td>
+                        <td>NT$ ${item.price6.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch(e) {
+                console.error(e);
             }
-            tbody.innerHTML = filtered.map(item => `
-                <tr>
-                    <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
-                    <td style="font-weight: bold;">${item.code}</td>
-                    <td>${item.size}</td>
-                    <td style="color: #64748b;">${item.unit}</td>
-                    <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
-                    <td>NT$ ${item.price3.toLocaleString()}</td>
-                    <td>NT$ ${item.price6.toLocaleString()}</td>
-                    <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
-                    <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
-                </tr>
-            `).join('');
         }
 
         function deleteSelectedBranchData() {
-            const filterVal = document.getElementById('storage-branch-filter').value;
+            const filterEl = document.getElementById('storage-branch-filter');
+            const filterVal = filterEl ? filterEl.value : 'all';
             if (!filterVal || filterVal === 'all') {
                 alert('請先在上方選擇您想要刪除的「特定分店」！');
                 return;
             }
             if (confirm(`確定要刪除分店「${filterVal}」的所有倉位資料嗎？`)) {
                 storageData = storageData.filter(item => item.branch !== filterVal);
-                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                try { localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData)); } catch(err) {}
                 renderStorageTable();
                 alert(`已成功刪除 ${filterVal} 的資料！`);
             }
@@ -622,7 +647,7 @@
         function clearStorageData() {
             if (confirm('確定要清空全部本機的所有倉位資料嗎？')) {
                 storageData = [];
-                localStorage.removeItem('storeasy_storage_data');
+                try { localStorage.removeItem('storeasy_storage_data'); } catch(err) {}
                 renderStorageTable();
             }
         }
@@ -646,8 +671,10 @@
         }
 
         function renderQuoteSelectableItems() {
-            const selectedBranch = document.getElementById('quote-branch-select').value;
-            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
+            const selectedBranchEl = document.getElementById('quote-branch-select');
+            const searchKwEl = document.getElementById('quote-search-input');
+            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
+            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
             const tbody = document.getElementById('quote-selectable-body');
             if (!tbody) return;
 
@@ -681,7 +708,7 @@
                     <tr>
                         <td><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
-                        <td><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
+                        <td><b>${item.code}</b> (${item.size})</td>
                         <td style="font-weight: 600;">NT$ ${item.price1.toLocaleString()}</td>
                         <td style="font-weight: 600; color: #059669;">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
@@ -758,8 +785,10 @@
         }
 
         function renderInvoiceSelectableItems() {
-            const selectedBranch = document.getElementById('invoice-branch-select').value;
-            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
+            const selectedBranchEl = document.getElementById('invoice-branch-select');
+            const searchKwEl = document.getElementById('invoice-search-input');
+            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
+            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
             const tbody = document.getElementById('invoice-selectable-body');
             if (!tbody) return;
 
@@ -793,7 +822,7 @@
                     <tr>
                         <td><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
-                        <td><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
+                        <td><b>${item.code}</b> (${item.size})</td>
                         <td style="font-weight: 600;">NT$ ${item.price1.toLocaleString()}</td>
                         <td style="font-weight: 600; color: #059669;">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
@@ -1050,8 +1079,8 @@
             aoa.push(
                 [],
                 ["費用試算表"],
-                ["租金總計:", document.getElementById('v-q-rent').innerText],
-                ["保證金總計:", document.getElementById('v-q-deposit').innerText],
+                ["租金總計:", document.getElementById('v-q-rent'].innerText],
+                ["保證金總計:", document.getElementById('v-q-deposit'].innerText],
                 ["保險文書處理費總計:", document.getElementById('v-q-fee'].innerText],
                 ["合計:", document.getElementById('v-q-total'].innerText]
             );
