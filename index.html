@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (超強萬用 Excel 匯入修復版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (按鈕與上傳修復版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動智慧掃描 Excel 中的編號、尺寸、材積與價格，自動計算各方案（個位數維持0）。</p>
+                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -60,7 +60,7 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入資料</button>
+                        <button type="button" onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">一鍵智慧匯入資料</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -72,8 +72,8 @@
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="deleteSelectedBranchData()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition">🗑️ 刪除目前選取的分店</button>
-                                <button onclick="clearStorageData()" class="text-xs text-slate-400 hover:text-red-500 hover:underline">清空全部本機資料</button>
+                                <button type="button" onclick="deleteSelectedBranchData()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition cursor-pointer">🗑️ 刪除目前選取的分店</button>
+                                <button type="button" onclick="clearStorageData()" class="text-xs text-slate-400 hover:text-red-500 hover:underline cursor-pointer">清空全部本機資料</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -184,7 +184,7 @@
                             </div>
                         </div>
 
-                        <button onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">📄 一鍵生成公司標準格式報價單</button>
+                        <button type="button" onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
                     </div>
 
                     <!-- 公司標準正式報價單預覽區 -->
@@ -252,8 +252,8 @@
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
                         <div class="flex justify-end gap-3 no-print">
-                            <button onclick="exportQuoteExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm">📥 匯出為 Excel 檔</button>
-                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm">🖨️ 另存為 PDF</button>
+                            <button type="button" onclick="exportQuoteExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
+                            <button type="button" onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -343,7 +343,7 @@
                             </div>
                         </div>
 
-                        <button onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">💰 一鍵套用會計版正式請款單</button>
+                        <button type="button" onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
                     </div>
 
                     <!-- 會計版正式請款單預覽區 -->
@@ -408,8 +408,8 @@
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
                         <div class="flex justify-end gap-3 no-print">
-                            <button onclick="exportInvoiceExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm">📥 匯出為 Excel 檔</button>
-                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm">🖨️ 另存為 PDF</button>
+                            <button type="button" onclick="exportInvoiceExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
+                            <button type="button" onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -422,7 +422,6 @@
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let selectedQuoteItems = {}; 
         let selectedInvoiceItems = {}; 
-        let rawExcelJson = [];
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -449,136 +448,131 @@
             }
         }
 
-        // 超強萬用 Excel 上傳解析引擎 (不限特定表頭名稱，自動掃描欄位)
         function handleSmartExcelUpload() {
-            const fileInput = document.getElementById('excelFile');
-            if (fileInput.files.length === 0) {
-                alert('請先選擇一個 Excel 檔案！');
-                return;
+            try {
+                const fileInput = document.getElementById('excelFile');
+                if (!fileInput || fileInput.files.length === 0) {
+                    alert('請先選擇一個 Excel 檔案！');
+                    return;
+                }
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                        if (!jsonSheet || jsonSheet.length < 2) {
+                            alert('Excel 檔案內容不足或格式不支援！');
+                            return;
+                        }
+
+                        let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
+                        let newItems = [];
+
+                        for (let i = 0; i < jsonSheet.length; i++) {
+                            let row = jsonSheet[i];
+                            if (!row || row.length === 0) continue;
+
+                            let code = '';
+                            let size = '-';
+                            let unit = '-';
+                            let price1 = NaN;
+
+                            for (let c = 0; c < row.length; c++) {
+                                let val = row[c];
+                                if (val === undefined || val === null) continue;
+                                let sVal = String(val).trim();
+
+                                if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
+                                    code = sVal;
+                                    if (!isNaN(row[c+1])) code += row[c+1];
+                                } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                                    size = sVal;
+                                } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
+                                    price1 = Number(sVal);
+                                }
+                            }
+
+                            if (!code) {
+                                for (let c = 0; c < row.length; c++) {
+                                    let s = String(row[c] || '').trim();
+                                    if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
+                                        code = s;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (isNaN(price1)) {
+                                for (let c = 0; c < row.length; c++) {
+                                    let n = Number(row[c]);
+                                    if (!isNaN(n) && n >= 500 && n < 100000) {
+                                        price1 = n;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (unit === '-') {
+                                for (let c = 0; c < row.length; c++) {
+                                    let n = Number(row[c]);
+                                    if (!isNaN(n) && n >= 10 && n <= 500) {
+                                        unit = String(n);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (code && !isNaN(price1) && price1 > 200) {
+                                let price3 = Math.round((price1 * 0.95) / 10) * 10;
+                                let price6 = Math.round((price1 * 0.90) / 10) * 10;
+                                let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
+                                let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
+
+                                newItems.push({
+                                    branch: inputBranch,
+                                    code: code,
+                                    size: size !== '-' ? size : '標準尺寸',
+                                    unit: unit !== '-' ? unit : '50',
+                                    price1: price1,
+                                    price3: price3,
+                                    price6: price6,
+                                    price12_85: price12_85,
+                                    price12_80: price12_80
+                                });
+                            }
+                        }
+
+                        if (newItems.length === 0) {
+                            alert('未能自動抓取到有效資料，請確認 Excel 內容格式。');
+                            return;
+                        }
+
+                        let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
+                        if (existingBranchIndex !== -1) {
+                            let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
+                            if (choice) {
+                                storageData = storageData.filter(item => item.branch !== inputBranch);
+                            }
+                        }
+
+                        storageData = storageData.concat(newItems);
+                        localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                        renderStorageTable();
+                        alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
+                    } catch (err) {
+                        console.error(err);
+                        alert('解析 Excel 檔案時發生錯誤，請檢查檔案格式是否正確。');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                console.error(err);
+                alert('上傳檔案發生異常。');
             }
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-
-                if (jsonSheet.length < 2) {
-                    alert('Excel 檔案內容不足！');
-                    return;
-                }
-
-                let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
-                let newItems = [];
-
-                // 智慧萬用掃描：逐行尋找符合倉位編號與價格的資料
-                for (let i = 0; i < jsonSheet.length; i++) {
-                    let row = jsonSheet[i];
-                    if (!row || row.length === 0) continue;
-
-                    let code = '';
-                    let size = '-';
-                    let unit = '-';
-                    let price1 = NaN;
-
-                    for (let c = 0; c < row.length; c++) {
-                        let val = row[c];
-                        if (val === undefined || val === null) continue;
-                        let sVal = String(val).trim();
-
-                        // 辨識倉位編號 (例如 QD335, QU393 等英數組合)
-                        if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] && !isNaN(row[c+1])))) {
-                            code = sVal;
-                            if (!isNaN(row[c+1])) code += row[c+1];
-                        }
-                        // 辨識尺寸規格 (包含數字與星號 * 或 x)
-                        else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
-                            size = sVal;
-                        }
-                        // 辨識材積 (數字通常在 10 到 1000 之間，且欄位名稱或數值合理)
-                        else if (unit === '-' && !isNaN(Number(sVal)) && Number(sVal) >= 5 && Number(sVal) <= 1000 && !sVal.includes('.')) {
-                            // 檢查是否為純材積數值
-                            if (Number(sVal) < 300 && size !== '-') {
-                                unit = sVal;
-                            }
-                        }
-                        // 辨識月繳原價 (價格通常大於 300 且小於 100000)
-                        else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
-                            price1 = Number(sVal);
-                        }
-                    }
-
-                    // 備用：若上述沒抓齊，強制從整行撈取第一個代號與價格
-                    if (!code) {
-                        for (let c = 0; c < row.length; c++) {
-                            let s = String(row[c] || '').trim();
-                            if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
-                                code = s;
-                                break;
-                            }
-                        }
-                    }
-                    if (isNaN(price1)) {
-                        for (let c = 0; c < row.length; c++) {
-                            let n = Number(row[c]);
-                            if (!isNaN(n) && n >= 500 && n < 100000) {
-                                price1 = n;
-                                break;
-                            }
-                        }
-                    }
-                    if (unit === '-') {
-                        for (let c = 0; c < row.length; c++) {
-                            let n = Number(row[c]);
-                            if (!isNaN(n) && n >= 10 && n <= 500) {
-                                unit = String(n);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (code && !isNaN(price1) && price1 > 200) {
-                        let price3 = Math.round((price1 * 0.95) / 10) * 10;
-                        let price6 = Math.round((price1 * 0.90) / 10) * 10;
-                        let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
-                        let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
-
-                        newItems.push({
-                            branch: inputBranch,
-                            code: code,
-                            size: size !== '-' ? size : '標準尺寸',
-                            unit: unit !== '-' ? unit : '50',
-                            price1: price1,
-                            price3: price3,
-                            price6: price6,
-                            price12_85: price12_85,
-                            price12_80: price12_80
-                        });
-                    }
-                }
-
-                if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料，請確認 Excel 檔案格式。');
-                    return;
-                }
-
-                let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
-                if (existingBranchIndex !== -1) {
-                    let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
-                    if (choice) {
-                        storageData = storageData.filter(item => item.branch !== inputBranch);
-                    }
-                }
-
-                storageData = storageData.concat(newItems);
-                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                renderStorageTable();
-                alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
-            };
-            reader.readAsArrayBuffer(file);
         }
 
         function updateBranchFilter() {
@@ -758,7 +752,7 @@
                                 <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
                                 <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算 (僅列出價格)</option>
                             </select>
-                            <button onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button>
+                            <button type="button" onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
                         </div>
                     </div>
                 `;
@@ -871,7 +865,7 @@
                                 <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
                                 <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款 (僅列出價格)</option>
                             </select>
-                            <button onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button>
+                            <button type="button" onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
                         </div>
                     </div>
                 `;
