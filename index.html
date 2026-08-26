@@ -96,8 +96,7 @@
     <main>
         <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <!-- 系統版本：由 GitHub Actions 自動動態注入版本號 -->
-            <div class="version" id="system-version">系統版本：%%VERSION_TAG%%</div>
+            <div class="version" id="system-version">系統版本：20260826_1</div>
         </header>
 
         <div class="content-body">
@@ -968,7 +967,7 @@
                                     <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
                                     <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款</option>
                                 </select>
-                                <select onchange="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
+                                <select onsystem-version="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
                                     <option value="yes" ${currentDep==='yes'?'selected':''}>🔒 含保證金</option>
                                     <option value="no" ${currentDep==='no'?'selected':''}>🔓 無保證金 (續約)</option>
                                 </select>
