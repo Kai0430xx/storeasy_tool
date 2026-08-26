@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與分店管理</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (公司正式格式版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (額外優惠客製版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳分店倉位 Excel (尺寸與價格)</h3>
-                        <p class="text-sm text-slate-500 mb-4">請上傳包含「據點、倉位尺寸、規格、價格」等欄位的 Excel 檔案（支援土城店或各分店報價表）。資料將安全儲存於瀏覽器中。</p>
+                        <p class="text-sm text-slate-500 mb-4">請上傳包含「據點、倉位尺寸、規格、價格」等欄位的 Excel 檔案。資料將安全儲存於瀏覽器中。</p>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
@@ -79,10 +79,10 @@
                     </div>
                 </div>
 
-                <!-- 2. 生成報價單頁籤 (完全對齊公司報價單格式) -->
+                <!-- 2. 生成報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與勾選</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與優惠調整</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店名稱</label>
@@ -104,7 +104,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
-                                <label class="block text-sm font-medium mb-1">客戶名稱 (對應人)</label>
+                                <label class="block text-sm font-medium mb-1">客戶名稱</label>
                                 <input type="text" id="q-client-name" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客戶姓名">
                             </div>
                             <div>
@@ -117,8 +117,8 @@
                             </div>
                         </div>
 
-                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目：</h4>
-                        <div class="max-h-60 overflow-y-auto border rounded-lg p-2 mb-4">
+                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目與自訂優惠價格：</h4>
+                        <div class="max-h-72 overflow-y-auto border rounded-lg p-2 mb-4">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-slate-50 sticky top-0">
                                     <tr>
@@ -126,10 +126,11 @@
                                         <th class="p-2">據點</th>
                                         <th class="p-2">倉位尺寸/規格</th>
                                         <th class="p-2">定價 (NT$)</th>
+                                        <th class="p-2">店長自訂優惠價 / 年繳特惠 (NT$)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="quote-selectable-body">
-                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -168,7 +169,7 @@
                                     <th class="p-2.5 text-right">月繳/月 (原價)</th>
                                     <th class="p-2.5 text-right">季繳/月 (95折)</th>
                                     <th class="p-2.5 text-right">半年繳/月 (9折)</th>
-                                    <th class="p-2.5 text-right">年繳/月 (85折)</th>
+                                    <th class="p-2.5 text-right">年繳/優惠價</th>
                                 </tr>
                             </thead>
                             <tbody id="v-q-items" class="divide-y">
@@ -189,7 +190,7 @@
                     </div>
                 </div>
 
-                <!-- 3. 生成請款單頁籤 (完全對齊公司請款單格式) -->
+                <!-- 3. 生成請款單頁籤 -->
                 <div id="tab-invoice" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
                         <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 請款單設定</h3>
@@ -263,7 +264,7 @@
                                     <th class="p-2.5">材積</th>
                                     <th class="p-2.5 text-right">原價租金</th>
                                     <th class="p-2.5 text-center">租期</th>
-                                    <th class="p-2.5 text-right">年約/月</th>
+                                    <th class="p-2.5 text-right">優惠/年約月租</th>
                                     <th class="p-2.5 text-center">月份</th>
                                     <th class="p-2.5 text-right">保險文書處理費/月</th>
                                     <th class="p-2.5 text-right">小計</th>
@@ -386,18 +387,24 @@
             document.getElementById('inv-date').valueAsDate = new Date();
 
             if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">沒有符合的倉位資料，請先上傳 Excel</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">沒有符合的倉位資料，請先上傳 Excel</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = storageData.map((item, index) => `
-                <tr class="hover:bg-slate-50 border-b">
-                    <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-desc="${item.desc}" data-price="${item.price}"></td>
-                    <td class="p-2">${item.branch}</td>
-                    <td class="p-2">${item.size} (${item.desc})</td>
-                    <td class="p-2 font-semibold">NT$ ${item.price.toLocaleString()}</td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = storageData.map((item, index) => {
+                let defaultDiscountPrice = Math.round(item.price * 0.80); // 預設提供 8 折參考
+                return `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-desc="${item.desc}" data-price="${item.price}"></td>
+                        <td class="p-2">${item.branch}</td>
+                        <td class="p-2">${item.size} (${item.desc})</td>
+                        <td class="p-2 font-semibold">NT$ ${item.price.toLocaleString()}</td>
+                        <td class="p-2">
+                            <input type="number" id="custom-price-${index}" class="custom-discount-input w-36 border rounded px-2 py-1 text-sm font-semibold text-amber-700 bg-amber-50" value="${defaultDiscountPrice}">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function generateQuote() {
@@ -428,15 +435,19 @@
             let totalRent = 0;
             let html = '';
             checkboxes.forEach((cb) => {
+                const index = cb.getAttribute('data-index');
                 const size = cb.getAttribute('data-size');
                 const desc = cb.getAttribute('data-desc');
                 const price = Number(cb.getAttribute('data-price'));
-                totalRent += price;
+                
+                // 抓取店長自訂的優惠價格或年繳特惠價
+                const customInput = document.getElementById(`custom-price-${index}`);
+                const finalDiscountPrice = customInput ? Number(customInput.value) || Math.round(price * 0.80) : Math.round(price * 0.80);
 
-                // 依據公司報價單的折扣比例試算 (月繳原價、季繳95折、半年9折、年繳85折)
+                totalRent += finalDiscountPrice;
+
                 let p95 = Math.round(price * 0.95);
                 let p90 = Math.round(price * 0.90);
-                let p85 = Math.round(price * 0.85);
 
                 html += `
                     <tr>
@@ -445,17 +456,17 @@
                         <td class="p-2.5 text-right">NT$ ${price.toLocaleString()}</td>
                         <td class="p-2.5 text-right">NT$ ${p95.toLocaleString()}</td>
                         <td class="p-2.5 text-right">NT$ ${p90.toLocaleString()}</td>
-                        <td class="p-2.5 text-right font-bold text-amber-700">NT$ ${p85.toLocaleString()}</td>
+                        <td class="p-2.5 text-right font-black text-amber-700">NT$ ${finalDiscountPrice.toLocaleString()}</td>
                     </tr>
                 `;
             });
 
             tbody.innerHTML = html;
             document.getElementById('v-q-rent').innerText = totalRent.toLocaleString();
-            document.getElementById('v-q-deposit').innerText = totalRent.toLocaleString(); // 預設保證金同一個月租金
-            document.getElementById('v-q-fee').innerText = '150'; // 標準保險文書處理費
+            document.getElementById('v-q-deposit').innerText = totalRent.toLocaleString(); 
+            document.getElementById('v-q-fee').innerText = '150'; 
 
-            alert('公司正式格式報價單已成功生成！');
+            alert('公司正式格式報價單已成功生成（已帶入店長自訂優惠價）！');
         }
 
         function generateInvoice() {
@@ -488,10 +499,15 @@
             let subtotal = 0;
             let html = '';
             checkboxes.forEach((cb) => {
+                const index = cb.getAttribute('data-index');
                 const size = cb.getAttribute('data-size');
                 const desc = cb.getAttribute('data-desc');
                 const price = Number(cb.getAttribute('data-price'));
-                subtotal += price;
+
+                const customInput = document.getElementById(`custom-price-${index}`);
+                const finalDiscountPrice = customInput ? Number(customInput.value) || Math.round(price * 0.80) : Math.round(price * 0.80);
+
+                subtotal += finalDiscountPrice;
 
                 html += `
                     <tr>
@@ -499,10 +515,10 @@
                         <td class="p-2.5">${desc}</td>
                         <td class="p-2.5 text-right">${price.toLocaleString()}</td>
                         <td class="p-2.5 text-center">年約</td>
-                        <td class="p-2.5 text-right">${Math.round(price * 0.85).toLocaleString()}</td>
+                        <td class="p-2.5 text-right font-bold">${finalDiscountPrice.toLocaleString()}</td>
                         <td class="p-2.5 text-center">12</td>
                         <td class="p-2.5 text-right">150</td>
-                        <td class="p-2.5 text-right font-bold">NT$ ${((Math.round(price * 0.85) * 12) + 150).toLocaleString()}</td>
+                        <td class="p-2.5 text-right font-bold text-amber-700">NT$ ${((finalDiscountPrice * 12) + 150).toLocaleString()}</td>
                     </tr>
                 `;
             });
@@ -517,7 +533,7 @@
             document.getElementById('v-i-box').innerText = 'NT$ ' + box.toLocaleString();
             document.getElementById('v-i-total').innerText = 'NT$ ' + grandTotal.toLocaleString();
 
-            alert('公司標準格式請款單已成功套用！');
+            alert('公司標準格式請款單已成功套用（已帶入店長自訂優惠價）！');
         }
 
         renderStorageTable();
