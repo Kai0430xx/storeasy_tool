@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與智慧上傳</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (據點數量計數與篩選版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (字對字精準智慧辨識版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 智慧上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動根據表頭文字（月繳、季繳、半年繳、年繳）精準對應各方案金額。</p>
+                        <p class="text-sm text-slate-500 mb-4">系統會自動掃描表頭文字，字對字精準對應「材積/立方英尺」、「尺寸/規格」、「月繳/原價」、「季繳」、「半年繳」、「年繳」。</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -60,7 +60,7 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">精準智慧匯入</button>
+                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">字對字精準智慧匯入</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -408,6 +408,7 @@
             XLSX.writeFile(wb, filename);
         }
 
+        // 字對字精準智慧辨識 Excel 表頭文字
         function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -431,28 +432,30 @@
 
                 let inputBranch = document.getElementById('upload-branch-name').value.trim() || '士林店';
 
+                // 逐字掃描表頭列找尋關鍵字
                 let headerRowIdx = 0;
                 let colMap = { unit: -1, size: -1, p1: -1, p3: -1, p6: -1, p12: -1 };
 
-                for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
+                for (let r = 0; r < Math.min(jsonSheet.length, 10); r++) {
                     let row = jsonSheet[r];
                     if (!row) continue;
+                    let matchCount = 0;
                     for (let c = 0; c < row.length; c++) {
                         let name = String(row[c] || '').trim();
-                        if (/單位|材積|立方英尺/.test(name)) colMap.unit = c;
-                        if (/尺寸|規格|倉位/.test(name)) colMap.size = c;
-                        if (/月繳|原價/.test(name)) colMap.p1 = c;
-                        else if (/租金/.test(name) && colMap.p1 === -1) colMap.p1 = c;
-                        if (/季繳/.test(name)) colMap.p3 = c;
-                        if (/半年繳/.test(name)) colMap.p6 = c;
-                        if (/年繳/.test(name)) colMap.p12 = c;
+                        if (/材積|立方英尺|單位/.test(name)) { colMap.unit = c; matchCount++; }
+                        else if (/尺寸|規格/.test(name)) { colMap.size = c; matchCount++; }
+                        else if (/月繳|原價/.test(name) && !/季繳|半年|年繳/.test(name)) { colMap.p1 = c; matchCount++; }
+                        else if (/季繳/.test(name)) { colMap.p3 = c; matchCount++; }
+                        else if (/半年繳/.test(name)) { colMap.p6 = c; matchCount++; }
+                        else if (/年繳/.test(name)) { colMap.p12 = c; matchCount++; }
                     }
-                    if (colMap.p1 !== -1 && colMap.size !== -1) {
+                    if (matchCount >= 2 || colMap.p1 !== -1) {
                         headerRowIdx = r;
                         break;
                     }
                 }
 
+                // 若自動掃描沒找到，進行保底預設
                 if (colMap.p1 === -1) {
                     colMap = { unit: 0, size: 1, p1: 2, p3: 3, p6: 4, p12: 5 };
                     headerRowIdx = 0;
@@ -485,7 +488,7 @@
                 }
 
                 if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料，請確認 Excel 表頭是否有包含「月繳/原價」與「尺寸」。');
+                    alert('未能自動抓取到有效資料，請確認該 Excel 表頭是否有明確寫出「材積」、「尺寸」、「月繳/原價」等文字。');
                     return;
                 }
 
@@ -500,12 +503,11 @@
                 storageData = storageData.concat(newItems);
                 localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                 renderStorageTable();
-                alert('成功智慧匯入 ' + newItems.length + ' 筆倉位資料！');
+                alert('成功透過字對字精準辨識匯入 ' + newItems.length + ' 筆倉位資料！');
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // 動態產生帶有數量計數的據點下拉選單
         function updateBranchFilter() {
             const branchCounts = {};
             storageData.forEach(item => {
@@ -659,7 +661,7 @@
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700">${unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium">[${itemBranch}] ${size}</td>
+                        <td class="p-2.5 border border-slate-700 font-medium">${size}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
@@ -765,7 +767,7 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">[${itemBranch}] ${size}</td>
+                        <td class="p-2.5 border border-slate-700 font-bold">${size}</td>
                         <td class="p-2.5 border border-slate-700">${unit}呎</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${monthlyRate.toLocaleString()}</td>
