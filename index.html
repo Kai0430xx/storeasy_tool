@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與分店管理</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (智慧表頭辨識版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (欄位對應升級版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -47,12 +47,40 @@
                 <!-- 1. 倉位資料管理頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel (智慧辨識欄位)</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識表頭中的「尺寸、材積、月繳原價」欄位。支援各分店不同格式的 Excel 檔案上傳。</p>
+                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel</h3>
+                        <p class="text-sm text-slate-500 mb-4">上傳後可在下方自由指定哪一欄是「尺寸」與「月繳原價」，確保抓取完全正確。</p>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
-                            <button onclick="handleExcelUpload()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm whitespace-nowrap">智慧解析並匯入</button>
+                            <button onclick="handleExcelUpload()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm whitespace-nowrap">上傳並讀取表頭</button>
+                        </div>
+                    </div>
+
+                    <!-- 欄位對應設定區 (上傳後出現) -->
+                    <div id="column-mapping-box" class="bg-amber-50 p-6 rounded-xl shadow-sm border border-amber-200 hidden space-y-4">
+                        <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認 (請選擇正確的欄位)</h3>
+                        <p class="text-xs text-amber-700">系統已讀取到您的 Excel，請核對以下下拉選單，確保對應到正確的資料列：</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                                <label class="block font-semibold mb-1 text-slate-700">據點名稱欄位</label>
+                                <select id="map-branch" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1 text-slate-700">倉位尺寸/編號欄位</label>
+                                <select id="map-size" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1 text-slate-700">材積/單位欄位</label>
+                                <select id="map-unit" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold mb-1 text-slate-900 font-bold">⭐ 月繳/月(原價)欄位</label>
+                                <select id="map-price" class="w-full border rounded-lg px-3 py-2 bg-white font-bold text-amber-700 border-amber-400"></select>
+                            </div>
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="confirmAndImportExcel()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">確認對應並匯入資料</button>
                         </div>
                     </div>
 
@@ -294,6 +322,7 @@
 
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let rawExcelJson = []; // 暫存上傳後的原始 Excel 資料
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -311,7 +340,7 @@
             }
         }
 
-        // 智慧解析 Excel 表頭：自動辨識哪一欄是尺寸、材積、月繳原價等
+        // 步驟 1：上傳檔案並解析出欄位供店長手動對應
         function handleExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -326,76 +355,87 @@
                 const workbook = XLSX.read(data, {type: 'array'});
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                rawExcelJson = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
-                if (jsonSheet.length < 2) {
-                    alert('Excel 檔案內容不足或格式有誤！');
+                if (rawExcelJson.length < 2) {
+                    alert('Excel 檔案內容不足！');
                     return;
                 }
 
-                // 步驟 1：掃描前幾列尋找表頭關鍵字
-                let headerRowIndex = 0;
-                let colMap = { branch: -1, size: -1, unit: -1, price: -1 };
-
-                for (let r = 0; r < Math.min(jsonSheet.length, 10); r++) {
-                    let row = jsonSheet[r];
-                    if (!row) continue;
-                    
-                    let foundCols = { branch: -1, size: -1, unit: -1, price: -1 };
-                    for (let c = 0; c < row.length; c++) {
-                        let cellVal = String(row[c] || '').trim();
-                        if (/據點|分店/.test(cellVal)) foundCols.branch = c;
-                        if (/倉位|尺寸|編號|規格/.test(cellVal)) foundCols.size = c;
-                        if (/單位|材積|立方英尺/.test(cellVal)) foundCols.unit = c;
-                        if (/月繳|原價|租金/.test(cellVal) && !/季繳|半年|年繳/.test(cellVal)) foundCols.price = c;
-                    }
-
-                    // 如果成功辨識出尺寸與價格欄位，則鎖定此行為表頭
-                    if (foundCols.size !== -1 && foundCols.price !== -1) {
-                        headerRowIndex = r;
-                        colMap = foundCols;
-                        break;
+                // 尋找最適當的表頭列 (預設抓前 5 列中有文字最多的那一列作為表頭)
+                let headerRowIdx = 0;
+                let maxCols = 0;
+                for (let r = 0; r < Math.min(rawExcelJson.length, 5); r++) {
+                    let nonNullCount = rawExcelJson[r].filter(cell => cell !== undefined && cell !== '').length;
+                    if (nonNullCount > maxCols) {
+                        maxCols = nonNullCount;
+                        headerRowIdx = r;
                     }
                 }
 
-                // 如果自動辨識失敗，預設採用標準直覺欄位 (Col 0:據點, Col 1:尺寸, Col 2:材積, Col 3:月繳原價)
-                if (colMap.size === -1 || colMap.price === -1) {
-                    colMap = { branch: 0, size: 1, unit: 0, price: 2 };
-                    headerRowIndex = 0; 
-                }
+                let headerRow = rawExcelJson[headerRowIdx] || [];
+                let optionsHtml = headerRow.map((colName, idx) => `<option value="${idx}">第 ${idx + 1} 欄: ${colName || '(空白)'}</option>`).join('');
+                
+                // 放入下拉選單
+                ['map-branch', 'map-size', 'map-unit', 'map-price'].forEach(id => {
+                    document.getElementById(id).innerHTML = optionsHtml;
+                });
 
-                let parsedItems = [];
-                // 從表頭下一行開始讀取資料
-                for (let i = headerRowIndex + 1; i < jsonSheet.length; i++) {
-                    let row = jsonSheet[i];
-                    if (!row || row.length === 0) continue;
+                // 智慧預測最佳選項
+                headerRow.forEach((colName, idx) => {
+                    let name = String(colName || '');
+                    if (/據點|分店/.test(name)) document.getElementById('map-branch').value = idx;
+                    if (/倉位|尺寸|編號|規格/.test(name)) document.getElementById('map-size').value = idx;
+                    if (/單位|材積|立方英尺/.test(name)) document.getElementById('map-unit').value = idx;
+                    if (/月繳|原價|租金/.test(name) && !/季繳|半年|年繳/.test(name)) document.getElementById('map-price').value = idx;
+                });
 
-                    let branch = colMap.branch !== -1 && row[colMap.branch] ? String(row[colMap.branch]) : '土城店';
-                    let size = colMap.size !== -1 && row[colMap.size] ? String(row[colMap.size]) : '';
-                    let unit = colMap.unit !== -1 && row[colMap.unit] ? String(row[colMap.unit]) : '-';
-                    let price = colMap.price !== -1 ? Number(row[colMap.price]) : NaN;
-
-                    // 過濾掉無效行或不是數字的價格
-                    if (size && !isNaN(price) && price > 0) {
-                        parsedItems.push({
-                            branch: branch,
-                            size: size,
-                            unit: unit,
-                            price: price
-                        });
-                    }
-                }
-
-                if (parsedItems.length > 0) {
-                    storageData = parsedItems;
-                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                    renderStorageTable();
-                    alert('成功智慧解析並匯入 ' + parsedItems.length + ' 筆倉位資料！');
-                } else {
-                    alert('未能成功解析出有效的倉位與月繳價格，請確認該 Excel 表格結構。');
-                }
+                // 顯示對應設定區
+                document.getElementById('column-mapping-box').classList.remove('hidden');
+                alert('Excel 上傳成功！請在下方確認欄位對應後，點擊「確認並匯入資料」。');
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // 步驟 2：店長確認對應後正式匯入
+        function confirmAndImportExcel() {
+            let bIdx = Number(document.getElementById('map-branch').value);
+            let sIdx = Number(document.getElementById('map-size').value);
+            let uIdx = Number(document.getElementById('map-unit').value);
+            let pIdx = Number(document.getElementById('map-price').value);
+
+            // 從表頭下一行開始掃描
+            let parsedItems = [];
+            let headerRowIdx = 0; // 簡化起見，從第2列 (index 1) 開始抓，或依據實際選擇
+            for (let i = 1; i < rawExcelJson.length; i++) {
+                let row = rawExcelJson[i];
+                if (!row || row.length === 0) continue;
+
+                let branch = row[bIdx] !== undefined ? String(row[bIdx]) : '土城店';
+                let size = row[sIdx] !== undefined ? String(row[sIdx]) : '';
+                let unit = row[uIdx] !== undefined ? String(row[uIdx]) : '-';
+                let price = row[pIdx] !== undefined ? Number(row[pIdx]) : NaN;
+
+                // 只要尺寸有值、且價格是有效數字就收錄
+                if (size && size !== 'undefined' && !isNaN(price) && price > 0) {
+                    parsedItems.push({
+                        branch: branch.trim(),
+                        size: size.trim(),
+                        unit: unit.trim(),
+                        price: price
+                    });
+                }
+            }
+
+            if (parsedItems.length > 0) {
+                storageData = parsedItems;
+                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                renderStorageTable();
+                document.getElementById('column-mapping-box').classList.add('hidden');
+                alert('成功匯入 ' + parsedItems.length + ' 筆倉位資料！');
+            } else {
+                alert('未能抓取到有效資料，請檢查您選擇的「月繳原價欄位」是否正確包含了數值金額。');
+            }
         }
 
         function renderStorageTable() {
@@ -433,7 +473,7 @@
             }
 
             tbody.innerHTML = storageData.map((item, index) => {
-                let defaultDiscountPrice = Math.round(item.price * 0.80); // 預設提供 8 折參考
+                let defaultDiscountPrice = Math.round(item.price * 0.80);
                 return `
                     <tr class="hover:bg-slate-50 border-b">
                         <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-unit="${item.unit}" data-price="${item.price}"></td>
