@@ -96,7 +96,7 @@
     <main>
         <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (全方案顯示一致版)</div>
+            <div class="version">系統版本：2026.09 (專業格線與精準對齊版)</div>
         </header>
 
         <div class="content-body">
@@ -191,7 +191,7 @@
                                     <th style="width: 40px;">選取</th>
                                     <th>據點</th>
                                     <th>尺寸(寬*深*高 m) / 材積</th>
-                                    <th>月繳/原價</th>
+                                    <th>月繳原價</th>
                                     <th>季繳</th>
                                     <th>半年繳</th>
                                     <th>年繳(85折)</th>
@@ -256,7 +256,7 @@
                     </table>
 
                     <div class="summary-box">
-                        <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (依據各項目獨立方案計費)</div>
+                        <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (此試算不含額外優惠)</div>
                         <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
@@ -1091,7 +1091,7 @@
             const qTotal = document.getElementById('v-q-total').innerText;
 
             let aoa = [
-                ["收多易迷你倉庫 - 報價單"],
+                ["收多易迷你倉庫 - 報價單", "", "", "", "", "報價有效期限 7 天"],
                 [""],
                 ["日期:", qDate, "", "客戶名稱:", qClient],
                 ["店長:", qManager, "", "客戶電話:", qClientPhone],
@@ -1125,7 +1125,7 @@
 
             aoa.push(
                 [""],
-                ["費用試算表 (依據各項目獨立方案計費)"],
+                ["費用試算表 (此試算不含額外優惠)"],
                 ["租金總計 (NT$)：", "", "", "", "", qRent],
                 ["保證金總計 (NT$)：", "", "", "", "", qDeposit],
                 ["保險文書處理費總計 (NT$)：", "", "", "", "", qFee],
@@ -1152,6 +1152,8 @@
                 left: { style: "thin", color: { rgb: "000000" } },
                 right: { style: "thin", color: { rgb: "000000" } }
             };
+
+            ws['!views'] = [{ showGridLines: true }];
 
             const range = XLSX.utils.decode_range(ws['!ref']);
             for (let R = range.s.r; R <= range.e.r; ++R) {
@@ -1261,6 +1263,8 @@
                 left: { style: "thin", color: { rgb: "000000" } },
                 right: { style: "thin", color: { rgb: "000000" } }
             };
+
+            ws['!views'] = [{ showGridLines: true }];
 
             const range = XLSX.utils.decode_range(ws['!ref']);
             for (let R = range.s.r; R <= range.e.r; ++R) {
