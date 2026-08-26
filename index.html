@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (避開單價陷阱、精準抓取月租版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (標準四捨五入至十位數版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識真實的「月租/月繳原價」（避開每坪單價陷阱），並精準對應尺寸、材積與各折扣方案。</p>
+                        <p class="text-sm text-slate-500 mb-4">系統自動辨識原價後，若檔案無折扣價會依公司規則計算（原價×折扣，四捨五入至十位數、個位數維持0）。</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -81,11 +81,11 @@
                                         <th class="p-3">倉位編號</th>
                                         <th class="p-3">尺寸 (W*L*H)</th>
                                         <th class="p-3">材積 (呎)</th>
-                                        <th class="p-3">月租/月繳原價</th>
-                                        <th class="p-3">季繳</th>
-                                        <th class="p-3">半年繳</th>
-                                        <th class="p-3">年繳(85折)</th>
-                                        <th class="p-3">年繳(8折)</th>
+                                        <th class="p-3">月繳/原價</th>
+                                        <th class="p-3">季繳/95折</th>
+                                        <th class="p-3">半年繳/9折</th>
+                                        <th class="p-3">年繳/85折</th>
+                                        <th class="p-3">年繳/8折</th>
                                     </tr>
                                 </thead>
                                 <tbody id="storage-table-body" class="text-sm divide-y">
@@ -411,7 +411,7 @@
             XLSX.writeFile(wb, filename);
         }
 
-        // 精準避開單價陷阱的智慧上傳引擎
+        // 嚴格過濾單價陷阱、並套用公司個位數四捨五入維持0規則的智慧上傳引擎
         function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -435,7 +435,7 @@
 
                 let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
 
-                // 搜尋表頭列，精準對應各欄位
+                // 搜尋表頭列
                 let headerRowIdx = 0;
                 let colMap = { code: -1, size: -1, unit: -1, p1: -1, p3: -1, p6: -1, p12_85: -1, p12_80: -1 };
 
@@ -447,8 +447,8 @@
                         if (/倉位|編號|代號/.test(text) && !/尺寸/.test(text)) colMap.code = c;
                         else if (/尺寸|規格|w\*l\*h/i.test(text)) colMap.size = c;
                         else if (/材積|立方英尺|單位/.test(text)) colMap.unit = c;
-                        // 尋找真正的月租/月繳原價（明確排除帶有「單價」的欄位，避免抓到每坪單價55元）
-                        else if ((/月繳|原價|月租/.test(text) || /月租金/.test(text)) && !/單價|季繳|半年|年繳|折/.test(text)) colMap.p1 = c;
+                        // 嚴格尋找月繳/原價/月租，並絕對排除「單價」
+                        else if ((/月繳|原價|月租/.test(text)) && !/單價|季繳|半年|年繳|折/.test(text)) colMap.p1 = c;
                         else if (/季繳|95折/.test(text)) colMap.p3 = c;
                         else if (/半年繳|9折/.test(text)) colMap.p6 = c;
                         else if (/85折|年繳.*85/.test(text)) colMap.p12_85 = c;
@@ -471,11 +471,11 @@
                     let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]).trim() : '-';
                     let price1 = colMap.p1 !== -1 ? Number(row[colMap.p1]) : NaN;
 
-                    // 智慧備用：若 p1 沒抓到或數值小於 200（代表可能誤抓到單價），自動在整行中尋找較大的價格數字（例如 > 500 作為月租）
+                    // 若未直接抓到或抓到小於200的數字（代表誤抓單價），智慧掃描整行尋找真實月租金額（例如 > 300）
                     if (isNaN(price1) || price1 <= 200) {
                         for (let c = 0; c < row.length; c++) {
                             let val = Number(row[c]);
-                            if (!isNaN(val) && val > 500 && val < 100000) {
+                            if (!isNaN(val) && val > 300 && val < 100000) {
                                 price1 = val;
                                 break;
                             }
@@ -491,10 +491,11 @@
                         }
                         if (!code) code = `R${i}`;
 
-                        let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) ? Number(row[colMap.p3]) : Math.round(price1 * 0.95);
-                        let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) ? Number(row[colMap.p6]) : Math.round(price1 * 0.90);
-                        let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) ? Number(row[colMap.p12_85]) : Math.round(price1 * 0.85);
-                        let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) ? Number(row[colMap.p12_80]) : Math.round(price1 * 0.80);
+                        // 公司標準計算規則：四捨五入至十位數，保持個位數是0
+                        let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) && Number(row[colMap.p3]) > 200 ? Number(row[colMap.p3]) : Math.round((price1 * 0.95) / 10) * 10;
+                        let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) && Number(row[colMap.p6]) > 200 ? Number(row[colMap.p6]) : Math.round((price1 * 0.90) / 10) * 10;
+                        let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) && Number(row[colMap.p12_85]) > 200 ? Number(row[colMap.p12_85]) : Math.round((price1 * 0.85) / 10) * 10;
+                        let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) && Number(row[colMap.p12_80]) > 200 ? Number(row[colMap.p12_80]) : Math.round((price1 * 0.80) / 10) * 10;
 
                         newItems.push({
                             branch: inputBranch,
