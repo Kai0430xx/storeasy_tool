@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (按鈕與請款單獨立工具修復版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (超強萬用 Excel 匯入修復版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
+                        <p class="text-sm text-slate-500 mb-4">系統會自動智慧掃描 Excel 中的編號、尺寸、材積與價格，自動計算各方案（個位數維持0）。</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -421,7 +421,7 @@
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let selectedQuoteItems = {}; 
-        let selectedInvoiceItems = {}; // 請款單專屬勾選記錄
+        let selectedInvoiceItems = {}; 
         let rawExcelJson = [];
 
         function switchTab(tabId) {
@@ -449,12 +449,7 @@
             }
         }
 
-        function exportTableToExcel(tableId, filename = 'download.xlsx') {
-            const table = document.getElementById(tableId);
-            const wb = XLSX.utils.table_to_book(table, {sheet: "Sheet1"});
-            XLSX.writeFile(wb, filename);
-        }
-
+        // 超強萬用 Excel 上傳解析引擎 (不限特定表頭名稱，自動掃描欄位)
         function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -477,70 +472,85 @@
                 }
 
                 let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
-
-                let headerRowIdx = 0;
-                let colMap = { code: -1, size: -1, unit: -1, p1: -1, p3: -1, p6: -1, p12_85: -1, p12_80: -1 };
-
-                for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
-                    let row = jsonSheet[r];
-                    if (!row) continue;
-                    for (let c = 0; c < row.length; c++) {
-                        let text = String(row[c] || '').trim();
-                        if (/倉位|編號|代號/.test(text) && !/尺寸/.test(text)) colMap.code = c;
-                        else if (/尺寸|規格|w\*l\*h/i.test(text)) colMap.size = c;
-                        else if (/材積|立方英尺|單位/.test(text)) colMap.unit = c;
-                        else if ((/月繳|原價|月租/.test(text)) && !/單價|季繳|半年|年繳|折/.test(text)) colMap.p1 = c;
-                        else if (/季繳|95折/.test(text)) colMap.p3 = c;
-                        else if (/半年繳|9折/.test(text)) colMap.p6 = c;
-                        else if (/85折/.test(text)) colMap.p12_85 = c;
-                        else if (/80折|8折/.test(text)) colMap.p12_80 = c;
-                        else if (/年繳/.test(text) && !/80折|8折|85折/.test(text) && colMap.p12_85 === -1) colMap.p12_85 = c;
-                    }
-                    if (colMap.p1 !== -1) {
-                        headerRowIdx = r;
-                        break;
-                    }
-                }
-
                 let newItems = [];
-                for (let i = headerRowIdx + 1; i < jsonSheet.length; i++) {
+
+                // 智慧萬用掃描：逐行尋找符合倉位編號與價格的資料
+                for (let i = 0; i < jsonSheet.length; i++) {
                     let row = jsonSheet[i];
                     if (!row || row.length === 0) continue;
 
-                    let code = colMap.code !== -1 && row[colMap.code] !== undefined ? String(row[colMap.code]).trim() : '';
-                    let size = colMap.size !== -1 && row[colMap.size] !== undefined ? String(row[colMap.size]).trim() : '-';
-                    let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]).trim() : '-';
-                    let price1 = colMap.p1 !== -1 ? Number(row[colMap.p1]) : NaN;
+                    let code = '';
+                    let size = '-';
+                    let unit = '-';
+                    let price1 = NaN;
 
-                    if (isNaN(price1) || price1 <= 200) {
+                    for (let c = 0; c < row.length; c++) {
+                        let val = row[c];
+                        if (val === undefined || val === null) continue;
+                        let sVal = String(val).trim();
+
+                        // 辨識倉位編號 (例如 QD335, QU393 等英數組合)
+                        if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] && !isNaN(row[c+1])))) {
+                            code = sVal;
+                            if (!isNaN(row[c+1])) code += row[c+1];
+                        }
+                        // 辨識尺寸規格 (包含數字與星號 * 或 x)
+                        else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                            size = sVal;
+                        }
+                        // 辨識材積 (數字通常在 10 到 1000 之間，且欄位名稱或數值合理)
+                        else if (unit === '-' && !isNaN(Number(sVal)) && Number(sVal) >= 5 && Number(sVal) <= 1000 && !sVal.includes('.')) {
+                            // 檢查是否為純材積數值
+                            if (Number(sVal) < 300 && size !== '-') {
+                                unit = sVal;
+                            }
+                        }
+                        // 辨識月繳原價 (價格通常大於 300 且小於 100000)
+                        else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
+                            price1 = Number(sVal);
+                        }
+                    }
+
+                    // 備用：若上述沒抓齊，強制從整行撈取第一個代號與價格
+                    if (!code) {
                         for (let c = 0; c < row.length; c++) {
-                            let val = Number(row[c]);
-                            if (!isNaN(val) && val > 300 && val < 100000) {
-                                price1 = val;
+                            let s = String(row[c] || '').trim();
+                            if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
+                                code = s;
+                                break;
+                            }
+                        }
+                    }
+                    if (isNaN(price1)) {
+                        for (let c = 0; c < row.length; c++) {
+                            let n = Number(row[c]);
+                            if (!isNaN(n) && n >= 500 && n < 100000) {
+                                price1 = n;
+                                break;
+                            }
+                        }
+                    }
+                    if (unit === '-') {
+                        for (let c = 0; c < row.length; c++) {
+                            let n = Number(row[c]);
+                            if (!isNaN(n) && n >= 10 && n <= 500) {
+                                unit = String(n);
                                 break;
                             }
                         }
                     }
 
-                    if (price1 > 200) {
-                        if (!code) {
-                            for (let c = 0; c < row.length; c++) {
-                                let s = String(row[c] || '').trim();
-                                if (/^[A-Za-z]+\d+/.test(s)) { code = s; break; }
-                            }
-                        }
-                        if (!code) code = `R${i}`;
-
-                        let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) && Number(row[colMap.p3]) > 200 ? Number(row[colMap.p3]) : Math.round((price1 * 0.95) / 10) * 10;
-                        let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) && Number(row[colMap.p6]) > 200 ? Number(row[colMap.p6]) : Math.round((price1 * 0.90) / 10) * 10;
-                        let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) && Number(row[colMap.p12_85]) > 200 ? Number(row[colMap.p12_85]) : Math.round((price1 * 0.85) / 10) * 10;
-                        let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) && Number(row[colMap.p12_80]) > 200 ? Number(row[colMap.p12_80]) : Math.round((price1 * 0.80) / 10) * 10;
+                    if (code && !isNaN(price1) && price1 > 200) {
+                        let price3 = Math.round((price1 * 0.95) / 10) * 10;
+                        let price6 = Math.round((price1 * 0.90) / 10) * 10;
+                        let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
+                        let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
 
                         newItems.push({
                             branch: inputBranch,
                             code: code,
-                            size: size,
-                            unit: unit,
+                            size: size !== '-' ? size : '標準尺寸',
+                            unit: unit !== '-' ? unit : '50',
                             price1: price1,
                             price3: price3,
                             price6: price6,
@@ -551,7 +561,7 @@
                 }
 
                 if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料！');
+                    alert('未能自動抓取到有效資料，請確認 Excel 檔案格式。');
                     return;
                 }
 
@@ -1064,7 +1074,7 @@
             aoa.push(
                 [],
                 ["費用試算表"],
-                ["租金總計:", document.getElementById('v-q-rent').innerText],
+                ["租金總計:", document.getElementById('v-q-rent'].innerText],
                 ["保證金總計:", document.getElementById('v-q-deposit'].innerText],
                 ["保險文書處理費總計:", document.getElementById('v-q-fee'].innerText],
                 ["合計:", document.getElementById('v-q-total'].innerText]
