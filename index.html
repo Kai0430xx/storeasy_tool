@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
+    <!-- SheetJS 用於解析 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -96,7 +96,7 @@
     <main>
         <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (完美格線與對齊版)</div>
+            <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
         <div class="content-body">
@@ -411,6 +411,17 @@
     <!-- 載入 SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
+        // 自動設定首頁右上角版本名稱為當天日期 (例如 20260826_1)
+        (function() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const versionStr = `${yyyy}${mm}${dd}_1`;
+            const verEl = document.getElementById('system-version');
+            if (verEl) verEl.innerText = `系統版本：${versionStr}`;
+        })();
+
         let storageData = [];
         try {
             let saved = localStorage.getItem('storeasy_storage_data');
@@ -692,7 +703,7 @@
                 let isChecked = selectedQuoteItems[globalIndex] ? 'checked' : '';
                 return `
                     <tr>
-                        <td><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
                         <td><b>${item.size}</b> (${item.unit}材)</td>
                         <td>NT$ ${item.price1.toLocaleString()}</td>
@@ -1068,7 +1079,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 完美 HTML Excel 匯出：帶有獨立格子、置中對齊與清晰黑線格線
+        // 完美格線與對齊的 Excel 匯出功能
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
