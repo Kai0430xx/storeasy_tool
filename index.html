@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與分店管理</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (欄位對應升級版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (彈性手動優惠版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">上傳後可在下方自由指定哪一欄是「尺寸」與「月繳原價」，確保抓取完全正確。</p>
+                        <p class="text-sm text-slate-500 mb-4">上傳後可自由指定哪一欄是「尺寸」與「月繳原價」。</p>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
@@ -56,11 +56,9 @@
                         </div>
                     </div>
 
-                    <!-- 欄位對應設定區 (上傳後出現) -->
+                    <!-- 欄位對應設定區 -->
                     <div id="column-mapping-box" class="bg-amber-50 p-6 rounded-xl shadow-sm border border-amber-200 hidden space-y-4">
-                        <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認 (請選擇正確的欄位)</h3>
-                        <p class="text-xs text-amber-700">系統已讀取到您的 Excel，請核對以下下拉選單，確保對應到正確的資料列：</p>
-                        
+                        <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                             <div>
                                 <label class="block font-semibold mb-1 text-slate-700">據點名稱欄位</label>
@@ -110,7 +108,7 @@
                 <!-- 2. 生成報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與優惠調整</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與彈性優惠設定</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店名稱</label>
@@ -145,8 +143,8 @@
                             </div>
                         </div>
 
-                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目與自訂優惠價格：</h4>
-                        <div class="max-h-72 overflow-y-auto border rounded-lg p-2 mb-4">
+                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的項目（可自由輸入優惠金額或文字備註）：</h4>
+                        <div class="max-h-80 overflow-y-auto border rounded-lg p-2 mb-4">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-slate-50 sticky top-0">
                                     <tr>
@@ -154,11 +152,12 @@
                                         <th class="p-2">據點</th>
                                         <th class="p-2">倉位尺寸/規格</th>
                                         <th class="p-2">月繳原價 (NT$)</th>
-                                        <th class="p-2">店長自訂優惠價 / 年繳特惠 (NT$)</th>
+                                        <th class="p-2">手動輸入優惠價 (數字)</th>
+                                        <th class="p-2">優惠方案備註 (文字，例:送一個月)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="quote-selectable-body">
-                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
+                                    <tr><td colspan="6" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -197,7 +196,7 @@
                                     <th class="p-2.5 text-right">月繳/月 (原價)</th>
                                     <th class="p-2.5 text-right">季繳/月 (95折)</th>
                                     <th class="p-2.5 text-right">半年繳/月 (9折)</th>
-                                    <th class="p-2.5 text-right">年繳/優惠價</th>
+                                    <th class="p-2.5 text-right">特惠價 / 優惠說明</th>
                                 </tr>
                             </thead>
                             <tbody id="v-q-items" class="divide-y">
@@ -305,8 +304,8 @@
 
                         <div class="bg-slate-50 p-4 rounded-lg border space-y-2 text-sm mb-8 text-right">
                             <div class="flex justify-between"><span>合計：</span> <span id="v-i-subtotal" class="font-bold">NT$ 0</span></div>
-                            <div class="flex justify-between"><span>保證金：</span> <span id="v-i-deposit">NT$ 0</span></div>
-                            <div class="flex justify-between"><span>包材：</span> <span id="v-i-box">NT$ 0</span></div>
+                            <div class="flex justify-between"><span>保證金：</span> <span id="v-i-deposit" class="font-bold">NT$ 0</span></div>
+                            <div class="flex justify-between"><span>包材：</span> <span id="v-i-box" class="font-bold">NT$ 0</span></div>
                             <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>應付總金額 (TWD)：</span> <span id="v-i-total">NT$ 0</span></div>
                         </div>
 
@@ -322,7 +321,7 @@
 
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        let rawExcelJson = []; // 暫存上傳後的原始 Excel 資料
+        let rawExcelJson = [];
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -340,7 +339,6 @@
             }
         }
 
-        // 步驟 1：上傳檔案並解析出欄位供店長手動對應
         function handleExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -362,7 +360,6 @@
                     return;
                 }
 
-                // 尋找最適當的表頭列 (預設抓前 5 列中有文字最多的那一列作為表頭)
                 let headerRowIdx = 0;
                 let maxCols = 0;
                 for (let r = 0; r < Math.min(rawExcelJson.length, 5); r++) {
@@ -376,12 +373,10 @@
                 let headerRow = rawExcelJson[headerRowIdx] || [];
                 let optionsHtml = headerRow.map((colName, idx) => `<option value="${idx}">第 ${idx + 1} 欄: ${colName || '(空白)'}</option>`).join('');
                 
-                // 放入下拉選單
                 ['map-branch', 'map-size', 'map-unit', 'map-price'].forEach(id => {
                     document.getElementById(id).innerHTML = optionsHtml;
                 });
 
-                // 智慧預測最佳選項
                 headerRow.forEach((colName, idx) => {
                     let name = String(colName || '');
                     if (/據點|分店/.test(name)) document.getElementById('map-branch').value = idx;
@@ -390,23 +385,19 @@
                     if (/月繳|原價|租金/.test(name) && !/季繳|半年|年繳/.test(name)) document.getElementById('map-price').value = idx;
                 });
 
-                // 顯示對應設定區
                 document.getElementById('column-mapping-box').classList.remove('hidden');
                 alert('Excel 上傳成功！請在下方確認欄位對應後，點擊「確認並匯入資料」。');
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // 步驟 2：店長確認對應後正式匯入
         function confirmAndImportExcel() {
             let bIdx = Number(document.getElementById('map-branch').value);
             let sIdx = Number(document.getElementById('map-size').value);
             let uIdx = Number(document.getElementById('map-unit').value);
             let pIdx = Number(document.getElementById('map-price').value);
 
-            // 從表頭下一行開始掃描
             let parsedItems = [];
-            let headerRowIdx = 0; // 簡化起見，從第2列 (index 1) 開始抓，或依據實際選擇
             for (let i = 1; i < rawExcelJson.length; i++) {
                 let row = rawExcelJson[i];
                 if (!row || row.length === 0) continue;
@@ -416,7 +407,6 @@
                 let unit = row[uIdx] !== undefined ? String(row[uIdx]) : '-';
                 let price = row[pIdx] !== undefined ? Number(row[pIdx]) : NaN;
 
-                // 只要尺寸有值、且價格是有效數字就收錄
                 if (size && size !== 'undefined' && !isNaN(price) && price > 0) {
                     parsedItems.push({
                         branch: branch.trim(),
@@ -434,7 +424,7 @@
                 document.getElementById('column-mapping-box').classList.add('hidden');
                 alert('成功匯入 ' + parsedItems.length + ' 筆倉位資料！');
             } else {
-                alert('未能抓取到有效資料，請檢查您選擇的「月繳原價欄位」是否正確包含了數值金額。');
+                alert('未能抓取到有效資料，請檢查您選擇的欄位是否正確。');
             }
         }
 
@@ -468,12 +458,12 @@
             document.getElementById('inv-date').valueAsDate = new Date();
 
             if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">沒有符合的倉位資料，請先上傳 Excel</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">沒有符合的倉位資料，請先上傳 Excel</td></tr>`;
                 return;
             }
 
+            // 預設不自動填入金額，讓店長完全手動輸入，或留白輸入文字說明
             tbody.innerHTML = storageData.map((item, index) => {
-                let defaultDiscountPrice = Math.round(item.price * 0.80);
                 return `
                     <tr class="hover:bg-slate-50 border-b">
                         <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-unit="${item.unit}" data-price="${item.price}"></td>
@@ -481,7 +471,10 @@
                         <td class="p-2">${item.size} (材積: ${item.unit})</td>
                         <td class="p-2 font-semibold">NT$ ${item.price.toLocaleString()}</td>
                         <td class="p-2">
-                            <input type="number" id="custom-price-${index}" class="custom-discount-input w-36 border rounded px-2 py-1 text-sm font-semibold text-amber-700 bg-amber-50" value="${defaultDiscountPrice}">
+                            <input type="number" id="custom-price-${index}" class="w-32 border rounded px-2 py-1 text-sm font-semibold text-amber-700 bg-amber-50" placeholder="選填優惠價">
+                        </td>
+                        <td class="p-2">
+                            <input type="text" id="custom-note-${index}" class="w-44 border rounded px-2 py-1 text-sm text-slate-700 bg-slate-50" placeholder="例:送1個月/折500元">
                         </td>
                     </tr>
                 `;
@@ -521,13 +514,24 @@
                 const unit = cb.getAttribute('data-unit');
                 const price = Number(cb.getAttribute('data-price'));
                 
-                const customInput = document.getElementById(`custom-price-${index}`);
-                const finalDiscountPrice = customInput ? Number(customInput.value) || Math.round(price * 0.80) : Math.round(price * 0.80);
+                const customPriceInput = document.getElementById(`custom-price-${index}`);
+                const customNoteInput = document.getElementById(`custom-note-${index}`);
+                
+                let customPriceVal = customPriceInput && customPriceInput.value !== '' ? Number(customPriceInput.value) : null;
+                let customNoteVal = customNoteInput ? customNoteInput.value.trim() : '';
 
-                totalRent += finalDiscountPrice;
+                // 如果店長有填寫優惠價則採計優惠價，否則預設用原價計算總計
+                let effectivePrice = customPriceVal !== null ? customPriceVal : price;
+                totalRent += effectivePrice;
 
                 let p95 = Math.round(price * 0.95);
                 let p90 = Math.round(price * 0.90);
+
+                // 組合報價單右側顯示的特惠價與文字備註
+                let displayPriceHtml = `NT$ ${effectivePrice.toLocaleString()}`;
+                if (customNoteVal) {
+                    displayPriceHtml += `<br><span class="text-xs text-red-600 font-semibold">(${customNoteVal})</span>`;
+                }
 
                 html += `
                     <tr>
@@ -536,7 +540,7 @@
                         <td class="p-2.5 text-right">NT$ ${price.toLocaleString()}</td>
                         <td class="p-2.5 text-right">NT$ ${p95.toLocaleString()}</td>
                         <td class="p-2.5 text-right">NT$ ${p90.toLocaleString()}</td>
-                        <td class="p-2.5 text-right font-black text-amber-700">NT$ ${finalDiscountPrice.toLocaleString()}</td>
+                        <td class="p-2.5 text-right font-black text-amber-700">${displayPriceHtml}</td>
                     </tr>
                 `;
             });
@@ -584,10 +588,16 @@
                 const unit = cb.getAttribute('data-unit');
                 const price = Number(cb.getAttribute('data-price'));
 
-                const customInput = document.getElementById(`custom-price-${index}`);
-                const finalDiscountPrice = customInput ? Number(customInput.value) || Math.round(price * 0.80) : Math.round(price * 0.80);
+                const customPriceInput = document.getElementById(`custom-price-${index}`);
+                const customNoteInput = document.getElementById(`custom-note-${index}`);
+                
+                let customPriceVal = customPriceInput && customPriceInput.value !== '' ? Number(customPriceInput.value) : null;
+                let customNoteVal = customNoteInput ? customNoteInput.value.trim() : '';
 
-                subtotal += finalDiscountPrice;
+                let effectivePrice = customPriceVal !== null ? customPriceVal : price;
+                subtotal += effectivePrice;
+
+                let noteText = customNoteVal ? `<br><span class="text-xs text-red-600">(${customNoteVal})</span>` : '';
 
                 html += `
                     <tr>
@@ -595,10 +605,10 @@
                         <td class="p-2.5">${unit}</td>
                         <td class="p-2.5 text-right">${price.toLocaleString()}</td>
                         <td class="p-2.5 text-center">年約</td>
-                        <td class="p-2.5 text-right font-bold">${finalDiscountPrice.toLocaleString()}</td>
+                        <td class="p-2.5 text-right font-bold">${effectivePrice.toLocaleString()}${noteText}</td>
                         <td class="p-2.5 text-center">12</td>
                         <td class="p-2.5 text-right">150</td>
-                        <td class="p-2.5 text-right font-bold text-amber-700">NT$ ${((finalDiscountPrice * 12) + 150).toLocaleString()}</td>
+                        <td class="p-2.5 text-right font-bold text-amber-700">NT$ ${((effectivePrice * 12) + 150).toLocaleString()}</td>
                     </tr>
                 `;
             });
