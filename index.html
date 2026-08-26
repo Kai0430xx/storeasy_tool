@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (支援編號/材積快速搜尋版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (各項目獨立方案設定版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -83,7 +83,7 @@
                                         <th class="p-3">據點名稱</th>
                                         <th class="p-3">倉位編號</th>
                                         <th class="p-3">尺寸 (W*L*H)</th>
-                                        <th class="p-3">材積 (呎)</th>
+                                        <th class="p-3">材積 (材)</th>
                                         <th class="p-3">月繳/原價</th>
                                         <th class="p-3">季繳/95折</th>
                                         <th class="p-3">半年繳/9折</th>
@@ -102,7 +102,7 @@
                 <!-- 2. 生成正式報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與快速搜尋勾選</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與跨據點勾選</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
@@ -176,38 +176,27 @@
                             </table>
                         </div>
 
-                        <!-- 已勾選項目持久清單 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border mb-6">
-                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">✅ 已選取的報價項目總覽 (跨據點保留)：</h5>
-                            <div id="selected-items-summary" class="text-xs text-slate-500">尚未勾選任何項目</div>
+                        <!-- 已勾選項目持久清單 (各項目可獨立設定租期方案) -->
+                        <div class="bg-slate-50 p-4 rounded-xl border mb-6 space-y-3">
+                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider">✅ 已選取的報價項目 (可為各項目獨立設定繳費方案)：</h5>
+                            <div id="selected-items-summary" class="space-y-2 text-xs text-slate-600">
+                                <span class="text-slate-400">尚未勾選任何項目</span>
+                            </div>
                         </div>
 
-                        <!-- 試算參數設定 -->
+                        <!-- 保證金參數設定 -->
                         <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 mb-6 space-y-4">
                             <h4 class="font-bold text-sm text-amber-900">📊 費用試算設定</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold mb-1 text-amber-900">試算計算基準：</label>
-                                    <select id="q-calc-target" class="border rounded-lg px-3 py-2 text-sm bg-white font-semibold w-full">
-                                        <option value="all">全部勾選項目總計</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold mb-1 text-amber-900">選擇本次繳費方式 (租期方案)：</label>
-                                    <select id="q-calc-term" class="border rounded-lg px-3 py-2 text-sm bg-white font-semibold w-full">
-                                        <option value="1">月繳 (1個月 / 原價)</option>
-                                        <option value="3">季繳 (3個月 / 95折)</option>
-                                        <option value="6">半年繳 (6個月 / 9折)</option>
-                                        <option value="12">年繳 (12個月 / 85折)</option>
-                                        <option value="12_80">年繳 (12個月 / 8折)</option>
-                                    </select>
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-semibold mb-1 text-amber-900">保證金收取設定：</label>
                                     <select id="q-deposit-mode" class="border rounded-lg px-3 py-2 text-sm bg-white font-semibold w-full">
                                         <option value="auto">自動計算 (1-2月收2個月原價，3月以上收1個月原價)</option>
                                         <option value="zero">免收保證金 (NT$ 0)</option>
                                     </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <p class="text-xs text-amber-800">💡 提示：各項目的租期與繳費方式已於上方「已選取項目總覽」中獨立設定，系統將自動加總計算。</p>
                                 </div>
                             </div>
                         </div>
@@ -243,7 +232,7 @@
                         <table id="quote-export-table" class="w-full text-left border-collapse mb-6 text-sm">
                             <thead>
                                 <tr class="bg-slate-900 text-white text-center">
-                                    <th class="p-2.5 border border-slate-700">單位<br>(立方英尺)</th>
+                                    <th class="p-2.5 border border-slate-700">單位<br>(材)</th>
                                     <th class="p-2.5 border border-slate-700">倉位尺寸</th>
                                     <th class="p-2.5 border border-slate-700">月繳/月<br>(原價)</th>
                                     <th class="p-2.5 border border-slate-700">季繳/月<br>(95折)</th>
@@ -257,10 +246,10 @@
                         </table>
 
                         <div class="bg-slate-50 p-4 rounded-lg border space-y-2 text-sm mb-6">
-                            <div class="font-bold border-b pb-1 text-slate-700">費用試算表 (<span id="v-q-calc-mode">全部總計</span> | 方案：<span id="v-q-term-text">年繳</span>)</div>
-                            <div class="flex justify-between"><span>租金 (NT$)：</span> <span id="v-q-rent" class="font-bold">0</span></div>
-                            <div class="flex justify-between"><span>保證金 (NT$)：</span> <span id="v-q-deposit">0</span></div>
-                            <div class="flex justify-between"><span>保險文書處理費 (NT$)：</span> <span id="v-q-fee">0</span></div>
+                            <div class="font-bold border-b pb-1 text-slate-700">費用試算表 (綜合多據點獨立方案)</div>
+                            <div class="flex justify-between"><span>租金總計 (NT$)：</span> <span id="v-q-rent" class="font-bold">0</span></div>
+                            <div class="flex justify-between"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
+                            <div class="flex justify-between"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
                             <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
                         </div>
 
@@ -364,9 +353,11 @@
                         </div>
 
                         <!-- 已勾選請款項目持久清單 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border mb-6">
-                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">✅ 已選取的請款項目總覽 (跨據點保留)：</h5>
-                            <div id="invoice-selected-summary" class="text-xs text-slate-500">尚未勾選任何請款項目</div>
+                        <div class="bg-slate-50 p-4 rounded-xl border mb-6 space-y-3">
+                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider">✅ 已選取的請款項目 (可為各項目獨立設定繳費方案)：</h5>
+                            <div id="invoice-selected-summary" class="space-y-2 text-xs text-slate-600">
+                                <span class="text-slate-400">尚未勾選任何請款項目</span>
+                            </div>
                         </div>
 
                         <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用會計版正式請款單</button>
@@ -446,7 +437,7 @@
 
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        let selectedQuoteItems = {}; 
+        let selectedQuoteItems = {}; // key = globalIndex, value = { ...item, term: '12' }
         let selectedInvoiceItems = {}; 
         let rawExcelJson = [];
 
@@ -688,7 +679,6 @@
 
             let branchItems = storageData.filter(item => item.branch === selectedBranch);
             
-            // 關鍵字搜尋過濾 (支援編號或材積)
             if (searchKw) {
                 branchItems = branchItems.filter(item => 
                     item.code.toLowerCase().includes(searchKw) || 
@@ -709,7 +699,7 @@
                     <tr class="hover:bg-slate-50 border-b">
                         <td class="p-2"><input type="checkbox" class="q-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}呎)</td>
+                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
                         <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
                         <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
@@ -720,19 +710,24 @@
         function toggleQuoteItem(globalIndex) {
             const chk = document.querySelector(`input.q-item-chk[data-index="${globalIndex}"]`);
             if (chk && chk.checked) {
-                selectedQuoteItems[globalIndex] = storageData[globalIndex];
+                // 預設給予年繳(85折)作為初始方案
+                selectedQuoteItems[globalIndex] = { ...storageData[globalIndex], term: '12' };
             } else {
                 delete selectedQuoteItems[globalIndex];
             }
             renderSelectedQuoteSummary();
-            updateCalcTargetOptions();
+        }
+
+        function updateItemTerm(globalIndex, termVal) {
+            if (selectedQuoteItems[globalIndex]) {
+                selectedQuoteItems[globalIndex].term = termVal;
+            }
         }
 
         function removeQuoteItem(globalIndex) {
             delete selectedQuoteItems[globalIndex];
             renderQuoteSelectableItems();
             renderSelectedQuoteSummary();
-            updateCalcTargetOptions();
         }
 
         function renderSelectedQuoteSummary() {
@@ -743,28 +738,29 @@
                 return;
             }
 
-            let html = '<div class="flex flex-wrap gap-2">';
+            let html = '';
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
+                let currentTerm = item.term || '12';
                 html += `
-                    <div class="inline-flex items-center gap-1.5 bg-white border border-amber-300 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-amber-900">
-                        <span>[${item.branch}] <b>${item.code}</b> (${item.size}) - NT$ ${item.price1.toLocaleString()}</span>
-                        <button onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold ml-1">×</button>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white border border-amber-300 p-2.5 rounded-lg shadow-sm">
+                        <div class="font-semibold text-amber-900">
+                            [${item.branch}] <b>${item.code}</b> (${item.size} / ${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
+                            <select onchange="updateItemTerm(${idx}, this.value)" class="border rounded px-2 py-1 text-xs bg-amber-50 font-semibold">
+                                <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
+                                <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
+                                <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
+                                <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
+                                <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
+                            </select>
+                            <button onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button>
+                        </div>
                     </div>
                 `;
             });
-            html += '</div>';
             summaryEl.innerHTML = html;
-        }
-
-        function updateCalcTargetOptions() {
-            const keys = Object.keys(selectedQuoteItems);
-            let optionsHtml = '<option value="all">全部勾選項目總計</option>';
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                optionsHtml += `<option value="${idx}">單獨計算: [${item.branch}] ${item.code} (${item.size})</option>`;
-            });
-            document.getElementById('q-calc-target').innerHTML = optionsHtml;
         }
 
         // --- 請款單據點聯動與快速搜尋 ---
@@ -812,7 +808,7 @@
                     <tr class="hover:bg-slate-50 border-b">
                         <td class="p-2"><input type="checkbox" class="i-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
+                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
                         <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
                         <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
@@ -823,11 +819,17 @@
         function toggleInvoiceItem(globalIndex) {
             const chk = document.querySelector(`input.i-item-chk[data-index="${globalIndex}"]`);
             if (chk && chk.checked) {
-                selectedInvoiceItems[globalIndex] = storageData[globalIndex];
+                selectedInvoiceItems[globalIndex] = { ...storageData[globalIndex], term: '12' };
             } else {
                 delete selectedInvoiceItems[globalIndex];
             }
             renderSelectedInvoiceSummary();
+        }
+
+        function updateInvoiceItemTerm(globalIndex, termVal) {
+            if (selectedInvoiceItems[globalIndex]) {
+                selectedInvoiceItems[globalIndex].term = termVal;
+            }
         }
 
         function removeInvoiceItem(globalIndex) {
@@ -844,17 +846,28 @@
                 return;
             }
 
-            let html = '<div class="flex flex-wrap gap-2">';
+            let html = '';
             keys.forEach(idx => {
                 let item = selectedInvoiceItems[idx];
+                let currentTerm = item.term || '12';
                 html += `
-                    <div class="inline-flex items-center gap-1.5 bg-white border border-amber-300 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-amber-900">
-                        <span>[${item.branch}] <b>${item.code}</b> (${item.size}) - NT$ ${item.price1.toLocaleString()}</span>
-                        <button onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold ml-1">×</button>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white border border-amber-300 p-2.5 rounded-lg shadow-sm">
+                        <div class="font-semibold text-amber-900">
+                            [${item.branch}] <b>${item.code}</b> (${item.size} / ${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
+                            <select onchange="updateInvoiceItemTerm(${idx}, this.value)" class="border rounded px-2 py-1 text-xs bg-amber-50 font-semibold">
+                                <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
+                                <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
+                                <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
+                                <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
+                                <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
+                            </select>
+                            <button onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2">×</button>
+                        </div>
                     </div>
                 `;
             });
-            html += '</div>';
             summaryEl.innerHTML = html;
         }
 
@@ -868,9 +881,6 @@
             const company = document.getElementById('q-company').value || '---';
             const taxid = document.getElementById('q-taxid').value || '---';
             const date = document.getElementById('quote-date').value;
-            
-            const calcTarget = document.getElementById('q-calc-target').value;
-            const calcTerm = document.getElementById('q-calc-term').value;
             const depositMode = document.getElementById('q-deposit-mode').value;
             
             const keys = Object.keys(selectedQuoteItems);
@@ -894,16 +904,6 @@
             let targetRent = 0;
             let targetFee = 0;
             let targetDeposit = 0;
-            let calcModeText = '全部總計';
-            let termMonths = 1;
-            let termTextName = '月繳';
-
-            if (calcTerm === '3') { termMonths = 3; termTextName = '季繳'; }
-            else if (calcTerm === '6') { termMonths = 6; termTextName = '半年繳'; }
-            else if (calcTerm === '12') { termMonths = 12; termTextName = '年繳 (85折)'; }
-            else if (calcTerm === '12_80') { termMonths = 12; termTextName = '年繳 (8折)'; }
-
-            document.getElementById('v-q-term-text').innerText = termTextName;
 
             keys.forEach((idx) => {
                 let item = selectedQuoteItems[idx];
@@ -912,11 +912,12 @@
                 let p6 = item.price6;
                 let p12_85 = item.price12_85;
                 let p12_80 = item.price12_80;
+                let term = item.term || '12';
 
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700">${item.unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium"><b>${item.code}</b><br>${item.size}</td>
+                        <td class="p-2.5 border border-slate-700 font-medium">[${item.branch}] <b>${item.code}</b><br>${item.size}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
@@ -924,25 +925,17 @@
                     </tr>
                 `;
 
-                let selectedMonthlyRate = p1;
-                if (calcTerm === '3') selectedMonthlyRate = p3;
-                else if (calcTerm === '6') selectedMonthlyRate = p6;
-                else if (calcTerm === '12') selectedMonthlyRate = p12_85;
-                else if (calcTerm === '12_80') selectedMonthlyRate = p12_80;
+                let termMonths = 1;
+                let monthlyRate = p1;
+                if (term === '3') { termMonths = 3; monthlyRate = p3; }
+                else if (term === '6') { termMonths = 6; monthlyRate = p6; }
+                else if (term === '12') { termMonths = 12; monthlyRate = p12_85; }
+                else if (term === '12_80') { termMonths = 12; monthlyRate = p12_80; }
 
-                let itemTotalRent = selectedMonthlyRate * termMonths;
-                let feePerMonth = selectedMonthlyRate >= 3000 ? 150 : 80;
-                let itemFee = feePerMonth * termMonths;
-                let itemDeposit = termMonths <= 2 ? (p1 * 2) : p1;
-
-                if (calcTarget === 'all' || calcTarget === idx) {
-                    targetRent += itemTotalRent;
-                    targetFee += itemFee;
-                    targetDeposit += itemDeposit;
-                }
-                if (calcTarget === idx) {
-                    calcModeText = `[${item.branch}] ${item.code} (${item.size})`;
-                }
+                targetRent += (monthlyRate * termMonths);
+                let feePerMonth = monthlyRate >= 3000 ? 150 : 80;
+                targetFee += (feePerMonth * termMonths);
+                targetDeposit += (termMonths <= 2 ? (p1 * 2) : p1);
             });
 
             if (depositMode === 'zero') {
@@ -952,7 +945,8 @@
             tbody.innerHTML = html;
             let grandTotal = targetRent + targetFee + targetDeposit;
 
-            document.getElementById('v-q-calc-mode').innerText = calcModeText;
+            document.getElementById('v-q-calc-mode').innerText = '跨據點綜合加總';
+            document.getElementById('v-q-term-text').innerText = '各項目獨立設定';
             document.getElementById('v-q-rent').innerText = targetRent.toLocaleString();
             document.getElementById('v-q-deposit').innerText = targetDeposit.toLocaleString();
             document.getElementById('v-q-fee').innerText = targetFee.toLocaleString();
@@ -971,7 +965,6 @@
             const company = document.getElementById('i-company').value || '---';
             const taxid = document.getElementById('i-taxid').value || '---';
             const date = document.getElementById('inv-date').value;
-            const calcTerm = document.getElementById('q-calc-term').value;
             
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) {
@@ -993,10 +986,6 @@
             let html = '';
             let totalRentInc = 0;
             let totalDeposit = 0;
-            let termMonths = 1;
-            if (calcTerm === '3') termMonths = 3;
-            else if (calcTerm === '6') termMonths = 6;
-            else if (calcTerm === '12' || calcTerm === '12_80') termMonths = 12;
 
             keys.forEach((idx) => {
                 let item = selectedInvoiceItems[idx];
@@ -1005,12 +994,14 @@
                 let p6 = item.price6;
                 let p12_85 = item.price12_85;
                 let p12_80 = item.price12_80;
+                let term = item.term || '12';
 
+                let termMonths = 1;
                 let monthlyRate = p1;
-                if (calcTerm === '3') monthlyRate = p3;
-                else if (calcTerm === '6') monthlyRate = p6;
-                else if (calcTerm === '12') monthlyRate = p12_85;
-                else if (calcTerm === '12_80') monthlyRate = p12_80;
+                if (term === '3') { termMonths = 3; monthlyRate = p3; }
+                else if (term === '6') { termMonths = 6; monthlyRate = p6; }
+                else if (term === '12') { termMonths = 12; monthlyRate = p12_85; }
+                else if (term === '12_80') { termMonths = 12; monthlyRate = p12_80; }
 
                 let incSubtotal = monthlyRate * termMonths;
                 let exSubtotal = Math.round(incSubtotal / 1.05);
@@ -1023,8 +1014,8 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">${item.code}</td>
-                        <td class="p-2.5 border border-slate-700">${item.unit}呎</td>
+                        <td class="p-2.5 border border-slate-700 font-bold">[${item.branch}] ${item.code}</td>
+                        <td class="p-2.5 border border-slate-700">${item.unit}材</td>
                         <td class="p-2.5 border border-slate-700 text-right">${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">${monthlyRate.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-center">${termMonths}</td>
