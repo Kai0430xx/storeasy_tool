@@ -39,12 +39,12 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (極速靈敏版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (穩定修復版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
 
-                <!-- 1. 倉位資料與多據點管理頁籤 -->
+                <!-- 1. 倉位資料頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
@@ -99,7 +99,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 生成正式報價單頁籤 -->
+                <!-- 2. 生成報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
                         <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與彈性搜尋勾選</h3>
@@ -187,7 +187,7 @@
                         <button onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
                     </div>
 
-                    <!-- 公司標準正式報價單預覽區 -->
+                    <!-- 報價單預覽區 -->
                     <div id="quote-preview" class="bg-white p-10 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto text-slate-900">
                         <div class="flex justify-between items-start mb-6 border-b-2 border-slate-900 pb-4">
                             <div>
@@ -346,7 +346,7 @@
                         <button onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
                     </div>
 
-                    <!-- 會計版正式請款單預覽區 -->
+                    <!-- 請款單預覽區 -->
                     <div id="invoice-preview" class="bg-white p-10 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto text-slate-900">
                         <div class="flex justify-between items-start mb-6 border-b-2 border-slate-900 pb-4">
                             <div>
@@ -1034,7 +1034,7 @@
 
             let aoa = [
                 ["收多易迷你倉庫 - 報價單"],
-                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client'].innerText],
+                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client').innerText],
                 ["店長:", document.getElementById('v-q-manager'].innerText, "客戶電話:", document.getElementById('v-q-client-phone'].innerText],
                 ["分店名稱:", document.getElementById('v-q-branch'].innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
                 ["聯繫電話:", document.getElementById('v-q-tel'].innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
