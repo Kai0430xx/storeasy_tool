@@ -26,9 +26,9 @@
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button type="button" onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm cursor-pointer">📦 倉位資料</button>
-                <button type="button" onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">📄 生成報價單</button>
-                <button type="button" onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">💰 生成請款單</button>
+                <button type="button" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm cursor-pointer">📦 倉位資料</button>
+                <button type="button" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">📄 生成報價單</button>
+                <button type="button" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">💰 生成請款單</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
                 資料已永久儲存於本機瀏覽器
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (極致安全防呆版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (事件監聽強效穩定版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -60,20 +60,20 @@
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button type="button" onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">一鍵智慧匯入資料</button>
+                        <button type="button" id="btn-upload" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">一鍵智慧匯入資料</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                             <div class="flex items-center gap-3 w-full sm:w-auto">
                                 <h3 class="text-lg font-bold text-slate-700">📋 已載入的倉位清單</h3>
-                                <select id="storage-branch-filter" onchange="renderStorageTable()" class="border rounded-lg px-3 py-1.5 text-sm bg-slate-50 font-semibold text-amber-900">
+                                <select id="storage-branch-filter" class="border rounded-lg px-3 py-1.5 text-sm bg-slate-50 font-semibold text-amber-900">
                                     <option value="all">全部據點</option>
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button type="button" onclick="deleteSelectedBranchData()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition cursor-pointer">🗑️ 刪除目前選取的分店</button>
-                                <button type="button" onclick="clearStorageData()" class="text-xs text-slate-400 hover:text-red-500 hover:underline cursor-pointer">清空全部本機資料</button>
+                                <button type="button" id="btn-delete-branch" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition cursor-pointer">🗑️ 刪除目前選取的分店</button>
+                                <button type="button" id="btn-clear-all" class="text-xs text-slate-400 hover:text-red-500 hover:underline cursor-pointer">清空全部本機資料</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -149,13 +149,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
-                                <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                <select id="quote-branch-select" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
                                     <option value="">-- 全部據點 / 不限分店 --</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
-                                <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
+                                <input type="text" id="quote-search-input" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
                             </div>
                         </div>
 
@@ -184,7 +184,7 @@
                             </div>
                         </div>
 
-                        <button type="button" onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
+                        <button type="button" id="btn-generate-quote" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
                     </div>
 
                     <!-- 公司標準正式報價單預覽區 -->
@@ -252,8 +252,8 @@
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
                         <div class="flex justify-end gap-3 no-print">
-                            <button type="button" onclick="exportQuoteExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
-                            <button type="button" onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
+                            <button type="button" id="btn-export-quote-excel" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
+                            <button type="button" id="btn-print-quote" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -308,13 +308,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
-                                <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                <select id="invoice-branch-select" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
                                     <option value="">-- 全部據點 / 不限分店 --</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
-                                <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
+                                <input type="text" id="invoice-search-input" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
                             </div>
                         </div>
 
@@ -343,7 +343,7 @@
                             </div>
                         </div>
 
-                        <button type="button" onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
+                        <button type="button" id="btn-generate-invoice" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
                     </div>
 
                     <!-- 會計版正式請款單預覽區 -->
@@ -408,8 +408,8 @@
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
                         <div class="flex justify-end gap-3 no-print">
-                            <button type="button" onclick="exportInvoiceExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
-                            <button type="button" onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
+                            <button type="button" id="btn-export-invoice-excel" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
+                            <button type="button" id="btn-print-invoice" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -428,6 +428,37 @@
 
         let selectedQuoteItems = {}; 
         let selectedInvoiceItems = {}; 
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 綁定側邊欄切換
+            document.getElementById('btn-tab-storage').addEventListener('click', () => switchTab('tab-storage'));
+            document.getElementById('btn-tab-quote').addEventListener('click', () => switchTab('tab-quote'));
+            document.getElementById('btn-tab-invoice').addEventListener('click', () => switchTab('tab-invoice'));
+
+            // 綁定按鈕動作
+            document.getElementById('btn-upload').addEventListener('click', handleSmartExcelUpload);
+            document.getElementById('btn-delete-branch').addEventListener('click', deleteSelectedBranchData);
+            document.getElementById('btn-clear-all').addEventListener('click', clearStorageData);
+            document.getElementById('btn-generate-quote').addEventListener('click', generateQuote);
+            document.getElementById('btn-generate-invoice').addEventListener('click', generateInvoice);
+            document.getElementById('btn-export-quote-excel').addEventListener('click', exportQuoteExcel);
+            document.getElementById('btn-print-quote').addEventListener('click', () => window.print());
+            document.getElementById('btn-export-invoice-excel').addEventListener('click', exportInvoiceExcel);
+            document.getElementById('btn-print-invoice').addEventListener('click', () => window.print());
+
+            // 綁定即時搜尋監聽
+            const qSearch = document.getElementById('quote-search-input');
+            if (qSearch) qSearch.addEventListener('input', renderQuoteSelectableItems);
+            const qBranch = document.getElementById('quote-branch-select');
+            if (qBranch) qBranch.addEventListener('change', renderQuoteSelectableItems);
+
+            const iSearch = document.getElementById('invoice-search-input');
+            if (iSearch) iSearch.addEventListener('input', renderInvoiceSelectableItems);
+            const iBranch = document.getElementById('invoice-branch-select');
+            if (iBranch) iBranch.addEventListener('change', renderInvoiceSelectableItems);
+
+            renderStorageTable();
+        });
 
         function switchTab(tabId) {
             try {
@@ -745,17 +776,17 @@
             renderSelectedQuoteSummary();
         }
 
-        function updateItemTerm(globalIndex, termVal) {
+        window.updateItemTerm = function(globalIndex, termVal) {
             if (selectedQuoteItems[globalIndex]) {
                 selectedQuoteItems[globalIndex].term = termVal;
             }
-        }
+        };
 
-        function removeQuoteItem(globalIndex) {
+        window.removeQuoteItem = function(globalIndex) {
             delete selectedQuoteItems[globalIndex];
             renderQuoteSelectableItems();
             renderSelectedQuoteSummary();
-        }
+        };
 
         function renderSelectedQuoteSummary() {
             const summaryEl = document.getElementById('selected-items-summary');
@@ -863,17 +894,17 @@
             renderSelectedInvoiceSummary();
         }
 
-        function updateInvoiceItemTerm(globalIndex, termVal) {
+        window.updateInvoiceItemTerm = function(globalIndex, termVal) {
             if (selectedInvoiceItems[globalIndex]) {
                 selectedInvoiceItems[globalIndex].term = termVal;
             }
-        }
+        };
 
-        function removeInvoiceItem(globalIndex) {
+        window.removeInvoiceItem = function(globalIndex) {
             delete selectedInvoiceItems[globalIndex];
             renderInvoiceSelectableItems();
             renderSelectedInvoiceSummary();
-        }
+        };
 
         function renderSelectedInvoiceSummary() {
             const summaryEl = document.getElementById('invoice-selected-summary');
@@ -1082,9 +1113,9 @@
             let aoa = [
                 ["收多易迷你倉庫 - 報價單"],
                 ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client').innerText],
-                ["店長:", document.getElementById('v-q-manager').innerText, "客戶電話:", document.getElementById('v-q-client-phone').innerText],
-                ["分店名稱:", document.getElementById('v-q-branch').innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
-                ["聯繫電話:", document.getElementById('v-q-tel').innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
+                ["店長:", document.getElementById('v-q-manager'].innerText, "客戶電話:", document.getElementById('v-q-client-phone'].innerText],
+                ["分店名稱:", document.getElementById('v-q-branch'].innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
+                ["聯繫電話:", document.getElementById('v-q-tel'].innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
                 ["分店地址:", document.getElementById('v-q-address'].innerText],
                 [],
                 ["單位(材)", "倉位尺寸", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
@@ -1175,8 +1206,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "請款單");
             XLSX.writeFile(wb, "Storeasy_請款單.xlsx");
         }
-
-        renderStorageTable();
     </script>
 </body>
 </html>
