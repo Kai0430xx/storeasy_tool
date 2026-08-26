@@ -26,9 +26,9 @@
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料</button>
-                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 生成報價單</button>
-                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 生成請款單</button>
+                <button type="button" onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm cursor-pointer">📦 倉位資料</button>
+                <button type="button" onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">📄 生成報價單</button>
+                <button type="button" onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">💰 生成請款單</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
                 資料已永久儲存於本機瀏覽器
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (按鈕與上傳修復版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (按鈕完全修復版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -419,7 +419,13 @@
     </div>
 
     <script>
-        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let storageData = [];
+        try {
+            storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        } catch(e) {
+            storageData = [];
+        }
+
         let selectedQuoteItems = {}; 
         let selectedInvoiceItems = {}; 
 
@@ -429,17 +435,22 @@
                 el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
                 el.classList.add('hover:bg-slate-800', 'text-slate-300');
             });
-            document.getElementById(tabId).classList.remove('hidden');
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.remove('hidden');
+            
             const activeBtn = document.getElementById('btn-' + tabId);
-            activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-            activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+            if (activeBtn) {
+                activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
+                activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+            }
 
             const titleMap = {
                 'tab-storage': '📦 倉位資料',
                 'tab-quote': '📄 生成報價單',
                 'tab-invoice': '💰 生成請款單'
             };
-            document.getElementById('page-title').innerText = titleMap[tabId] || '營運管理工具';
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.innerText = titleMap[tabId] || '營運管理工具';
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
@@ -471,7 +482,10 @@
                             return;
                         }
 
-                        let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
+                        let inputBranchField = document.getElementById('upload-branch-name');
+                        let inputBranch = inputBranchField ? inputBranchField.value.trim() : '土城店';
+                        if (!inputBranch) inputBranch = '土城店';
+
                         let newItems = [];
 
                         for (let i = 0; i < jsonSheet.length; i++) {
@@ -565,7 +579,7 @@
                         alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
                     } catch (err) {
                         console.error(err);
-                        alert('解析 Excel 檔案時發生錯誤，請檢查檔案格式是否正確。');
+                        alert('解析 Excel 檔案時發生錯誤。');
                     }
                 };
                 reader.readAsArrayBuffer(file);
@@ -596,8 +610,10 @@
 
         function renderStorageTable() {
             updateBranchFilter();
-            const filterVal = document.getElementById('storage-branch-filter').value;
+            const filterEl = document.getElementById('storage-branch-filter');
+            const filterVal = filterEl ? filterEl.value : 'all';
             const tbody = document.getElementById('storage-table-body');
+            if (!tbody) return;
             
             let filtered = storageData;
             if (filterVal && filterVal !== 'all') {
@@ -624,7 +640,8 @@
         }
 
         function deleteSelectedBranchData() {
-            const filterVal = document.getElementById('storage-branch-filter').value;
+            const filterEl = document.getElementById('storage-branch-filter');
+            const filterVal = filterEl ? filterEl.value : 'all';
             if (!filterVal || filterVal === 'all') {
                 alert('請先在上方選擇您想要刪除的「特定分店」！');
                 return;
@@ -647,10 +664,13 @@
 
         // --- 報價單專屬據點與搜尋勾選 ---
         function initQuoteTab() {
-            document.getElementById('quote-date').valueAsDate = new Date();
-            document.getElementById('inv-date').valueAsDate = new Date();
+            const qDate = document.getElementById('quote-date');
+            const iDate = document.getElementById('inv-date');
+            if (qDate && !qDate.value) qDate.valueAsDate = new Date();
+            if (iDate && !iDate.value) iDate.valueAsDate = new Date();
             
             const branchSelect = document.getElementById('quote-branch-select');
+            if (!branchSelect) return;
             const branches = [...new Set(storageData.map(item => item.branch))];
             
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
@@ -662,9 +682,12 @@
         }
 
         function renderQuoteSelectableItems() {
-            const selectedBranch = document.getElementById('quote-branch-select').value;
-            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
+            const selectedBranchEl = document.getElementById('quote-branch-select');
+            const searchKwEl = document.getElementById('quote-search-input');
+            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
+            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
             const tbody = document.getElementById('quote-selectable-body');
+            if (!tbody) return;
 
             if (storageData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
@@ -728,6 +751,7 @@
 
         function renderSelectedQuoteSummary() {
             const summaryEl = document.getElementById('selected-items-summary');
+            if (!summaryEl) return;
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
                 summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何項目</span>';
@@ -764,6 +788,7 @@
         // --- 請款單專屬據點與搜尋勾選 (獨立工具) ---
         function initInvoiceTab() {
             const branchSelect = document.getElementById('invoice-branch-select');
+            if (!branchSelect) return;
             const branches = [...new Set(storageData.map(item => item.branch))];
             
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
@@ -775,9 +800,12 @@
         }
 
         function renderInvoiceSelectableItems() {
-            const selectedBranch = document.getElementById('invoice-branch-select').value;
-            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
+            const selectedBranchEl = document.getElementById('invoice-branch-select');
+            const searchKwEl = document.getElementById('invoice-search-input');
+            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
+            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
             const tbody = document.getElementById('invoice-selectable-body');
+            if (!tbody) return;
 
             if (storageData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
@@ -841,6 +869,7 @@
 
         function renderSelectedInvoiceSummary() {
             const summaryEl = document.getElementById('invoice-selected-summary');
+            if (!summaryEl) return;
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) {
                 summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何請款項目</span>';
@@ -1045,9 +1074,9 @@
             let aoa = [
                 ["收多易迷你倉庫 - 報價單"],
                 ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client').innerText],
-                ["店長:", document.getElementById('v-q-manager'].innerText, "客戶電話:", document.getElementById('v-q-client-phone'].innerText],
-                ["分店名稱:", document.getElementById('v-q-branch'].innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
-                ["聯繫電話:", document.getElementById('v-q-tel'].innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
+                ["店長:", document.getElementById('v-q-manager').innerText, "客戶電話:", document.getElementById('v-q-client-phone').innerText],
+                ["分店名稱:", document.getElementById('v-q-branch').innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
+                ["聯繫電話:", document.getElementById('v-q-tel').innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
                 ["分店地址:", document.getElementById('v-q-address'].innerText],
                 [],
                 ["單位(材)", "倉位尺寸", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
@@ -1068,7 +1097,7 @@
             aoa.push(
                 [],
                 ["費用試算表"],
-                ["租金總計:", document.getElementById('v-q-rent'].innerText],
+                ["租金總計:", document.getElementById('v-q-rent').innerText],
                 ["保證金總計:", document.getElementById('v-q-deposit'].innerText],
                 ["保險文書處理費總計:", document.getElementById('v-q-fee'].innerText],
                 ["合計:", document.getElementById('v-q-total'].innerText]
