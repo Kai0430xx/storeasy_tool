@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -92,7 +92,7 @@
     <main>
         <header>
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (零錯誤完美版)</div>
+            <div class="version">系統版本：2026.09 (免當機終極版)</div>
         </header>
 
         <div class="content-body">
@@ -1044,7 +1044,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 精準陣列排版 Excel 匯出（變數分離，絕對零括號錯誤）
+        // 完美陣列排版 Excel 匯出功能 (變數分離防錯機制)
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -1061,6 +1061,10 @@
             const qTel = document.getElementById('v-q-tel').innerText;
             const qTaxid = document.getElementById('v-q-taxid').innerText;
             const qAddress = document.getElementById('v-q-address').innerText;
+            const qRent = document.getElementById('v-q-rent').innerText;
+            const qDeposit = document.getElementById('v-q-deposit').innerText;
+            const qFee = document.getElementById('v-q-fee').innerText;
+            const qTotal = document.getElementById('v-q-total').innerText;
 
             let aoa = [
                 ["收多易迷你倉庫 - 報價單"],
@@ -1088,10 +1092,10 @@
             aoa.push(
                 [],
                 ["費用試算表"],
-                ["租金總計:", document.getElementById('v-q-rent').innerText],
-                ["保證金總計:", document.getElementById('v-q-deposit').innerText],
-                ["保險文書處理費總計:", document.getElementById('v-q-fee').innerText],
-                ["合計:", document.getElementById('v-q-total'].innerText]
+                ["租金總計:", qRent],
+                ["保證金總計:", qDeposit],
+                ["保險文書處理費總計:", qFee],
+                ["合計:", qTotal]
             );
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -1116,6 +1120,9 @@
             const iTel = document.getElementById('v-i-tel').innerText;
             const iTaxid = document.getElementById('v-i-taxid').innerText;
             const iAddress = document.getElementById('v-i-address').innerText;
+            const iSubtotal = document.getElementById('v-i-subtotal').innerText;
+            const iDeposit = document.getElementById('v-i-deposit').innerText;
+            const iTotal = document.getElementById('v-i-total').innerText;
 
             let aoa = [
                 ["收多易股份有限公司 - 請款單"],
@@ -1158,9 +1165,9 @@
 
             aoa.push(
                 [],
-                ["租金合計:", document.getElementById('v-i-subtotal').innerText],
-                ["保證金合計:", document.getElementById('v-i-deposit').innerText],
-                ["請款總金額 (TWD):", document.getElementById('v-i-total'].innerText]
+                ["租金合計:", iSubtotal],
+                ["保證金合計:", iDeposit],
+                ["請款總金額 (TWD):", iTotal]
             );
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
