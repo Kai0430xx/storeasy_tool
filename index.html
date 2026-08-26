@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -96,7 +96,7 @@
     <main>
         <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (格線完美輸出版)</div>
+            <div class="version">系統版本：2026.09 (完美格線與對齊版)</div>
         </header>
 
         <div class="content-body">
@@ -692,7 +692,7 @@
                 let isChecked = selectedQuoteItems[globalIndex] ? 'checked' : '';
                 return `
                     <tr>
-                        <td><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
                         <td><b>${item.size}</b> (${item.unit}材)</td>
                         <td>NT$ ${item.price1.toLocaleString()}</td>
@@ -1068,7 +1068,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 使用網頁 HTML 匯出格式 (.xls)，完美保留黑框格線、欄位對齊與所有備註資訊
+        // 完美 HTML Excel 匯出：帶有獨立格子、置中對齊與清晰黑線格線
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -1094,34 +1094,34 @@
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="utf-8"><style>
                     table { border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 10pt; }
-                    th, td { border: 1px solid #000000; padding: 8px; vertical-align: middle; }
+                    th, td { border: 1px solid #000000 !important; padding: 8px; vertical-align: middle; }
                     th { background-color: #f8fafc; font-weight: bold; text-align: center; }
                     .num { text-align: right; }
                     .center { text-align: center; }
+                    .noborder { border: none !important; }
                 </style></head>
                 <body>
                     <table>
-                        <tr><td colspan="6" style="font-size: 16pt; font-weight: bold; border: none;">收多易迷你倉庫 - 報價單</td></tr>
-                        <tr><td colspan="6" style="font-size: 9pt; color: #dc2626; border: none;">報價有效期限 7 天</td></tr>
+                        <tr><td colspan="4" style="font-size: 16pt; font-weight: bold; border: none;">收多易迷你倉庫 - 報價單</td><td colspan="2" style="text-align: right; color: #dc2626; font-weight: bold; border: none;">報價有效期限 7 天</td></tr>
                         <tr><td colspan="6" style="border: none;"></td></tr>
                         <tr>
-                            <td colspan="1" style="border: none;"><b>日期：</b></td><td colspan="2" style="border: none;">${qDate}</td>
-                            <td colspan="1" style="border: none;"><b>客戶名稱：</b></td><td colspan="2" style="border: none;">${qClient}</td>
+                            <td class="noborder"><b>日期：</b></td><td colspan="2" class="noborder">${qDate}</td>
+                            <td class="noborder"><b>客戶名稱：</b></td><td colspan="2" class="noborder">${qClient}</td>
                         </tr>
                         <tr>
-                            <td colspan="1" style="border: none;"><b>店長：</b></td><td colspan="2" style="border: none;">${qManager}</td>
-                            <td colspan="1" style="border: none;"><b>客戶電話：</b></td><td colspan="2" style="border: none;">${qClientPhone}</td>
+                            <td class="noborder"><b>店長：</b></td><td colspan="2" class="noborder">${qManager}</td>
+                            <td class="noborder"><b>客戶電話：</b></td><td colspan="2" class="noborder">${qClientPhone}</td>
                         </tr>
                         <tr>
-                            <td colspan="1" style="border: none;"><b>分店名稱：</b></td><td colspan="2" style="border: none;">${qBranch}</td>
-                            <td colspan="1" style="border: none;"><b>公司抬頭：</b></td><td colspan="2" style="border: none;">${qCompany}</td>
+                            <td class="noborder"><b>分店名稱：</b></td><td colspan="2" class="noborder">${qBranch}</td>
+                            <td class="noborder"><b>公司抬頭：</b></td><td colspan="2" class="noborder">${qCompany}</td>
                         </tr>
                         <tr>
-                            <td colspan="1" style="border: none;"><b>聯繫電話：</b></td><td colspan="2" style="border: none;">${qTel}</td>
-                            <td colspan="1" style="border: none;"><b>統一編號：</b></td><td colspan="2" style="border: none;">${qTaxid}</td>
+                            <td class="noborder"><b>聯繫電話：</b></td><td colspan="2" class="noborder">${qTel}</td>
+                            <td class="noborder"><b>統一編號：</b></td><td colspan="2" class="noborder">${qTaxid}</td>
                         </tr>
                         <tr>
-                            <td colspan="1" style="border: none;"><b>分店地址：</b></td><td colspan="5" style="border: none;">${qAddress}</td>
+                            <td class="noborder"><b>分店地址：</b></td><td colspan="5" class="noborder">${qAddress}</td>
                         </tr>
                         <tr><td colspan="6" style="border: none;"></td></tr>
                         <tr>
@@ -1212,33 +1212,34 @@
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="utf-8"><style>
                     table { border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 10pt; }
-                    th, td { border: 1px solid #000000; padding: 8px; vertical-align: middle; }
+                    th, td { border: 1px solid #000000 !important; padding: 8px; vertical-align: middle; }
                     th { background-color: #f8fafc; font-weight: bold; text-align: center; }
                     .num { text-align: right; }
                     .center { text-align: center; }
+                    .noborder { border: none !important; }
                 </style></head>
                 <body>
                     <table>
                         <tr><td colspan="10" style="font-size: 16pt; font-weight: bold; border: none;">收多易股份有限公司 - 請款單</td></tr>
                         <tr><td colspan="10" style="border: none;"></td></tr>
                         <tr>
-                            <td colspan="2" style="border: none;"><b>日期：</b></td><td colspan="3" style="border: none;">${iDate}</td>
-                            <td colspan="2" style="border: none;"><b>客戶名稱：</b></td><td colspan="3" style="border: none;">${iClient}</td>
+                            <td colspan="2" class="noborder"><b>日期：</b></td><td colspan="3" class="noborder">${iDate}</td>
+                            <td colspan="2" class="noborder"><b>客戶名稱：</b></td><td colspan="3" class="noborder">${iClient}</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="border: none;"><b>店長：</b></td><td colspan="3" style="border: none;">${iManager}</td>
-                            <td colspan="2" style="border: none;"><b>客戶電話：</b></td><td colspan="3" style="border: none;">${iClientPhone}</td>
+                            <td colspan="2" class="noborder"><b>店長：</b></td><td colspan="3" class="noborder">${iManager}</td>
+                            <td colspan="2" class="noborder"><b>客戶電話：</b></td><td colspan="3" class="noborder">${iClientPhone}</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="border: none;"><b>分店名稱：</b></td><td colspan="3" style="border: none;">${iBranch}</td>
-                            <td colspan="2" style="border: none;"><b>公司抬頭：</b></td><td colspan="3" style="border: none;">${iCompany}</td>
+                            <td colspan="2" class="noborder"><b>分店名稱：</b></td><td colspan="3" class="noborder">${iBranch}</td>
+                            <td colspan="2" class="noborder"><b>公司抬頭：</b></td><td colspan="3" class="noborder">${iCompany}</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="border: none;"><b>聯繫電話：</b></td><td colspan="3" style="border: none;">${iTel}</td>
-                            <td colspan="2" style="border: none;"><b>統一編號：</b></td><td colspan="3" style="border: none;">${iTaxid}</td>
+                            <td colspan="2" class="noborder"><b>聯繫電話：</b></td><td colspan="3" class="noborder">${iTel}</td>
+                            <td colspan="2" class="noborder"><b>統一編號：</b></td><td colspan="3" class="noborder">${iTaxid}</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="border: none;"><b>分店地址：</b></td><td colspan="8" style="border: none;">${iAddress}</td>
+                            <td colspan="2" class="noborder"><b>分店地址：</b></td><td colspan="8" class="noborder">${iAddress}</td>
                         </tr>
                         <tr><td colspan="10" style="border: none;"></td></tr>
                         <tr>
