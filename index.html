@@ -20,7 +20,7 @@
 
     <div class="flex min-h-screen">
         <!-- 側邊導覽列 -->
-        <aside class="w-64 bg-slate-900 text-white flex flex-col shrink-0 no-print shadow-lg">
+        <aside class="w-64 bg-slate-900 text-white flex flex-col shrink-0 no-print shadow-lg select-none">
             <div class="p-6 border-b border-slate-800">
                 <h1 class="text-xl font-bold tracking-wider text-amber-400">收多易迷你倉庫</h1>
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (按鈕完全修復版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (極致安全防呆版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -430,32 +430,36 @@
         let selectedInvoiceItems = {}; 
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('aside nav button').forEach(el => {
-                el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
-                el.classList.add('hover:bg-slate-800', 'text-slate-300');
-            });
-            const targetTab = document.getElementById(tabId);
-            if (targetTab) targetTab.classList.remove('hidden');
-            
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-                activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
-            }
+            try {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('aside nav button').forEach(el => {
+                    el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
+                    el.classList.add('hover:bg-slate-800', 'text-slate-300');
+                });
+                const targetTab = document.getElementById(tabId);
+                if (targetTab) targetTab.classList.remove('hidden');
+                
+                const activeBtn = document.getElementById('btn-' + tabId);
+                if (activeBtn) {
+                    activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
+                    activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+                }
 
-            const titleMap = {
-                'tab-storage': '📦 倉位資料',
-                'tab-quote': '📄 生成報價單',
-                'tab-invoice': '💰 生成請款單'
-            };
-            const pageTitle = document.getElementById('page-title');
-            if (pageTitle) pageTitle.innerText = titleMap[tabId] || '營運管理工具';
+                const titleMap = {
+                    'tab-storage': '📦 倉位資料',
+                    'tab-quote': '📄 生成報價單',
+                    'tab-invoice': '💰 生成請款單'
+                };
+                const pageTitle = document.getElementById('page-title');
+                if (pageTitle) pageTitle.innerText = titleMap[tabId] || '營運管理工具';
 
-            if (tabId === 'tab-quote') {
-                initQuoteTab();
-            } else if (tabId === 'tab-invoice') {
-                initInvoiceTab();
+                if (tabId === 'tab-quote') {
+                    initQuoteTab();
+                } else if (tabId === 'tab-invoice') {
+                    initInvoiceTab();
+                }
+            } catch(err) {
+                console.error("Tab switch error:", err);
             }
         }
 
@@ -609,34 +613,38 @@
         }
 
         function renderStorageTable() {
-            updateBranchFilter();
-            const filterEl = document.getElementById('storage-branch-filter');
-            const filterVal = filterEl ? filterEl.value : 'all';
-            const tbody = document.getElementById('storage-table-body');
-            if (!tbody) return;
-            
-            let filtered = storageData;
-            if (filterVal && filterVal !== 'all') {
-                filtered = storageData.filter(item => item.branch === filterVal);
-            }
+            try {
+                updateBranchFilter();
+                const filterEl = document.getElementById('storage-branch-filter');
+                const filterVal = filterEl ? filterEl.value : 'all';
+                const tbody = document.getElementById('storage-table-body');
+                if (!tbody) return;
+                
+                let filtered = storageData;
+                if (filterVal && filterVal !== 'all') {
+                    filtered = storageData.filter(item => item.branch === filterVal);
+                }
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>`;
-                return;
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = filtered.map(item => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-medium text-amber-800">${item.branch}</td>
+                        <td class="p-3 font-bold">${item.code}</td>
+                        <td class="p-3">${item.size}</td>
+                        <td class="p-3 text-slate-500">${item.unit}</td>
+                        <td class="p-3 font-semibold text-amber-600">NT$ ${item.price1.toLocaleString()}</td>
+                        <td class="p-3">NT$ ${item.price3.toLocaleString()}</td>
+                        <td class="p-3">NT$ ${item.price6.toLocaleString()}</td>
+                        <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td class="p-3 text-emerald-700 font-semibold">NT$ ${item.price12_80.toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch(e) {
+                console.error(e);
             }
-            tbody.innerHTML = filtered.map(item => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-medium text-amber-800">${item.branch}</td>
-                    <td class="p-3 font-bold">${item.code}</td>
-                    <td class="p-3">${item.size}</td>
-                    <td class="p-3 text-slate-500">${item.unit}</td>
-                    <td class="p-3 font-semibold text-amber-600">NT$ ${item.price1.toLocaleString()}</td>
-                    <td class="p-3">NT$ ${item.price3.toLocaleString()}</td>
-                    <td class="p-3">NT$ ${item.price6.toLocaleString()}</td>
-                    <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
-                    <td class="p-3 text-emerald-700 font-semibold">NT$ ${item.price12_80.toLocaleString()}</td>
-                </tr>
-            `).join('');
         }
 
         function deleteSelectedBranchData() {
@@ -1097,7 +1105,7 @@
             aoa.push(
                 [],
                 ["費用試算表"],
-                ["租金總計:", document.getElementById('v-q-rent').innerText],
+                ["租金總計:", document.getElementById('v-q-rent'].innerText],
                 ["保證金總計:", document.getElementById('v-q-deposit'].innerText],
                 ["保險文書處理費總計:", document.getElementById('v-q-fee'].innerText],
                 ["合計:", document.getElementById('v-q-total'].innerText]
