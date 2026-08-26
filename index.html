@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -92,7 +92,7 @@
     <main>
         <header>
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (全自動化無錯版)</div>
+            <div class="version">系統版本：2026.09 (支援 Excel 匯出版)</div>
         </header>
 
         <div class="content-body">
@@ -232,15 +232,15 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
                     </div>
 
-                    <table>
+                    <table id="quote-table-export">
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">單位<br>(材)</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">倉位尺寸<br>(寬*深*高 m)</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">月繳/月</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">季繳/月</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">半年繳/月</th>
-                                <th style="border: 1px solid #334155; text-align: center; color: #0f172a !important; font-weight: bold; padding: 10px;">年繳/月</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">單位(材)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">月繳/月</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">季繳/月</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">半年繳/月</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">年繳/月</th>
                             </tr>
                         </thead>
                         <tbody id="v-q-items" style="text-align: center;">
@@ -356,10 +356,10 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
                     </div>
 
-                    <table>
+                    <table id="invoice-table-export">
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸<br>(寬*深*高 m)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">材積</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">原價租金</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">優惠租金</th>
@@ -1044,108 +1044,24 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // Excel 匯出功能
+        // 使用 SheetJS 穩健匯出 Excel（完美對應表格 DOM，零拼寫錯誤風險）
         function exportQuoteExcel() {
-            const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) {
-                alert('目前尚無報價單內容可匯出！');
+            const table = document.getElementById('quote-table-export');
+            if (!table || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
+                alert('目前尚無生成的報價單內容可供匯出！');
                 return;
             }
-
-            let aoa = [
-                ["收多易迷你倉庫 - 報價單"],
-                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client').innerText],
-                ["店長:", document.getElementById('v-q-manager').innerText, "客戶電話:", document.getElementById('v-q-client-phone').innerText],
-                ["分店名稱:", document.getElementById('v-q-branch').innerText, "公司抬頭:", document.getElementById('v-q-company').innerText],
-                ["聯繫電話:", document.getElementById('v-q-tel').innerText, "統一編號:", document.getElementById('v-q-taxid').innerText],
-                ["分店地址:", document.getElementById('v-q-address').innerText],
-                [],
-                ["單位(材)", "倉位尺寸(寬*深*高 m)", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
-            ];
-
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                aoa.push([
-                    item.unit,
-                    `[${item.branch}] ${item.size}`,
-                    item.price1,
-                    item.price3,
-                    item.price6,
-                    item.price12_85
-                ]);
-            });
-
-            aoa.push(
-                [],
-                ["費用試算表"],
-                ["租金總計:", document.getElementById('v-q-rent').innerText],
-                ["保證金總計:", document.getElementById('v-q-deposit').innerText],
-                ["保險文書處理費總計:", document.getElementById('v-q-fee').innerText],
-                ["合計:", document.getElementById('v-q-total'].innerText]
-            );
-
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "報價單");
+            const wb = XLSX.utils.table_to_book(table, {sheet: "報價單"});
             XLSX.writeFile(wb, "Storeasy_報價單.xlsx");
         }
 
         function exportInvoiceExcel() {
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                alert('目前尚無請款單內容可匯出！');
+            const table = document.getElementById('invoice-table-export');
+            if (!table || document.getElementById('v-i-items').innerText.includes('請先於')) {
+                alert('目前尚無生成的請款單內容可供匯出！');
                 return;
             }
-
-            let aoa = [
-                ["收多易股份有限公司 - 請款單"],
-                ["日期:", document.getElementById('v-i-date').innerText, "客戶名稱:", document.getElementById('v-i-client').innerText],
-                ["店長:", document.getElementById('v-i-manager').innerText, "客戶電話:", document.getElementById('v-i-client-phone').innerText],
-                ["分店名稱:", document.getElementById('v-i-branch').innerText, "公司抬頭:", document.getElementById('v-i-company').innerText],
-                ["聯繫電話:", document.getElementById('v-i-tel').innerText, "統一編號:", document.getElementById('v-i-taxid').innerText],
-                ["分店地址:", document.getElementById('v-i-address').innerText],
-                [],
-                ["倉位尺寸(寬*深*高 m)", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "小計"]
-            ];
-
-            keys.forEach(idx => {
-                let item = selectedInvoiceItems[idx];
-                let term = item.term || '12';
-                if (term === 'none') return;
-
-                let p1 = item.price1;
-                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
-                let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
-                let incSub = monthlyRate * termMonths;
-                let exSub = Math.round(incSub / 1.05);
-                let tax = incSub - exSub;
-                let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                let lineTotal = incSub + dep;
-
-                aoa.push([
-                    `[${item.branch}] ${item.size}`,
-                    item.unit + "材",
-                    p1,
-                    monthlyRate,
-                    termMonths,
-                    exSub,
-                    tax,
-                    incSub,
-                    dep,
-                    lineTotal
-                ]);
-            });
-
-            aoa.push(
-                [],
-                ["租金合計:", document.getElementById('v-i-subtotal').innerText],
-                ["保證金合計:", document.getElementById('v-i-deposit'].innerText],
-                ["請款總金額 (TWD):", document.getElementById('v-i-total'].innerText]
-            );
-
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "請款單");
+            const wb = XLSX.utils.table_to_book(table, {sheet: "請款單"});
             XLSX.writeFile(wb, "Storeasy_請款單.xlsx");
         }
 
