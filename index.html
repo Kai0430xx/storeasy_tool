@@ -63,9 +63,13 @@
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
+        /* 完美列印控制：只保留預覽單據，隱藏側邊欄、頂部導覽與設定面板 */
         @media print {
-            .no-print { display: none !important; }
-            .preview-box { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
+            body * { visibility: hidden; }
+            aside, header.no-print, .card.no-print, .no-print { display: none !important; }
+            #quote-preview.preview-box, #quote-preview.preview-box *,
+            #invoice-preview.preview-box, #invoice-preview.preview-box * { visibility: visible; }
+            #quote-preview, #invoice-preview { position: absolute; left: 0; top: 0; width: 100% !important; margin: 0 !important; padding: 20px !important; box-shadow: none !important; border: none !important; background: white !important; }
             body { background: white !important; }
         }
     </style>
@@ -73,7 +77,7 @@
 <body>
 
     <!-- 側邊導覽列 -->
-    <aside>
+    <aside class="no-print">
         <div class="sidebar-header">
             <h1>收多易迷你倉庫</h1>
             <p>Storeasy Storage 單據生成工具</p>
@@ -90,9 +94,9 @@
 
     <!-- 主內容區 -->
     <main>
-        <header>
+        <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (免當機終極版)</div>
+            <div class="version">系統版本：2026.09 (專業列印與Excel版)</div>
         </header>
 
         <div class="content-body">
@@ -232,7 +236,7 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
                     </div>
 
-                    <table>
+                    <table id="quote-table-export">
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">單位(材)</th>
@@ -270,7 +274,7 @@
                     <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
-                        <button type="button" onclick="exportQuoteExcel()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
+                        <button type="button" onclick="exportQuoteExcelFromDOM()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
                         <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
                     </div>
                 </div>
@@ -356,7 +360,7 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
                     </div>
 
-                    <table>
+                    <table id="invoice-table-export">
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
@@ -392,7 +396,7 @@
                     <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
-                        <button type="button" onclick="exportInvoiceExcel()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
+                        <button type="button" onclick="exportInvoiceExcelFromDOM()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
                         <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
                     </div>
                 </div>
@@ -1044,135 +1048,24 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 完美陣列排版 Excel 匯出功能 (變數分離防錯機制)
+        // 使用 SheetJS 的 table_to_book 直接將預覽表格轉為 Excel，完整保留格線與欄位格式
         function exportQuoteExcel() {
-            const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) {
-                alert('目前尚無報價單內容可匯出！');
+            const table = document.getElementById('quote-table-export');
+            if (!table || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
+                alert('目前尚無生成的報價單內容可供匯出！');
                 return;
             }
-
-            const qDate = document.getElementById('v-q-date').innerText;
-            const qClient = document.getElementById('v-q-client').innerText;
-            const qManager = document.getElementById('v-q-manager').innerText;
-            const qClientPhone = document.getElementById('v-q-client-phone').innerText;
-            const qBranch = document.getElementById('v-q-branch').innerText;
-            const qCompany = document.getElementById('v-q-company').innerText;
-            const qTel = document.getElementById('v-q-tel').innerText;
-            const qTaxid = document.getElementById('v-q-taxid').innerText;
-            const qAddress = document.getElementById('v-q-address').innerText;
-            const qRent = document.getElementById('v-q-rent').innerText;
-            const qDeposit = document.getElementById('v-q-deposit').innerText;
-            const qFee = document.getElementById('v-q-fee').innerText;
-            const qTotal = document.getElementById('v-q-total').innerText;
-
-            let aoa = [
-                ["收多易迷你倉庫 - 報價單"],
-                ["日期:", qDate, "客戶名稱:", qClient],
-                ["店長:", qManager, "客戶電話:", qClientPhone],
-                ["分店名稱:", qBranch, "公司抬頭:", qCompany],
-                ["聯繫電話:", qTel, "統一編號:", qTaxid],
-                ["分店地址:", qAddress],
-                [],
-                ["單位(材)", "倉位尺寸(寬*深*高 m)", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
-            ];
-
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                aoa.push([
-                    item.unit,
-                    `[${item.branch}] ${item.size}`,
-                    item.price1,
-                    item.price3,
-                    item.price6,
-                    item.price12_85
-                ]);
-            });
-
-            aoa.push(
-                [],
-                ["費用試算表"],
-                ["租金總計:", qRent],
-                ["保證金總計:", qDeposit],
-                ["保險文書處理費總計:", qFee],
-                ["合計:", qTotal]
-            );
-
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "報價單");
+            const wb = XLSX.utils.table_to_book(table, {sheet: "報價單"});
             XLSX.writeFile(wb, "Storeasy_報價單.xlsx");
         }
 
         function exportInvoiceExcel() {
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                alert('目前尚無請款單內容可匯出！');
+            const table = document.getElementById('invoice-table-export');
+            if (!table || document.getElementById('v-i-items').innerText.includes('請先於')) {
+                alert('目前尚無生成的請款單內容可供匯出！');
                 return;
             }
-
-            const iDate = document.getElementById('v-i-date').innerText;
-            const iClient = document.getElementById('v-i-client').innerText;
-            const iManager = document.getElementById('v-i-manager').innerText;
-            const iClientPhone = document.getElementById('v-i-client-phone').innerText;
-            const iBranch = document.getElementById('v-i-branch').innerText;
-            const iCompany = document.getElementById('v-i-company').innerText;
-            const iTel = document.getElementById('v-i-tel').innerText;
-            const iTaxid = document.getElementById('v-i-taxid').innerText;
-            const iAddress = document.getElementById('v-i-address').innerText;
-            const iSubtotal = document.getElementById('v-i-subtotal').innerText;
-            const iDeposit = document.getElementById('v-i-deposit').innerText;
-            const iTotal = document.getElementById('v-i-total').innerText;
-
-            let aoa = [
-                ["收多易股份有限公司 - 請款單"],
-                ["日期:", iDate, "客戶名稱:", iClient],
-                ["店長:", iManager, "客戶電話:", iClientPhone],
-                ["分店名稱:", iBranch, "公司抬頭:", iCompany],
-                ["聯繫電話:", iTel, "統一編號:", iTaxid],
-                ["分店地址:", iAddress],
-                [],
-                ["倉位尺寸(寬*深*高 m)", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "小計"]
-            ];
-
-            keys.forEach(idx => {
-                let item = selectedInvoiceItems[idx];
-                let term = item.term || '12';
-                if (term === 'none') return;
-
-                let p1 = item.price1;
-                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
-                let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
-                let incSub = monthlyRate * termMonths;
-                let exSub = Math.round(incSub / 1.05);
-                let tax = incSub - exSub;
-                let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                let lineTotal = incSub + dep;
-
-                aoa.push([
-                    `[${item.branch}] ${item.size}`,
-                    item.unit + "材",
-                    p1,
-                    monthlyRate,
-                    termMonths,
-                    exSub,
-                    tax,
-                    incSub,
-                    dep,
-                    lineTotal
-                ]);
-            });
-
-            aoa.push(
-                [],
-                ["租金合計:", iSubtotal],
-                ["保證金合計:", iDeposit],
-                ["請款總金額 (TWD):", iTotal]
-            );
-
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "請款單");
+            const wb = XLSX.utils.table_to_book(table, {sheet: "請款單"});
             XLSX.writeFile(wb, "Storeasy_請款單.xlsx");
         }
 
