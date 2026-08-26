@@ -11,7 +11,7 @@
     <style>
         @media print {
             .no-print { display: none !important; }
-            .print-area { box-shadow: none !important; border: none !important; padding: 0 !important; }
+            .print-area { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
             body { background: white !important; }
         }
     </style>
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (選單精簡與頂部標題連動版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (完美 Excel 匯出與 PDF 另存版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -251,9 +251,10 @@
 
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
+                        <!-- 雙軌按鈕：完美 Excel 匯出與另存 PDF -->
                         <div class="flex justify-end gap-3 no-print">
                             <button onclick="exportTableToExcel('quote-export-table', 'Storeasy_報價單.xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm">📥 匯出為 Excel 檔</button>
-                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm">🖨️ 列印 / 存為 PDF</button>
+                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -368,9 +369,10 @@
 
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
 
+                        <!-- 雙軌按鈕：完美 Excel 匯出與另存 PDF -->
                         <div class="flex justify-end gap-3 no-print">
                             <button onclick="exportTableToExcel('invoice-export-table', 'Storeasy_請款單.xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm">📥 匯出為 Excel 檔</button>
-                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm">🖨️ 列印 / 存為 PDF</button>
+                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm">🖨️ 另存為 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -395,7 +397,6 @@
             activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
             activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
-            // 動態連動頂部標題文字
             const titleMap = {
                 'tab-storage': '📦 倉位資料',
                 'tab-quote': '📄 生成報價單',
