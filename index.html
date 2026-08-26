@@ -4,452 +4,419 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- Tailwind CSS 樣式框架 -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; }
+        
+        /* 側邊導覽列 */
+        aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
+        .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
+        .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        nav button { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: transparent; color: #cbd5e1; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        nav button:hover { background-color: #1e293b; color: #fff; }
+        nav button.active { background-color: #f59e0b; color: #0f172a; }
+        .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; }
+
+        /* 主內容區 */
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; }
+        .tab-content { display: none; flex-direction: column; gap: 24px; }
+        .tab-content.active { display: flex; }
+
+        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .card h3 { font-size: 1.1rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
+        .card p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1); }
+
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-amber { background-color: #f59e0b; color: #0f172a; }
+        .btn-amber:hover { background-color: #d97706; }
+        .btn-dark { background-color: #0f172a; color: #fff; }
+        .btn-dark:hover { background-color: #1e293b; }
+        .btn-emerald { background-color: #059669; color: #fff; }
+        .btn-emerald:hover { background-color: #047857; }
+        .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .btn-red-outline:hover { background-color: #fee2e2; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        tr:hover { background-color: #f8fafc; }
+
+        .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 850px; margin: 0 auto; width: 100%; }
+        .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
+        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
+        .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-bottom: 24px; }
+        .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
+        
+        .table-container { max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
+
         @media print {
             .no-print { display: none !important; }
-            .print-area { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
+            .preview-box { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: none !important; }
             body { background: white !important; }
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans">
+<body>
 
-    <div class="flex min-h-screen">
-        <!-- 側邊導覽列 -->
-        <aside class="w-64 bg-slate-900 text-white flex flex-col shrink-0 no-print shadow-lg select-none">
-            <div class="p-6 border-b border-slate-800">
-                <h1 class="text-xl font-bold tracking-wider text-amber-400">收多易迷你倉庫</h1>
-                <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
-            </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm cursor-pointer">📦 倉位資料</button>
-                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">📄 生成報價單</button>
-                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition cursor-pointer">💰 生成請款單</button>
-            </nav>
-            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-                資料已永久儲存於本機瀏覽器
-            </div>
-        </aside>
+    <!-- 側邊導覽列 -->
+    <aside>
+        <div class="sidebar-header">
+            <h1>收多易迷你倉庫</h1>
+            <p>Storeasy Storage 單據生成工具</p>
+        </div>
+        <nav>
+            <button type="button" onclick="switchTab('tab-storage')" id="btn-tab-storage" class="active">📦 倉位資料</button>
+            <button type="button" onclick="switchTab('tab-quote')" id="btn-tab-quote">📄 生成報價單</button>
+            <button type="button" onclick="switchTab('tab-invoice')" id="btn-tab-invoice">💰 生成請款單</button>
+        </nav>
+        <div class="sidebar-footer">
+            資料已永久儲存於本機瀏覽器
+        </div>
+    </aside>
 
-        <!-- 主內容區 -->
-        <main class="flex-1 flex flex-col min-w-0">
-            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
-                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (鐵壁防呆穩定版)</div>
-            </header>
+    <!-- 主內容區 -->
+    <main>
+        <header>
+            <h2 id="page-title">📦 倉位資料</h2>
+            <div class="version">系統版本：2026.09 (純原生極速穩定版)</div>
+        </header>
 
-            <div class="p-8 max-w-7xl mx-auto w-full">
+        <div class="content-body">
 
-                <!-- 1. 倉位資料頁籤 -->
-                <div id="tab-storage" class="tab-content space-y-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">分店名稱</label>
-                                <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" value="土城店" placeholder="例如: 土城店、士林店">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium mb-1">選擇 Excel 檔案</label>
-                                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
-                            </div>
+            <!-- 1. 倉位資料頁籤 -->
+            <div id="tab-storage" class="tab-content active">
+                <div class="card">
+                    <h3>📥 一鍵上傳各店空倉表 Excel</h3>
+                    <p>系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>分店名稱</label>
+                            <input type="text" id="upload-branch-name" value="土城店" placeholder="例如: 土城店">
                         </div>
-                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">一鍵智慧匯入資料</button>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                            <div class="flex items-center gap-3 w-full sm:w-auto">
-                                <h3 class="text-lg font-bold text-slate-700">📋 已載入的倉位清單</h3>
-                                <select id="storage-branch-filter" onchange="renderStorageTable()" class="border rounded-lg px-3 py-1.5 text-sm bg-slate-50 font-semibold text-amber-900">
-                                    <option value="all">全部據點</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="deleteSelectedBranchData()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition cursor-pointer">🗑️ 刪除目前選取的分店</button>
-                                <button onclick="clearStorageData()" class="text-xs text-slate-400 hover:text-red-500 hover:underline cursor-pointer">清空全部本機資料</button>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 border-b text-slate-600 text-sm">
-                                        <th class="p-3">據點名稱</th>
-                                        <th class="p-3">倉位編號</th>
-                                        <th class="p-3">尺寸 (W*L*H)</th>
-                                        <th class="p-3">材積 (材)</th>
-                                        <th class="p-3">月繳/原價</th>
-                                        <th class="p-3">季繳</th>
-                                        <th class="p-3">半年繳</th>
-                                        <th class="p-3">年繳(85折)</th>
-                                        <th class="p-3">年繳(8折)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="storage-table-body" class="text-sm divide-y">
-                                    <tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>
-                                </tbody>
-                            </table>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>選擇 Excel 檔案</label>
+                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
                         </div>
                     </div>
+                    <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">一鍵智慧匯入資料</button>
                 </div>
 
-                <!-- 2. 生成報價單頁籤 -->
-                <div id="tab-quote" class="tab-content hidden space-y-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與彈性搜尋勾選</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
-                                <input type="text" id="q-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="土城店">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">店長</label>
-                                <input type="text" id="q-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="經辦人員">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">聯繫電話</label>
-                                <input type="text" id="q-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="0800-388075">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">報價日期</label>
-                                <input type="date" id="quote-date" class="w-full border rounded-lg px-3 py-2 text-sm">
-                            </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <h3 style="margin-bottom:0;">📋 已載入的倉位清單</h3>
+                            <select id="storage-branch-filter" onchange="renderStorageTable()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #92400e; background: #fef3c7;">
+                                <option value="all">全部據點</option>
+                            </select>
                         </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium mb-1">分店地址</label>
-                                <input type="text" id="q-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="新北市土城區...">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">客戶名稱</label>
-                                <input type="text" id="q-client-name" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客戶姓名">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">客戶聯繫電話</label>
-                                <input type="text" id="q-client-tel" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客電">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">公司抬頭</label>
-                                <input type="text" id="q-company" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="抬頭">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">統一編號</label>
-                                <input type="text" id="q-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
-                            </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" onclick="deleteSelectedBranchData()" class="btn btn-red-outline" style="padding: 6px 12px; font-size: 0.8rem;">🗑️ 刪除目前選取分店</button>
+                            <button type="button" onclick="clearStorageData()" style="background:none; border:none; color: #94a3b8; font-size: 0.8rem; cursor:pointer; text-decoration: underline;">清空全部本機資料</button>
                         </div>
-
-                        <!-- 據點選擇與搜尋框 -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
-                            <div>
-                                <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
-                                <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
-                                    <option value="">-- 全部據點 / 不限分店 --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
-                                <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
-                            </div>
-                        </div>
-
-                        <div class="max-h-60 overflow-y-auto border rounded-lg p-2 mb-4">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 sticky top-0">
-                                    <tr>
-                                        <th class="p-2 w-10">選取</th>
-                                        <th class="p-2">據點</th>
-                                        <th class="p-2">編號 / 尺寸(寬*深*高 m) / 材積</th>
-                                        <th class="p-2">月繳原價</th>
-                                        <th class="p-2">年繳優惠價</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quote-selectable-body">
-                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請在上方選擇據點或直接輸入關鍵字搜尋</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- 已勾選項目持久清單 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border mb-6 space-y-3">
-                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider">✅ 已選取的報價項目 (可獨立設定方案或選擇「不列入試算」)：</h5>
-                            <div id="selected-items-summary" class="space-y-2 text-xs text-slate-600">
-                                <span class="text-slate-400">尚未勾選任何項目</span>
-                            </div>
-                        </div>
-
-                        <button type="button" onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">📄 一鍵生成公司標準格式報價單</button>
                     </div>
-
-                    <!-- 報價單預覽區 -->
-                    <div id="quote-preview" class="bg-white p-10 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto text-slate-900">
-                        <div class="flex justify-between items-start mb-6 border-b-2 border-slate-900 pb-4">
-                            <div>
-                                <h1 class="text-2xl font-black tracking-wider">收多易迷你倉庫</h1>
-                                <p class="text-xs text-slate-500">Storeasy Storage Solution</p>
-                            </div>
-                            <div class="text-right">
-                                <h2 class="text-xl font-bold text-slate-800">報 價 單</h2>
-                                <p class="text-xs text-red-600 font-semibold mt-1">報價有效期限 7 天</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm mb-6 bg-slate-50 p-4 rounded-lg border">
-                            <div><strong>日  期：</strong> <span id="v-q-date">---</span></div>
-                            <div><strong>客 戶 名 稱：</strong> <span id="v-q-client">---</span></div>
-                            <div><strong>店  長：</strong> <span id="v-q-manager">---</span></div>
-                            <div><strong>客 戶 電 話：</strong> <span id="v-q-client-phone">---</span></div>
-                            <div><strong>分店名稱：</strong> <span id="v-q-branch">---</span></div>
-                            <div><strong>公 司 抬 頭：</strong> <span id="v-q-company">---</span></div>
-                            <div><strong>聯 繫 電 話：</strong> <span id="v-q-tel">---</span></div>
-                            <div><strong>統  編：</strong> <span id="v-q-taxid">---</span></div>
-                            <div class="col-span-2"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
-                        </div>
-
-                        <table class="w-full text-left border-collapse mb-6 text-sm">
+                    <div style="overflow-x: auto;">
+                        <table>
                             <thead>
-                                <tr class="bg-slate-900 text-white text-center">
-                                    <th class="p-2.5 border border-slate-700">單位<br>(材)</th>
-                                    <th class="p-2.5 border border-slate-700">倉位尺寸<br>(寬*深*高 m)</th>
-                                    <th class="p-2.5 border border-slate-700">月繳/月</th>
-                                    <th class="p-2.5 border border-slate-700">季繳/月</th>
-                                    <th class="p-2.5 border border-slate-700">半年繳/月</th>
-                                    <th class="p-2.5 border border-slate-700">年繳/月</th>
+                                <tr>
+                                    <th>據點名稱</th>
+                                    <th>倉位編號</th>
+                                    <th>尺寸 (寬*深*高 m)</th>
+                                    <th>材積 (材)</th>
+                                    <th>月繳/原價</th>
+                                    <th>季繳</th>
+                                    <th>半年繳</th>
+                                    <th>年繳(85折)</th>
+                                    <th>年繳(8折)</th>
                                 </tr>
                             </thead>
-                            <tbody id="v-q-items" class="divide-y text-center">
-                                <tr><td colspan="6" class="p-4 text-center text-slate-400">尚未產生內容</td></tr>
+                            <tbody id="storage-table-body">
+                                <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
                             </tbody>
                         </table>
-
-                        <div class="bg-slate-50 p-4 rounded-lg border space-y-2 text-sm mb-6">
-                            <div class="font-bold border-b pb-1 text-slate-700">費用試算表 (依據各項目獨立方案計費)</div>
-                            <div class="flex justify-between"><span>租金總計 (NT$)：</span> <span id="v-q-rent" class="font-bold">0</span></div>
-                            <div class="flex justify-between"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
-                            <div class="flex justify-between"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
-                            <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
-                        </div>
-
-                        <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
-                            <div class="font-bold text-slate-800">匯款資訊：</div>
-                            <div>戶名：收多易股份有限公司</div>
-                            <div>銀行代碼：013 國泰世華 新莊分行</div>
-                            <div>帳號號碼：________________________</div>
-                            <div class="mt-3 font-bold text-slate-800">備註：</div>
-                            <div>1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</div>
-                            <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
-                            <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
-                            <div>4. 付款方式: 轉帳、即期支票。</div>
-                            <div>5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</div>
-                        </div>
-
-                        <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
-
-                        <div class="flex justify-end gap-3 no-print">
-                            <button type="button" onclick="exportQuoteExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
-                            <button type="button" onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
-                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 3. 生成請款單頁籤 -->
-                <div id="tab-invoice" class="tab-content hidden space-y-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定與彈性搜尋勾選</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
-                                <input type="text" id="i-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="土城店">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">店長</label>
-                                <input type="text" id="i-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="經辦人員">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">聯繫電話</label>
-                                <input type="text" id="i-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="0800-388075">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">請款日期</label>
-                                <input type="date" id="inv-date" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium mb-1">分店地址</label>
-                                <input type="text" id="i-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="新北市土城區...">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">客戶名稱</label>
-                                <input type="text" id="i-client" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="姓名">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">客戶聯繫電話</label>
-                                <input type="text" id="i-client-phone" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客電">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">公司抬頭</label>
-                                <input type="text" id="i-company" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="抬頭">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">統一編號</label>
-                                <input type="text" id="i-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
-                            </div>
-                        </div>
-
-                        <!-- 請款單專屬據點選擇與搜尋框 -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
-                            <div>
-                                <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
-                                <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
-                                    <option value="">-- 全部據點 / 不限分店 --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
-                                <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
-                            </div>
-                        </div>
-
-                        <div class="max-h-60 overflow-y-auto border rounded-lg p-2 mb-4">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 sticky top-0">
-                                    <tr>
-                                        <th class="p-2 w-10">選取</th>
-                                        <th class="p-2">據點</th>
-                                        <th class="p-2">編號 / 尺寸(寬*深*高 m) / 材積</th>
-                                        <th class="p-2">月繳原價</th>
-                                        <th class="p-2">年繳優惠價</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="invoice-selectable-body">
-                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請在上方選擇據點或直接輸入關鍵字搜尋</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- 請款單已勾選項目持久清單 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border mb-6 space-y-3">
-                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider">✅ 已選取的請款項目 (可獨立設定方案或選擇「不列入請款」)：</h5>
-                            <div id="invoice-selected-summary" class="space-y-2 text-xs text-slate-600">
-                                <span class="text-slate-400">尚未勾選任何請款項目</span>
-                            </div>
-                        </div>
-
-                        <button type="button" onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer">💰 一鍵套用會計版正式請款單</button>
+            <!-- 2. 生成報價單頁籤 -->
+            <div id="tab-quote" class="tab-content">
+                <div class="card no-print">
+                    <h3>⚙️ 報價單設定與彈性搜尋勾選</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>分店顯示名稱</label><input type="text" id="q-branch" value="土城店"></div>
+                        <div class="form-group"><label>店長</label><input type="text" id="q-manager" value="經辦人員"></div>
+                        <div class="form-group"><label>聯繫電話</label><input type="text" id="q-tel" value="0800-388075"></div>
+                        <div class="form-group"><label>報價日期</label><input type="date" id="quote-date"></div>
+                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="q-address" value="新北市土城區..."></div>
+                        <div class="form-group"><label>客戶名稱</label><input type="text" id="q-client-name" placeholder="輸入客戶姓名"></div>
+                        <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="q-client-tel" placeholder="輸入客電"></div>
+                        <div class="form-group"><label>公司抬頭</label><input type="text" id="q-company" placeholder="抬頭"></div>
+                        <div class="form-group"><label>統一編號</label><input type="text" id="q-taxid" placeholder="統編"></div>
                     </div>
 
-                    <!-- 請款單預覽區 -->
-                    <div id="invoice-preview" class="bg-white p-10 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto text-slate-900">
-                        <div class="flex justify-between items-start mb-6 border-b-2 border-slate-900 pb-4">
-                            <div>
-                                <h1 class="text-2xl font-black tracking-wider">收多易股份有限公司</h1>
-                                <p class="text-xs text-slate-500">Storeasy Storage Invoice Statement</p>
-                            </div>
-                            <div class="text-right">
-                                <h2 class="text-xl font-bold text-slate-800">請 款 單</h2>
-                            </div>
+                    <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label>選擇分店據點：</label>
+                            <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
+                                <option value="">-- 全部據點 / 不限分店 --</option>
+                            </select>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm mb-6 bg-slate-50 p-4 rounded-lg border">
-                            <div><strong>日  期：</strong> <span id="v-i-date">---</span></div>
-                            <div><strong>客 戶 名 稱：</strong> <span id="v-i-client">---</span></div>
-                            <div><strong>店  長：</strong> <span id="v-i-manager">---</span></div>
-                            <div><strong>客 戶 電 話：</strong> <span id="v-i-client-phone">---</span></div>
-                            <div><strong>分店名稱：</strong> <span id="v-i-branch">---</span></div>
-                            <div><strong>公 司 抬 頭：</strong> <span id="v-i-company">---</span></div>
-                            <div><strong>聯 繫 電 話：</strong> <span id="v-i-tel">---</span></div>
-                            <div><strong>統  編：</strong> <span id="v-i-taxid">---</span></div>
-                            <div class="col-span-2"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
+                        <div class="form-group">
+                            <label>🔍 快速搜尋 (編號或材積)：</label>
+                            <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: QD335 或 75">
                         </div>
+                    </div>
 
-                        <table class="w-full text-left border-collapse mb-6 text-sm">
+                    <div class="table-container">
+                        <table>
                             <thead>
-                                <tr class="bg-slate-900 text-white text-center">
-                                    <th class="p-2.5 border border-slate-700">倉位尺寸<br>(寬*深*高 m)</th>
-                                    <th class="p-2.5 border border-slate-700">材積</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">原價租金</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">優惠租金</th>
-                                    <th class="p-2.5 border border-slate-700 text-center">承租月份</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">未稅小計</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">稅金</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">含稅小計</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">保證金</th>
-                                    <th class="p-2.5 border border-slate-700 text-right">小計</th>
+                                <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                                    <th style="width: 40px;">選取</th>
+                                    <th>據點</th>
+                                    <th>編號 / 尺寸(寬*深*高 m) / 材積</th>
+                                    <th>月繳原價</th>
+                                    <th>年繳優惠價</th>
                                 </tr>
                             </thead>
-                            <tbody id="v-i-items" class="divide-y text-center">
-                                <tr><td colspan="10" class="p-4 text-center text-slate-400">請先於請款單頁面勾選項目與繳費方式</td></tr>
+                            <tbody id="quote-selectable-body">
+                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
                             </tbody>
                         </table>
+                    </div>
 
-                        <div class="bg-slate-50 p-4 rounded-lg border space-y-2 text-sm mb-6 text-right">
-                            <div class="flex justify-between"><span>租金合計：</span> <span id="v-i-subtotal" class="font-bold">NT$ 0</span></div>
-                            <div class="flex justify-between"><span>保證金合計：</span> <span id="v-i-deposit">NT$ 0</span></div>
-                            <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
-                        </div>
-
-                        <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
-                            <div class="font-bold text-slate-800">付款資料：</div>
-                            <div>戶名：收多易股份有限公司</div>
-                            <div>銀行代碼：013 國泰世華 新莊分行</div>
-                            <div>帳號號碼：________________________</div>
-                            <div>支票付款抬頭請開：收多易股份有限公司</div>
-                            <div class="mt-2 text-red-600 font-semibold">請於請款日起7個工作日內完成入款</div>
-                        </div>
-
-                        <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
-
-                        <div class="flex justify-end gap-3 no-print">
-                            <button type="button" onclick="exportInvoiceExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">📥 匯出為 Excel 檔</button>
-                            <button type="button" onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer">🖨️ 另存為 PDF</button>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                        <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目：</h5>
+                        <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
+                            <span style="color: #94a3b8;">尚未勾選任何項目</span>
                         </div>
                     </div>
+
+                    <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 一鍵生成公司標準格式報價單</button>
                 </div>
 
+                <!-- 報價單預覽區 -->
+                <div id="quote-preview" class="preview-box">
+                    <div class="preview-header">
+                        <div>
+                            <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
+                            <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Solution</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">報 價 單</h2>
+                            <p style="font-size: 0.75rem; color: #dc2626; font-weight: 600; margin-top: 4px;">報價有效期限 7 天</p>
+                        </div>
+                    </div>
+
+                    <div class="preview-info">
+                        <div><strong>日  期：</strong> <span id="v-q-date">---</span></div>
+                        <div><strong>客 戶 名 稱：</strong> <span id="v-q-client">---</span></div>
+                        <div><strong>店  長：</strong> <span id="v-q-manager">---</span></div>
+                        <div><strong>客 戶 電 話：</strong> <span id="v-q-client-phone">---</span></div>
+                        <div><strong>分店名稱：</strong> <span id="v-q-branch">---</span></div>
+                        <div><strong>公 司 抬 頭：</strong> <span id="v-q-company">---</span></div>
+                        <div><strong>聯 繫 電 話：</strong> <span id="v-q-tel">---</span></div>
+                        <div><strong>統  編：</strong> <span id="v-q-taxid">---</span></div>
+                        <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr style="background-color: #0f172a; color: #fff; text-align: center;">
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">單位<br>(材)</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">倉位尺寸<br>(寬*深*高 m)</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">月繳/月</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">季繳/月</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">半年繳/月</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">年繳/月</th>
+                            </tr>
+                        </thead>
+                        <tbody id="v-q-items" style="text-align: center;">
+                            <tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">尚未產生內容</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="summary-box">
+                        <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (依據各項目獨立方案計費)</div>
+                        <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 6px; color: #b45309;"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
+                    </div>
+
+                    <div class="notes-box">
+                        <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">匯款資訊：</div>
+                        <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</div>
+                        <div style="font-weight: bold; color: #1e293b; margin-top: 8px; margin-bottom: 4px;">備註：</div>
+                        <div>1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</div>
+                        <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
+                        <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
+                        <div>4. 付款方式: 轉帳、即期支票。</div>
+                        <div>5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</div>
+                    </div>
+
+                    <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
+                        <button type="button" onclick="exportQuoteExcel()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
+                        <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 另存為 PDF</button>
+                    </div>
+                </div>
             </div>
-        </main>
-    </div>
+
+            <!-- 3. 生成請款單頁籤 -->
+            <div id="tab-invoice" class="tab-content">
+                <div class="card no-print">
+                    <h3>⚙️ 會計版請款單設定與彈性搜尋勾選</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>分店顯示名稱</label><input type="text" id="i-branch" value="土城店"></div>
+                        <div class="form-group"><label>店長</label><input type="text" id="i-manager" value="經辦人員"></div>
+                        <div class="form-group"><label>聯繫電話</label><input type="text" id="i-tel" value="0800-388075"></div>
+                        <div class="form-group"><label>請款日期</label><input type="date" id="inv-date"></div>
+                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="i-address" value="新北市土城區..."></div>
+                        <div class="form-group"><label>客戶名稱</label><input type="text" id="i-client" placeholder="姓名"></div>
+                        <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
+                        <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
+                        <div class="form-group"><label>統一編號</label><input type="text" id="i-taxid" placeholder="統編"></div>
+                    </div>
+
+                    <!-- 請款單專屬據點選擇與搜尋框 -->
+                    <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label>選擇分店據點：</label>
+                            <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
+                                <option value="">-- 全部據點 / 不限分店 --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>🔍 快速搜尋 (編號或材積)：</label>
+                            <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" placeholder="例如: QD335 或 75">
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                                    <th style="width: 40px;">選取</th>
+                                    <th>據點</th>
+                                    <th>編號 / 尺寸(寬*深*高 m) / 材積</th>
+                                    <th>月繳原價</th>
+                                    <th>年繳優惠價</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-selectable-body">
+                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                        <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的請款項目：</h5>
+                        <div id="invoice-selected-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
+                            <span style="color: #94a3b8;">尚未勾選任何請款項目</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="generateInvoice()" class="btn btn-dark">💰 一鍵套用會計版正式請款單</button>
+                </div>
+
+                <!-- 請款單預覽區 -->
+                <div id="invoice-preview" class="preview-box">
+                    <div class="preview-header">
+                        <div>
+                            <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易股份有限公司</h1>
+                            <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Invoice Statement</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">請 款 單</h2>
+                        </div>
+                    </div>
+
+                    <div class="preview-info">
+                        <div><strong>日  期：</strong> <span id="v-i-date">---</span></div>
+                        <div><strong>客 戶 名 稱：</strong> <span id="v-i-client">---</span></div>
+                        <div><strong>店  長：</strong> <span id="v-i-manager">---</span></div>
+                        <div><strong>客 戶 電 話：</strong> <span id="v-i-client-phone">---</span></div>
+                        <div><strong>分店名稱：</strong> <span id="v-i-branch">---</span></div>
+                        <div><strong>公 司 抬 頭：</strong> <span id="v-i-company">---</span></div>
+                        <div><strong>聯 繫 電 話：</strong> <span id="v-i-tel">---</span></div>
+                        <div><strong>統  編：</strong> <span id="v-i-taxid">---</span></div>
+                        <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr style="background-color: #0f172a; color: #fff; text-align: center;">
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">倉位尺寸<br>(寬*深*高 m)</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">材積</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">原價租金</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">優惠租金</th>
+                                <th style="border: 1px solid #334155; text-align: center; color:#fff;">承租月份</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">未稅小計</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">稅金</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">含稅小計</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">保證金</th>
+                                <th style="border: 1px solid #334155; text-align: right; color:#fff;">小計</th>
+                            </tr>
+                        </thead>
+                        <tbody id="v-i-items" style="text-align: center;">
+                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">請先於請款單頁面勾選項目與繳費方式</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 24px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; text-align: right; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between;"><span>租金合計：</span> <span id="v-i-subtotal" style="font-weight: bold;">NT$ 0</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>保證金合計：</span> <span id="v-i-deposit">NT$ 0</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 8px; color: #b45309;"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
+                    </div>
+
+                    <div class="notes-box">
+                        <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">付款資料：</div>
+                        <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</div>
+                        <div>支票付款抬頭請開：收多易股份有限公司</div>
+                        <div style="color: #dc2626; font-weight: 600; margin-top: 4px;">請於請款日起7個工作日內完成入款</div>
+                    </div>
+
+                    <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
+                        <button type="button" onclick="exportInvoiceExcel()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
+                        <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 另存為 PDF</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 
     <script>
-        let storageData = [];
-        try {
-            let saved = localStorage.getItem('storeasy_storage_data');
-            if (saved) {
-                let parsed = JSON.parse(saved);
-                if (Array.isArray(parsed)) {
-                    storageData = parsed;
-                }
-            }
-        } catch(e) {
-            storageData = [];
-            localStorage.removeItem('storeasy_storage_data');
-        }
-
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let selectedQuoteItems = {}; 
         let selectedInvoiceItems = {}; 
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('aside nav button').forEach(el => {
-                el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
-                el.classList.add('hover:bg-slate-800', 'text-slate-300');
-            });
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('aside nav button').forEach(el => el.classList.remove('active'));
+            
             const targetTab = document.getElementById(tabId);
-            if (targetTab) targetTab.classList.remove('hidden');
+            if (targetTab) targetTab.classList.add('active');
             
             const activeBtn = document.getElementById('btn-' + tabId);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-                activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
-            }
+            if (activeBtn) activeBtn.classList.add('active');
 
             const titleMap = {
                 'tab-storage': '📦 倉位資料',
@@ -467,133 +434,125 @@
         }
 
         function handleSmartExcelUpload() {
-            try {
-                const fileInput = document.getElementById('excelFile');
-                if (!fileInput || fileInput.files.length === 0) {
-                    alert('請先選擇一個 Excel 檔案！');
-                    return;
-                }
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, {type: 'array'});
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-
-                        if (!jsonSheet || jsonSheet.length < 2) {
-                            alert('Excel 檔案內容不足！');
-                            return;
-                        }
-
-                        let inputBranchField = document.getElementById('upload-branch-name');
-                        let inputBranch = inputBranchField ? inputBranchField.value.trim() : '土城店';
-                        if (!inputBranch) inputBranch = '土城店';
-
-                        let newItems = [];
-
-                        for (let i = 0; i < jsonSheet.length; i++) {
-                            let row = jsonSheet[i];
-                            if (!row || row.length === 0) continue;
-
-                            let code = '';
-                            let size = '-';
-                            let unit = '-';
-                            let price1 = NaN;
-
-                            for (let c = 0; c < row.length; c++) {
-                                let val = row[c];
-                                if (val === undefined || val === null) continue;
-                                let sVal = String(val).trim();
-
-                                if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
-                                    code = sVal;
-                                    if (!isNaN(row[c+1])) code += row[c+1];
-                                } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
-                                    size = sVal;
-                                } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
-                                    price1 = Number(sVal);
-                                }
-                            }
-
-                            if (!code) {
-                                for (let c = 0; c < row.length; c++) {
-                                    let s = String(row[c] || '').trim();
-                                    if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
-                                        code = s;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (isNaN(price1)) {
-                                for (let c = 0; c < row.length; c++) {
-                                    let n = Number(row[c]);
-                                    if (!isNaN(n) && n >= 500 && n < 100000) {
-                                        price1 = n;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (unit === '-') {
-                                for (let c = 0; c < row.length; c++) {
-                                    let n = Number(row[c]);
-                                    if (!isNaN(n) && n >= 10 && n <= 500) {
-                                        unit = String(n);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (code && !isNaN(price1) && price1 > 200) {
-                                let price3 = Math.round((price1 * 0.95) / 10) * 10;
-                                let price6 = Math.round((price1 * 0.90) / 10) * 10;
-                                let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
-                                let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
-
-                                newItems.push({
-                                    branch: inputBranch,
-                                    code: code,
-                                    size: size !== '-' ? size + ' m' : '標準尺寸',
-                                    unit: unit !== '-' ? unit : '50',
-                                    price1: price1,
-                                    price3: price3,
-                                    price6: price6,
-                                    price12_85: price12_85,
-                                    price12_80: price12_80
-                                });
-                            }
-                        }
-
-                        if (newItems.length === 0) {
-                            alert('未能自動抓取到有效資料！');
-                            return;
-                        }
-
-                        let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
-                        if (existingBranchIndex !== -1) {
-                            let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
-                            if (choice) {
-                                storageData = storageData.filter(item => item.branch !== inputBranch);
-                            }
-                        }
-
-                        storageData = storageData.concat(newItems);
-                        localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                        renderStorageTable();
-                        alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
-                    } catch (err) {
-                        console.error(err);
-                        alert('解析 Excel 檔案時發生錯誤。');
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            } catch (err) {
-                console.error(err);
-                alert('上傳檔案發生異常。');
+            const fileInput = document.getElementById('excelFile');
+            if (!fileInput || fileInput.files.length === 0) {
+                alert('請先選擇一個 Excel 檔案！');
+                return;
             }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                    if (!jsonSheet || jsonSheet.length < 2) {
+                        alert('Excel 檔案內容不足！');
+                        return;
+                    }
+
+                    let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
+                    let newItems = [];
+
+                    for (let i = 0; i < jsonSheet.length; i++) {
+                        let row = jsonSheet[i];
+                        if (!row || row.length === 0) continue;
+
+                        let code = '';
+                        let size = '-';
+                        let unit = '-';
+                        let price1 = NaN;
+
+                        for (let c = 0; c < row.length; c++) {
+                            let val = row[c];
+                            if (val === undefined || val === null) continue;
+                            let sVal = String(val).trim();
+
+                            if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
+                                code = sVal;
+                                if (!isNaN(row[c+1])) code += row[c+1];
+                            } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                                size = sVal;
+                            } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
+                                price1 = Number(sVal);
+                            }
+                        }
+
+                        if (!code) {
+                            for (let c = 0; c < row.length; c++) {
+                                let s = String(row[c] || '').trim();
+                                if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
+                                    code = s;
+                                    break;
+                                }
+                            }
+                        }
+                        if (isNaN(price1)) {
+                            for (let c = 0; c < row.length; c++) {
+                                let n = Number(row[c]);
+                                if (!isNaN(n) && n >= 500 && n < 100000) {
+                                    price1 = n;
+                                    break;
+                                }
+                            }
+                        }
+                        if (unit === '-') {
+                            for (let c = 0; c < row.length; c++) {
+                                let n = Number(row[c]);
+                                if (!isNaN(n) && n >= 10 && n <= 500) {
+                                    unit = String(n);
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (code && !isNaN(price1) && price1 > 200) {
+                            let price3 = Math.round((price1 * 0.95) / 10) * 10;
+                            let price6 = Math.round((price1 * 0.90) / 10) * 10;
+                            let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
+                            let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
+
+                            newItems.push({
+                                branch: inputBranch,
+                                code: code,
+                                size: size !== '-' ? size + ' m' : '標準尺寸',
+                                unit: unit !== '-' ? unit : '50',
+                                price1: price1,
+                                price3: price3,
+                                price6: price6,
+                                price12_85: price12_85,
+                                price12_80: price12_80
+                            });
+                        }
+                    }
+
+                    if (newItems.length === 0) {
+                        alert('未能自動抓取到有效資料！');
+                        return;
+                    }
+
+                    let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
+                    if (existingBranchIndex !== -1) {
+                        let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
+                        if (choice) {
+                            storageData = storageData.filter(item => item.branch !== inputBranch);
+                        }
+                    }
+
+                    storageData = storageData.concat(newItems);
+                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                    renderStorageTable();
+                    alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
+                } catch (err) {
+                    console.error(err);
+                    alert('解析 Excel 檔案時發生錯誤。');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function updateBranchFilter() {
@@ -616,43 +575,38 @@
         }
 
         function renderStorageTable() {
-            try {
-                updateBranchFilter();
-                const filterEl = document.getElementById('storage-branch-filter');
-                const filterVal = filterEl ? filterEl.value : 'all';
-                const tbody = document.getElementById('storage-table-body');
-                if (!tbody) return;
-                
-                let filtered = storageData;
-                if (filterVal && filterVal !== 'all') {
-                    filtered = storageData.filter(item => item.branch === filterVal);
-                }
-
-                if (filtered.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = filtered.map(item => `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-medium text-amber-800">${item.branch}</td>
-                        <td class="p-3 font-bold">${item.code}</td>
-                        <td class="p-3">${item.size}</td>
-                        <td class="p-3 text-slate-500">${item.unit}</td>
-                        <td class="p-3 font-semibold text-amber-600">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-3">NT$ ${item.price3.toLocaleString()}</td>
-                        <td class="p-3">NT$ ${item.price6.toLocaleString()}</td>
-                        <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td class="p-3 text-emerald-700 font-semibold">NT$ ${item.price12_80.toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            } catch(e) {
-                console.error(e);
+            updateBranchFilter();
+            const filterEl = document.getElementById('storage-branch-filter');
+            const filterVal = filterEl ? filterEl.value : 'all';
+            const tbody = document.getElementById('storage-table-body');
+            if (!tbody) return;
+            
+            let filtered = storageData;
+            if (filterVal && filterVal !== 'all') {
+                filtered = storageData.filter(item => item.branch === filterVal);
             }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = filtered.map(item => `
+                <tr>
+                    <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
+                    <td style="font-weight: bold;">${item.code}</td>
+                    <td>${item.size}</td>
+                    <td style="color: #64748b;">${item.unit}</td>
+                    <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
+                    <td>NT$ ${item.price3.toLocaleString()}</td>
+                    <td>NT$ ${item.price6.toLocaleString()}</td>
+                    <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                </tr>
+            `).join('');
         }
 
         function deleteSelectedBranchData() {
-            const filterEl = document.getElementById('storage-branch-filter');
-            const filterVal = filterEl ? filterEl.value : 'all';
+            const filterVal = document.getElementById('storage-branch-filter').value;
             if (!filterVal || filterVal === 'all') {
                 alert('請先在上方選擇您想要刪除的「特定分店」！');
                 return;
@@ -673,7 +627,6 @@
             }
         }
 
-        // --- 報價單專屬據點與搜尋勾選 ---
         function initQuoteTab() {
             const qDate = document.getElementById('quote-date');
             const iDate = document.getElementById('inv-date');
@@ -693,15 +646,13 @@
         }
 
         function renderQuoteSelectableItems() {
-            const selectedBranchEl = document.getElementById('quote-branch-select');
-            const searchKwEl = document.getElementById('quote-search-input');
-            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
-            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
+            const selectedBranch = document.getElementById('quote-branch-select').value;
+            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
             const tbody = document.getElementById('quote-selectable-body');
             if (!tbody) return;
 
             if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
                 return;
             }
 
@@ -719,7 +670,7 @@
             }
 
             if (branchItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">找不到符合的倉位資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的倉位資料</td></tr>`;
                 return;
             }
 
@@ -727,12 +678,12 @@
                 let globalIndex = storageData.indexOf(item);
                 let isChecked = selectedQuoteItems[globalIndex] ? 'checked' : '';
                 return `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-2"><input type="checkbox" class="q-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
-                        <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
-                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <tr>
+                        <td><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
+                        <td><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
+                        <td style="font-weight: 600;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td style="font-weight: 600; color: #059669;">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -765,7 +716,7 @@
             if (!summaryEl) return;
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
-                summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何項目</span>';
+                summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>';
                 return;
             }
 
@@ -774,20 +725,18 @@
                 let item = selectedQuoteItems[idx];
                 let currentTerm = item.term || '12';
                 html += `
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white border border-amber-300 p-2.5 rounded-lg shadow-sm">
-                        <div class="font-semibold text-amber-900">
-                            [${item.branch}] <b>${item.code}</b> (${item.size} / ${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}
-                        </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
-                            <select onchange="updateItemTerm(${idx}, this.value)" class="border rounded px-2 py-1 text-xs bg-amber-50 font-semibold">
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px;">
+                        <span style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> (${item.size}) - 原價: NT$ ${item.price1.toLocaleString()}</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <select onchange="updateItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
                                 <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
                                 <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                 <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
                                 <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
                                 <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
-                                <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算 (僅列出價格)</option>
+                                <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
                             </select>
-                            <button onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
+                            <button type="button" onclick="removeQuoteItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
                         </div>
                     </div>
                 `;
@@ -795,8 +744,6 @@
             summaryEl.innerHTML = html;
         }
 
-
-        // --- 請款單專屬據點與搜尋勾選 (獨立工具) ---
         function initInvoiceTab() {
             const branchSelect = document.getElementById('invoice-branch-select');
             if (!branchSelect) return;
@@ -811,15 +758,13 @@
         }
 
         function renderInvoiceSelectableItems() {
-            const selectedBranchEl = document.getElementById('invoice-branch-select');
-            const searchKwEl = document.getElementById('invoice-search-input');
-            const selectedBranch = selectedBranchEl ? selectedBranchEl.value : '';
-            const searchKw = searchKwEl ? searchKwEl.value.trim().toLowerCase() : '';
+            const selectedBranch = document.getElementById('invoice-branch-select').value;
+            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
             const tbody = document.getElementById('invoice-selectable-body');
             if (!tbody) return;
 
             if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
                 return;
             }
 
@@ -837,7 +782,7 @@
             }
 
             if (branchItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">找不到符合的請款項目</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的請款項目</td></tr>`;
                 return;
             }
 
@@ -845,12 +790,12 @@
                 let globalIndex = storageData.indexOf(item);
                 let isChecked = selectedInvoiceItems[globalIndex] ? 'checked' : '';
                 return `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-2"><input type="checkbox" class="i-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
-                        <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
-                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <tr>
+                        <td><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
+                        <td><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
+                        <td style="font-weight: 600;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td style="font-weight: 600; color: #059669;">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -883,7 +828,7 @@
             if (!summaryEl) return;
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) {
-                summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何請款項目</span>';
+                summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何請款項目</span>';
                 return;
             }
 
@@ -892,20 +837,18 @@
                 let item = selectedInvoiceItems[idx];
                 let currentTerm = item.term || '12';
                 html += `
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white border border-amber-300 p-2.5 rounded-lg shadow-sm">
-                        <div class="font-semibold text-amber-900">
-                            [${item.branch}] <b>${item.code}</b> (${item.size} / ${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}
-                        </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
-                            <select onchange="updateInvoiceItemTerm(${idx}, this.value)" class="border rounded px-2 py-1 text-xs bg-amber-50 font-semibold">
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px;">
+                        <span style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> (${item.size}) - 原價: NT$ ${item.price1.toLocaleString()}</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <select onchange="updateInvoiceItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
                                 <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
                                 <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                 <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
                                 <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
                                 <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
-                                <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款 (僅列出價格)</option>
+                                <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款</option>
                             </select>
-                            <button onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold px-2 cursor-pointer">×</button>
+                            <button type="button" onclick="removeInvoiceItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
                         </div>
                     </div>
                 `;
@@ -957,12 +900,12 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700">${item.unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium">[${item.branch}] <b>${item.code}</b><br>${item.size}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right font-bold text-amber-700">NT$ ${p12_85.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px;">${item.unit}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px;">[${item.branch}] <b>${item.code}</b><br>${item.size}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p1.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p3.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p6.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">NT$ ${p12_85.toLocaleString()}</td>
                     </tr>
                 `;
 
@@ -1052,16 +995,16 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">[${item.branch}] ${item.code}<br>${item.size}</td>
-                        <td class="p-2.5 border border-slate-700">${item.unit}材</td>
-                        <td class="p-2.5 border border-slate-700 text-right">${p1.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">${monthlyRate.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-center">${termMonths}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">${exSubtotal.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">${tax.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">${incSubtotal.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">${deposit.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right font-bold text-amber-700">${lineTotal.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold;">[${item.branch}] ${item.code}<br>${item.size}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px;">${item.unit}材</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${p1.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${monthlyRate.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${termMonths}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${exSubtotal.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${tax.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${incSubtotal.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${deposit.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">${lineTotal.toLocaleString()}</td>
                     </tr>
                 `;
             });
@@ -1074,7 +1017,6 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 完美對應格式 Excel 匯出 (報價單)
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -1084,10 +1026,10 @@
 
             let aoa = [
                 ["收多易迷你倉庫 - 報價單"],
-                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client').innerText],
-                ["店長:", document.getElementById('v-q-manager').innerText, "客戶電話:", document.getElementById('v-q-client-phone').innerText],
-                ["分店名稱:", document.getElementById('v-q-branch').innerText, "公司抬頭:", document.getElementById('v-q-company').innerText],
-                ["聯繫電話:", document.getElementById('v-q-tel').innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
+                ["日期:", document.getElementById('v-q-date').innerText, "客戶名稱:", document.getElementById('v-q-client'].innerText],
+                ["店長:", document.getElementById('v-q-manager'].innerText, "客戶電話:", document.getElementById('v-q-client-phone'].innerText],
+                ["分店名稱:", document.getElementById('v-q-branch'].innerText, "公司抬頭:", document.getElementById('v-q-company'].innerText],
+                ["聯繫電話:", document.getElementById('v-q-tel'].innerText, "統一編號:", document.getElementById('v-q-taxid'].innerText],
                 ["分店地址:", document.getElementById('v-q-address'].innerText],
                 [],
                 ["單位(材)", "倉位尺寸(寬*深*高 m)", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
@@ -1109,7 +1051,7 @@
                 [],
                 ["費用試算表"],
                 ["租金總計:", document.getElementById('v-q-rent').innerText],
-                ["保證金總計:", document.getElementById('v-q-deposit'].innerText],
+                ["保證金總計:", document.getElementById('v-q-deposit').innerText],
                 ["保險文書處理費總計:", document.getElementById('v-q-fee'].innerText],
                 ["合計:", document.getElementById('v-q-total'].innerText]
             );
@@ -1120,7 +1062,6 @@
             XLSX.writeFile(wb, "Storeasy_報價單.xlsx");
         }
 
-        // 完美對應格式 Excel 匯出 (請款單)
         function exportInvoiceExcel() {
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) {
