@@ -26,7 +26,7 @@
                 <p class="text-xs text-slate-400 mt-1">Storeasy Storage 單據生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料與智慧上傳</button>
+                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料與一鍵智慧匯入</button>
                 <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 正式報價單生成</button>
                 <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 會計版請款單生成</button>
             </nav>
@@ -38,8 +38,8 @@
         <!-- 主內容區 -->
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
-                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與智慧上傳</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (字對字精準智慧辨識版)</div>
+                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全自動智慧辨識版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -47,20 +47,20 @@
                 <!-- 1. 倉位資料與多據點管理頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 智慧上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動掃描表頭文字，字對字精準對應「材積/立方英尺」、「尺寸/規格」、「月繳/原價」、「季繳」、「半年繳」、「年繳」。</p>
+                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
+                        <p class="text-sm text-slate-500 mb-4">店長只需選擇檔案與分店名稱，系統自動看懂表頭並精準分類匯入！</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店名稱</label>
-                                <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店" placeholder="例如: 士林店、土城店">
+                                <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" value="土城店" placeholder="例如: 土城店、士林店">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium mb-1">選擇 Excel 檔案</label>
                                 <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
                             </div>
                         </div>
-                        <button onclick="handleSmartExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">字對字精準智慧匯入</button>
+                        <button onclick="handleOneClickSmartUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">一鍵智慧匯入資料</button>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -78,16 +78,18 @@
                                 <thead>
                                     <tr class="bg-slate-50 border-b text-slate-600 text-sm">
                                         <th class="p-3">據點名稱</th>
-                                        <th class="p-3">材積 (立方英尺)</th>
-                                        <th class="p-3">倉位尺寸 / 規格</th>
-                                        <th class="p-3">月繳/月 (原價)</th>
-                                        <th class="p-3">季繳/月 (95折)</th>
-                                        <th class="p-3">半年繳/月 (9折)</th>
-                                        <th class="p-3">年繳/月 (85折/8折)</th>
+                                        <th class="p-3">倉位編號</th>
+                                        <th class="p-3">尺寸規格</th>
+                                        <th class="p-3">材積 (呎)</th>
+                                        <th class="p-3">月繳原價</th>
+                                        <th class="p-3">季繳</th>
+                                        <th class="p-3">半年繳</th>
+                                        <th class="p-3">年繳(85折)</th>
+                                        <th class="p-3">年繳(8折)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="storage-table-body" class="text-sm divide-y">
-                                    <tr><td colspan="7" class="p-4 text-center text-slate-400">尚未匯入資料，請先上傳 Excel 檔案</td></tr>
+                                    <tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料，請先上傳 Excel 檔案</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -101,15 +103,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
-                                <input type="text" id="q-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店">
+                                <input type="text" id="q-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="土城店">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">店長</label>
-                                <input type="text" id="q-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="阮陳彥 Tony">
+                                <input type="text" id="q-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="經辦人員">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">聯繫電話</label>
-                                <input type="text" id="q-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="02-2882-8008">
+                                <input type="text" id="q-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="0800-388075">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">報價日期</label>
@@ -120,7 +122,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium mb-1">分店地址</label>
-                                <input type="text" id="q-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
+                                <input type="text" id="q-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="新北市土城區...">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">客戶名稱</label>
@@ -147,7 +149,7 @@
                                     <tr>
                                         <th class="p-2 w-10">選取</th>
                                         <th class="p-2">據點</th>
-                                        <th class="p-2">尺寸 / 材積</th>
+                                        <th class="p-2">編號 / 尺寸</th>
                                         <th class="p-2">月繳原價</th>
                                         <th class="p-2">年繳優惠價</th>
                                     </tr>
@@ -174,7 +176,8 @@
                                         <option value="1">月繳 (1個月 / 原價)</option>
                                         <option value="3">季繳 (3個月 / 95折)</option>
                                         <option value="6">半年繳 (6個月 / 9折)</option>
-                                        <option value="12">年繳 (12個月 / 85折或8折)</option>
+                                        <option value="12">年繳 (12個月 / 85折)</option>
+                                        <option value="12_80">年繳 (12個月 / 8折)</option>
                                     </select>
                                 </div>
                                 <div>
@@ -268,15 +271,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
-                                <input type="text" id="i-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店">
+                                <input type="text" id="i-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="土城店">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">店長</label>
-                                <input type="text" id="i-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="阮陳彥 Tony">
+                                <input type="text" id="i-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="經辦人員">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">聯繫電話</label>
-                                <input type="text" id="i-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="02-2882-8008">
+                                <input type="text" id="i-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="0800-388075">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">請款日期</label>
@@ -287,7 +290,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium mb-1">分店地址</label>
-                                <input type="text" id="i-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
+                                <input type="text" id="i-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="新北市土城區...">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">客戶名稱</label>
@@ -408,8 +411,8 @@
             XLSX.writeFile(wb, filename);
         }
 
-        // 字對字精準智慧辨識 Excel 表頭文字
-        function handleSmartExcelUpload() {
+        // 全自動字對字智慧解析 Excel 上傳
+        function handleOneClickSmartUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
                 alert('請先選擇一個 Excel 檔案！');
@@ -430,35 +433,32 @@
                     return;
                 }
 
-                let inputBranch = document.getElementById('upload-branch-name').value.trim() || '士林店';
+                let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
 
-                // 逐字掃描表頭列找尋關鍵字
+                // 搜尋表頭列，精準以關鍵字字對字辨識欄位
                 let headerRowIdx = 0;
-                let colMap = { unit: -1, size: -1, p1: -1, p3: -1, p6: -1, p12: -1 };
+                let colMap = { code: -1, size: -1, unit: -1, p1: -1, p3: -1, p6: -1, p12_85: -1, p12_80: -1 };
 
-                for (let r = 0; r < Math.min(jsonSheet.length, 10); r++) {
+                for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
                     let row = jsonSheet[r];
                     if (!row) continue;
-                    let matchCount = 0;
+                    let found = false;
                     for (let c = 0; c < row.length; c++) {
                         let name = String(row[c] || '').trim();
-                        if (/材積|立方英尺|單位/.test(name)) { colMap.unit = c; matchCount++; }
-                        else if (/尺寸|規格/.test(name)) { colMap.size = c; matchCount++; }
-                        else if (/月繳|原價/.test(name) && !/季繳|半年|年繳/.test(name)) { colMap.p1 = c; matchCount++; }
-                        else if (/季繳/.test(name)) { colMap.p3 = c; matchCount++; }
-                        else if (/半年繳/.test(name)) { colMap.p6 = c; matchCount++; }
-                        else if (/年繳/.test(name)) { colMap.p12 = c; matchCount++; }
+                        if (/編號|倉位代號/.test(name)) { colMap.code = c; found = true; }
+                        else if (/尺寸|規格/.test(name)) { colMap.size = c; found = true; }
+                        else if (/單位|材積|立方英尺/.test(name)) { colMap.unit = c; found = true; }
+                        else if (/月繳|原價/.test(name) && !/季繳|半年|年繳/.test(name)) { colMap.p1 = c; found = true; }
+                        else if (/季繳/.test(name)) { colMap.p3 = c; found = true; }
+                        else if (/半年繳/.test(name)) { colMap.p6 = c; found = true; }
+                        else if (/85折|年繳.*85/.test(name)) { colMap.p12_85 = c; found = true; }
+                        else if (/80折|8折|年繳.*80/.test(name)) { colMap.p12_80 = c; found = true; }
+                        else if (/年繳/.test(name) && colMap.p12_85 === -1) { colMap.p12_85 = c; found = true; }
                     }
-                    if (matchCount >= 2 || colMap.p1 !== -1) {
+                    if (found) {
                         headerRowIdx = r;
                         break;
                     }
-                }
-
-                // 若自動掃描沒找到，進行保底預設
-                if (colMap.p1 === -1) {
-                    colMap = { unit: 0, size: 1, p1: 2, p3: 3, p6: 4, p12: 5 };
-                    headerRowIdx = 0;
                 }
 
                 let newItems = [];
@@ -466,29 +466,44 @@
                     let row = jsonSheet[i];
                     if (!row || row.length === 0) continue;
 
-                    let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]) : '-';
-                    let size = colMap.size !== -1 && row[colMap.size] !== undefined ? String(row[colMap.size]) : '';
+                    let code = colMap.code !== -1 && row[colMap.code] !== undefined ? String(row[colMap.code]).trim() : `P${i}`;
+                    let size = colMap.size !== -1 && row[colMap.size] !== undefined ? String(row[colMap.size]).trim() : '-';
+                    let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]).trim() : '-';
                     let price1 = colMap.p1 !== -1 ? Number(row[colMap.p1]) : NaN;
 
-                    if (size && size !== 'undefined' && !isNaN(price1) && price1 > 0) {
+                    // 若未找到原價但整行有數字，嘗試找第一個合適的數字
+                    if (isNaN(price1) || price1 <= 0) {
+                        for (let c = 0; c < row.length; c++) {
+                            let val = Number(row[c]);
+                            if (!isNaN(val) && val > 100 && val < 50000) {
+                                price1 = val;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!isNaN(price1) && price1 > 0) {
                         let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) ? Number(row[colMap.p3]) : Math.round(price1 * 0.95);
                         let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) ? Number(row[colMap.p6]) : Math.round(price1 * 0.90);
-                        let price12 = colMap.p12 !== -1 && !isNaN(Number(row[colMap.p12])) ? Number(row[colMap.p12]) : Math.round(price1 * 0.85);
+                        let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) ? Number(row[colMap.p12_85]) : Math.round(price1 * 0.85);
+                        let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) ? Number(row[p12_80]) : Math.round(price1 * 0.80);
 
                         newItems.push({
                             branch: inputBranch,
-                            unit: unit.trim(),
-                            size: size.trim(),
+                            code: code,
+                            size: size,
+                            unit: unit,
                             price1: price1,
                             price3: price3,
                             price6: price6,
-                            price12: price12
+                            price12_85: price12_85,
+                            price12_80: price12_80
                         });
                     }
                 }
 
                 if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料，請確認該 Excel 表頭是否有明確寫出「材積」、「尺寸」、「月繳/原價」等文字。');
+                    alert('未能自動抓取到有效資料，請確認 Excel 表頭是否有明確寫出「編號」、「尺寸」、「材積」、「月繳/原價」。');
                     return;
                 }
 
@@ -503,7 +518,7 @@
                 storageData = storageData.concat(newItems);
                 localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                 renderStorageTable();
-                alert('成功透過字對字精準辨識匯入 ' + newItems.length + ' 筆倉位資料！');
+                alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
             };
             reader.readAsArrayBuffer(file);
         }
@@ -538,18 +553,20 @@
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">目前尚無資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">目前尚無資料</td></tr>`;
                 return;
             }
             tbody.innerHTML = filtered.map(item => `
                 <tr class="hover:bg-slate-50">
                     <td class="p-3 font-medium text-amber-800">${item.branch}</td>
+                    <td class="p-3 font-bold">${item.code}</td>
+                    <td class="p-3">${item.size}</td>
                     <td class="p-3 text-slate-500">${item.unit}</td>
-                    <td class="p-3 font-bold">${item.size}</td>
                     <td class="p-3 font-semibold text-amber-600">NT$ ${item.price1.toLocaleString()}</td>
                     <td class="p-3">NT$ ${item.price3.toLocaleString()}</td>
                     <td class="p-3">NT$ ${item.price6.toLocaleString()}</td>
-                    <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
+                    <td class="p-3 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <td class="p-3 text-emerald-700 font-semibold">NT$ ${item.price12_80.toLocaleString()}</td>
                 </tr>
             `).join('');
         }
@@ -582,11 +599,11 @@
                     let globalIndex = storageData.indexOf(item);
                     html += `
                         <tr class="hover:bg-slate-50 border-b">
-                            <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
+                            <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-code="${item.code}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12_85="${item.price12_85}" data-p12_80="${item.price12_80}"></td>
                             <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                            <td class="p-2 font-medium">${item.size} (${item.unit}呎)</td>
+                            <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}呎)</td>
                             <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                            <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
+                            <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
                         </tr>
                     `;
                 });
@@ -600,10 +617,11 @@
             const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
             let optionsHtml = '<option value="all">全部勾選項目總計</option>';
             checkboxes.forEach(cb => {
+                const code = cb.getAttribute('data-code');
                 const size = cb.getAttribute('data-size');
                 const branch = cb.getAttribute('data-branch');
                 const idx = cb.getAttribute('data-index');
-                optionsHtml += `<option value="${idx}">單獨計算: [${branch}] ${size}</option>`;
+                optionsHtml += `<option value="${idx}">單獨計算: [${branch}] ${code} (${size})</option>`;
             });
             document.getElementById('q-calc-target').innerHTML = optionsHtml;
         }
@@ -620,7 +638,7 @@
             const date = document.getElementById('quote-date').value;
             
             const calcTarget = document.getElementById('q-calc-target').value;
-            const calcTerm = Number(document.getElementById('q-calc-term').value);
+            const calcTerm = document.getElementById('q-calc-term').value;
             const depositMode = document.getElementById('q-deposit-mode').value;
             const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
 
@@ -645,39 +663,49 @@
             let targetFee = 0;
             let targetDeposit = 0;
             let calcModeText = '全部總計';
-            let termTextName = calcTerm === 1 ? '月繳' : calcTerm === 3 ? '季繳' : calcTerm === 6 ? '半年繳' : '年繳';
+            let termMonths = 1;
+            let termTextName = '月繳';
+
+            if (calcTerm === '3') { termMonths = 3; termTextName = '季繳'; }
+            else if (calcTerm === '6') { termMonths = 6; termTextName = '半年繳'; }
+            else if (calcTerm === '12') { termMonths = 12; termTextName = '年繳 (85折)'; }
+            else if (calcTerm === '12_80') { termMonths = 12; termTextName = '年繳 (8折)'; }
+
             document.getElementById('v-q-term-text').innerText = termTextName;
 
             checkboxes.forEach((cb) => {
                 const index = cb.getAttribute('data-index');
+                const code = cb.getAttribute('data-code');
                 const size = cb.getAttribute('data-size');
                 const unit = cb.getAttribute('data-unit');
                 const p1 = Number(cb.getAttribute('data-p1'));
                 const p3 = Number(cb.getAttribute('data-p3'));
                 const p6 = Number(cb.getAttribute('data-p6'));
-                const p12 = Number(cb.getAttribute('data-p12'));
+                const p12_85 = Number(cb.getAttribute('data-p12_85'));
+                const p12_80 = Number(cb.getAttribute('data-p12_80'));
                 const itemBranch = cb.getAttribute('data-branch');
 
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700">${unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium">${size}</td>
+                        <td class="p-2.5 border border-slate-700 font-medium"><b>${code}</b><br>${size}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right font-bold text-amber-700">NT$ ${p12.toLocaleString()}</td>
+                        <td class="p-2.5 border border-slate-700 text-right font-bold text-amber-700">NT$ ${p12_85.toLocaleString()}</td>
                     </tr>
                 `;
 
                 let selectedMonthlyRate = p1;
-                if (calcTerm === 3) selectedMonthlyRate = p3;
-                else if (calcTerm === 6) selectedMonthlyRate = p6;
-                else if (calcTerm === 12) selectedMonthlyRate = p12;
+                if (calcTerm === '3') selectedMonthlyRate = p3;
+                else if (calcTerm === '6') selectedMonthlyRate = p6;
+                else if (calcTerm === '12') selectedMonthlyRate = p12_85;
+                else if (calcTerm === '12_80') selectedMonthlyRate = p12_80;
 
-                let itemTotalRent = selectedMonthlyRate * calcTerm;
+                let itemTotalRent = selectedMonthlyRate * termMonths;
                 let feePerMonth = selectedMonthlyRate >= 3000 ? 150 : 80;
-                let itemFee = feePerMonth * calcTerm;
-                let itemDeposit = calcTerm <= 2 ? (p1 * 2) : p1;
+                let itemFee = feePerMonth * termMonths;
+                let itemDeposit = termMonths <= 2 ? (p1 * 2) : p1;
 
                 if (calcTarget === 'all' || calcTarget === index) {
                     targetRent += itemTotalRent;
@@ -685,7 +713,7 @@
                     targetDeposit += itemDeposit;
                 }
                 if (calcTarget === index) {
-                    calcModeText = `[${itemBranch}] ${size}`;
+                    calcModeText = `[${itemBranch}] ${code} (${size})`;
                 }
             });
 
@@ -715,7 +743,7 @@
             const company = document.getElementById('i-company').value || '---';
             const taxid = document.getElementById('i-taxid').value || '---';
             const date = document.getElementById('inv-date').value;
-            const calcTerm = Number(document.getElementById('q-calc-term').value);
+            const calcTerm = document.getElementById('q-calc-term').value;
             const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
 
             document.getElementById('v-i-date').innerText = date;
@@ -735,43 +763,45 @@
             }
 
             let html = '';
-            let totalRentEx = 0;
-            let totalTax = 0;
             let totalRentInc = 0;
             let totalDeposit = 0;
+            let termMonths = 1;
+            if (calcTerm === '3') termMonths = 3;
+            else if (calcTerm === '6') termMonths = 6;
+            else if (calcTerm === '12' || calcTerm === '12_80') termMonths = 12;
 
             checkboxes.forEach((cb) => {
+                const code = cb.getAttribute('data-code');
                 const size = cb.getAttribute('data-size');
                 const unit = cb.getAttribute('data-unit');
                 const p1 = Number(cb.getAttribute('data-p1'));
                 const p3 = Number(cb.getAttribute('data-p3'));
                 const p6 = Number(cb.getAttribute('data-p6'));
-                const p12 = Number(cb.getAttribute('data-p12'));
-                const itemBranch = cb.getAttribute('data-branch');
+                const p12_85 = Number(cb.getAttribute('data-p12_85'));
+                const p12_80 = Number(cb.getAttribute('data-p12_80'));
 
                 let monthlyRate = p1;
-                if (calcTerm === 3) monthlyRate = p3;
-                else if (calcTerm === 6) monthlyRate = p6;
-                else if (calcTerm === 12) monthlyRate = p12;
+                if (calcTerm === '3') monthlyRate = p3;
+                else if (calcTerm === '6') monthlyRate = p6;
+                else if (calcTerm === '12') monthlyRate = p12_85;
+                else if (calcTerm === '12_80') monthlyRate = p12_80;
 
-                let incSubtotal = monthlyRate * calcTerm;
+                let incSubtotal = monthlyRate * termMonths;
                 let exSubtotal = Math.round(incSubtotal / 1.05);
                 let tax = incSubtotal - exSubtotal;
-                let deposit = calcTerm <= 2 ? (p1 * 2) : p1;
+                let deposit = termMonths <= 2 ? (p1 * 2) : p1;
                 let lineTotal = incSubtotal;
 
-                totalRentEx += exSubtotal;
-                totalTax += tax;
                 totalRentInc += incSubtotal;
                 totalDeposit += deposit;
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">${size}</td>
-                        <td class="p-2.5 border border-slate-700">${unit}呎</td>
-                        <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-right">NT$ ${monthlyRate.toLocaleString()}</td>
-                        <td class="p-2.5 border border-slate-700 text-center">${calcTerm}</td>
+                        <td class="p-2.5 border border-slate-700 font-bold">${code}</td>
+                        <td class="p-2.5 border border-slate-700">${unit}</td>
+                        <td class="p-2.5 border border-slate-700 text-right">${p1.toLocaleString()}</td>
+                        <td class="p-2.5 border border-slate-700 text-right">${monthlyRate.toLocaleString()}</td>
+                        <td class="p-2.5 border border-slate-700 text-center">${termMonths}</td>
                         <td class="p-2.5 border border-slate-700 text-right">${exSubtotal.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">${tax.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">${incSubtotal.toLocaleString()}</td>
