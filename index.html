@@ -96,7 +96,7 @@
     <main>
         <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (專業列印與Excel版)</div>
+            <div class="version">系統版本：2026.09 (完美 Excel 版)</div>
         </header>
 
         <div class="content-body">
@@ -239,8 +239,8 @@
                     <table>
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">單位(材)</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">單位<br>(材)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸<br>(寬*深*高 m)</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">月繳/月</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">季繳/月</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">半年繳/月</th>
@@ -1048,7 +1048,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 完美陣列排版 Excel 匯出（變數分離防錯機制，保證 100% 執行）
+        // 使用隱藏表格技術，將完整網頁預覽樣式（含客戶資料、格線與備註）直接轉出成 Excel
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -1070,41 +1070,90 @@
             const qFee = document.getElementById('v-q-fee').innerText;
             const qTotal = document.getElementById('v-q-total').innerText;
 
-            let aoa = [
-                ["收多易迷你倉庫 - 報價單"],
-                ["日期:", qDate, "客戶名稱:", qClient],
-                ["店長:", qManager, "客戶電話:", qClientPhone],
-                ["分店名稱:", qBranch, "公司抬頭:", qCompany],
-                ["聯繫電話:", qTel, "統一編號:", qTaxid],
-                ["分店地址:", qAddress],
-                [],
-                ["單位(材)", "倉位尺寸(寬*深*高 m)", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
-            ];
+            let tableHTML = `
+                <table>
+                    <tr><th colspan="6" style="text-align: center; font-size: 16pt;">收多易迷你倉庫 - 報價單</th></tr>
+                    <tr><td colspan="6"></td></tr>
+                    <tr>
+                        <td><strong>日期：</strong></td><td colspan="2">${qDate}</td>
+                        <td><strong>客戶名稱：</strong></td><td colspan="2">${qClient}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>店長：</strong></td><td colspan="2">${qManager}</td>
+                        <td><strong>客戶電話：</strong></td><td colspan="2">${qClientPhone}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>分店名稱：</strong></td><td colspan="2">${qBranch}</td>
+                        <td><strong>公司抬頭：</strong></td><td colspan="2">${qCompany}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>聯繫電話：</strong></td><td colspan="2">${qTel}</td>
+                        <td><strong>統一編號：</strong></td><td colspan="2">${qTaxid}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>分店地址：</strong></td><td colspan="5">${qAddress}</td>
+                    </tr>
+                    <tr><td colspan="6"></td></tr>
+                    <tr>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">單位(材)</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">倉位尺寸(寬*深*高 m)</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">月繳/月</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">季繳/月</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">半年繳/月</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">年繳/月</th>
+                    </tr>
+            `;
 
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
-                aoa.push([
-                    item.unit,
-                    `[${item.branch}] ${item.size}`,
-                    item.price1,
-                    item.price3,
-                    item.price6,
-                    item.price12_85
-                ]);
+                let term = item.term || '12';
+                let p1 = item.price1;
+                let p3 = item.price3;
+                let p6 = item.price6;
+                let p12_85 = item.price12_85;
+                
+                tableHTML += `
+                    <tr>
+                        <td style="border: 1px solid #000;">${item.unit}</td>
+                        <td style="border: 1px solid #000;">[${item.branch}] ${item.size}</td>
+                        <td style="border: 1px solid #000;">NT$ ${p1.toLocaleString()}</td>
+                        <td style="border: 1px solid #000;">NT$ ${p3.toLocaleString()}</td>
+                        <td style="border: 1px solid #000;">NT$ ${p6.toLocaleString()}</td>
+                        <td style="border: 1px solid #000;">NT$ ${p12_85.toLocaleString()}</td>
+                    </tr>
+                `;
             });
 
-            aoa.push(
-                [],
-                ["費用試算表"],
-                ["租金總計:", qRent],
-                ["保證金總計:", qDeposit],
-                ["保險文書處理費總計:", qFee],
-                ["合計:", qTotal]
-            );
+            tableHTML += `
+                    <tr><td colspan="6"></td></tr>
+                    <tr><td colspan="6" style="font-weight: bold;">費用試算表 (依據各項目獨立方案計費)</td></tr>
+                    <tr><td colspan="5">租金總計 (NT$)：</td><td style="text-align: right;">${qRent}</td></tr>
+                    <tr><td colspan="5">保證金總計 (NT$)：</td><td style="text-align: right;">${qDeposit}</td></tr>
+                    <tr><td colspan="5">保險文書處理費總計 (NT$)：</td><td style="text-align: right;">${qFee}</td></tr>
+                    <tr><td colspan="5" style="font-weight: bold;">合計 (NT$)：</td><td style="font-weight: bold; text-align: right; color: #b45309;">${qTotal}</td></tr>
+                    <tr><td colspan="6"></td></tr>
+                    <tr><td colspan="6" style="font-weight: bold;">匯款資訊：</td></tr>
+                    <tr><td colspan="6">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</td></tr>
+                    <tr><td colspan="6" style="font-weight: bold;">備註：</td></tr>
+                    <tr><td colspan="6">1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</td></tr>
+                    <tr><td colspan="6">2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</td></tr>
+                    <tr><td colspan="6">3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</td></tr>
+                    <tr><td colspan="6">4. 付款方式: 轉帳、即期支票。</td></tr>
+                    <tr><td colspan="6">5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</td></tr>
+                    <tr><td colspan="6"></td></tr>
+                    <tr><td colspan="6" style="text-align: center;">THANK YOU FOR YOUR BUSINESS!</td></tr>
+                </table>
+            `;
 
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "報價單");
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = tableHTML;
+            let wb = XLSX.utils.table_to_book(tempDiv.querySelector('table'), {sheet: "報價單"});
+            
+            // 設定欄寬排版
+            wb.Sheets["報價單"]['!cols'] = [
+                {wch: 15}, {wch: 30}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}
+            ];
+            
             XLSX.writeFile(wb, "Storeasy_報價單.xlsx");
         }
 
@@ -1128,16 +1177,43 @@
             const iDeposit = document.getElementById('v-i-deposit').innerText;
             const iTotal = document.getElementById('v-i-total').innerText;
 
-            let aoa = [
-                ["收多易股份有限公司 - 請款單"],
-                ["日期:", iDate, "客戶名稱:", iClient],
-                ["店長:", iManager, "客戶電話:", iClientPhone],
-                ["分店名稱:", iBranch, "公司抬頭:", iCompany],
-                ["聯繫電話:", iTel, "統一編號:", iTaxid],
-                ["分店地址:", iAddress],
-                [],
-                ["倉位尺寸(寬*深*高 m)", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "小計"]
-            ];
+            let tableHTML = `
+                <table>
+                    <tr><th colspan="10" style="text-align: center; font-size: 16pt;">收多易股份有限公司 - 請款單</th></tr>
+                    <tr><td colspan="10"></td></tr>
+                    <tr>
+                        <td colspan="2"><strong>日期：</strong></td><td colspan="3">${iDate}</td>
+                        <td colspan="2"><strong>客戶名稱：</strong></td><td colspan="3">${iClient}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>店長：</strong></td><td colspan="3">${iManager}</td>
+                        <td colspan="2"><strong>客戶電話：</strong></td><td colspan="3">${iClientPhone}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>分店名稱：</strong></td><td colspan="3">${iBranch}</td>
+                        <td colspan="2"><strong>公司抬頭：</strong></td><td colspan="3">${iCompany}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>聯繫電話：</strong></td><td colspan="3">${iTel}</td>
+                        <td colspan="2"><strong>統一編號：</strong></td><td colspan="3">${iTaxid}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>分店地址：</strong></td><td colspan="8">${iAddress}</td>
+                    </tr>
+                    <tr><td colspan="10"></td></tr>
+                    <tr>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">倉位尺寸(寬*深*高 m)</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">材積</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">原價租金</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">優惠租金</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">承租月份</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">未稅小計</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">稅金</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">含稅小計</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">保證金</th>
+                        <th style="border: 1px solid #000; background-color: #f1f5f9; font-weight: bold;">小計</th>
+                    </tr>
+            `;
 
             keys.forEach(idx => {
                 let item = selectedInvoiceItems[idx];
@@ -1153,30 +1229,47 @@
                 let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
                 let lineTotal = incSub + dep;
 
-                aoa.push([
-                    `[${item.branch}] ${item.size}`,
-                    item.unit + "材",
-                    p1,
-                    monthlyRate,
-                    termMonths,
-                    exSub,
-                    tax,
-                    incSub,
-                    dep,
-                    lineTotal
-                ]);
+                tableHTML += `
+                    <tr>
+                        <td style="border: 1px solid #000;">[${item.branch}] ${item.size}</td>
+                        <td style="border: 1px solid #000;">${item.unit}材</td>
+                        <td style="border: 1px solid #000; text-align: right;">${p1.toLocaleString()}</td>
+                        <td style="border: 1px solid #000; text-align: right;">${monthlyRate.toLocaleString()}</td>
+                        <td style="border: 1px solid #000; text-align: center;">${termMonths}</td>
+                        <td style="border: 1px solid #000; text-align: right;">${exSub.toLocaleString()}</td>
+                        <td style="border: 1px solid #000; text-align: right;">${tax.toLocaleString()}</td>
+                        <td style="border: 1px solid #000; text-align: right;">${incSub.toLocaleString()}</td>
+                        <td style="border: 1px solid #000; text-align: right;">${dep.toLocaleString()}</td>
+                        <td style="border: 1px solid #000; text-align: right;">${lineTotal.toLocaleString()}</td>
+                    </tr>
+                `;
             });
 
-            aoa.push(
-                [],
-                ["租金合計:", iSubtotal],
-                ["保證金合計:", iDeposit],
-                ["請款總金額 (TWD):", iTotal]
-            );
+            tableHTML += `
+                    <tr><td colspan="10"></td></tr>
+                    <tr><td colspan="9">租金合計：</td><td style="text-align: right;">${iSubtotal}</td></tr>
+                    <tr><td colspan="9">保證金合計：</td><td style="text-align: right;">${iDeposit}</td></tr>
+                    <tr><td colspan="9" style="font-weight: bold;">請款總金額 (TWD)：</td><td style="font-weight: bold; text-align: right; color: #b45309;">${iTotal}</td></tr>
+                    <tr><td colspan="10"></td></tr>
+                    <tr><td colspan="10" style="font-weight: bold;">付款資料：</td></tr>
+                    <tr><td colspan="10">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</td></tr>
+                    <tr><td colspan="10">支票付款抬頭請開：收多易股份有限公司</td></tr>
+                    <tr><td colspan="10" style="color: red; font-weight: bold;">請於請款日起7個工作日內完成入款</td></tr>
+                    <tr><td colspan="10"></td></tr>
+                    <tr><td colspan="10" style="text-align: center;">THANK YOU FOR YOUR BUSINESS!</td></tr>
+                </table>
+            `;
 
-            const ws = XLSX.utils.aoa_to_sheet(aoa);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "請款單");
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = tableHTML;
+            let wb = XLSX.utils.table_to_book(tempDiv.querySelector('table'), {sheet: "請款單"});
+            
+            // 設定欄寬排版
+            wb.Sheets["請款單"]['!cols'] = [
+                {wch: 25}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 10}, 
+                {wch: 12}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 15}
+            ];
+            
             XLSX.writeFile(wb, "Storeasy_請款單.xlsx");
         }
 
