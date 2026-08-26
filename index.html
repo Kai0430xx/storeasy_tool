@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storeasy Storage 營運管理工具 (正式報價單與請款單系統)</title>
+    <title>Storeasy Storage 營運管理工具 (正式報價單與會計版請款單系統)</title>
     <!-- Tailwind CSS 樣式框架 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
@@ -28,7 +28,7 @@
             <nav class="flex-1 p-4 space-y-2">
                 <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料與多據點管理</button>
                 <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 正式報價單生成</button>
-                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 正式請款單生成</button>
+                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 會計版請款單生成</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
                 資料僅存於本機電腦 (Local Storage)
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與多據點管理</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (多據點分類與統編修正版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (會計版與防覆蓋智慧版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -47,23 +47,26 @@
                 <!-- 1. 倉位資料與多據點管理頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel (支援多據點累積)</h3>
-                        <p class="text-sm text-slate-500 mb-4">您可以分別上傳不同分店的 Excel 檔案，系統會自動分類並累積儲存。</p>
+                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel</h3>
+                        <p class="text-sm text-slate-500 mb-4">上傳後可選擇或手動指定所屬分店，系統會自動偵測重複分店或倉位並詢問是否覆蓋。</p>
                         
-                        <div class="flex flex-col sm:flex-row items-center gap-4">
-                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
-                            <button onclick="handleExcelUpload()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm whitespace-nowrap">上傳並讀取表頭</button>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">指定分店名稱 (或由Excel自動讀取)</label>
+                                <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="例如: 土城店、松山店">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium mb-1">選擇 Excel 檔案</label>
+                                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
+                            </div>
                         </div>
+                        <button onclick="handleExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">上傳並讀取表頭</button>
                     </div>
 
                     <!-- 欄位對應設定區 -->
                     <div id="column-mapping-box" class="bg-amber-50 p-6 rounded-xl shadow-sm border border-amber-200 hidden space-y-4">
                         <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                            <div>
-                                <label class="block font-semibold mb-1 text-slate-700">據點名稱欄位</label>
-                                <select id="map-branch" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div>
                                 <label class="block font-semibold mb-1 text-slate-700">倉位尺寸/編號欄位</label>
                                 <select id="map-size" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
@@ -162,7 +165,7 @@
                                 <thead class="bg-slate-50 sticky top-0">
                                     <tr>
                                         <th class="p-2 w-10">選取</th>
-                                        <th class="p-2">據點 / 尺寸</th>
+                                        <th class="p-2">據點 / 尺寸 (材積)</th>
                                         <th class="p-2">月繳原價</th>
                                         <th class="p-2">選擇租期方案</th>
                                         <th class="p-2">手動優惠價 (選填)</th>
@@ -237,13 +240,14 @@
                             <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
                         </div>
 
+                        <!-- 經典 5 項備註 -->
                         <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
                             <div class="font-bold text-slate-800">備註：</div>
-                            <div>1. 辦公時間：週一~週五 10:00AM~07:00PM；週六採預約制。</div>
+                            <div>1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</div>
                             <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
-                            <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
-                            <div>4. 付款方式：轉帳、即期支票。</div>
-                            <div>5. 個人用戶簽約請帶：雙證件及悠遊卡乙張；公司用戶請帶：設立登記表影本、大小章、負責人雙證件、悠遊卡兩張。</div>
+                            <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80; 月租金NT$3000以上每月加收NT$150)。</div>
+                            <div>4. 付款方式:轉帳、即期支票。</div>
+                            <div>5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶簽約請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</div>
                         </div>
 
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
@@ -255,10 +259,10 @@
                     </div>
                 </div>
 
-                <!-- 3. 生成請款單頁籤 -->
+                <!-- 3. 生成請款單頁籤 (會計版) -->
                 <div id="tab-invoice" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 請款單設定與保證金控制</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 請款單設定與項目勾選 (會計版格式)</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店名稱</label>
@@ -297,34 +301,50 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-lg border">
+                        <!-- 獨立勾選區域 -->
+                        <h4 class="font-bold text-sm mb-2 text-slate-600">請款單品項勾選與租期調整：</h4>
+                        <div class="max-h-72 overflow-y-auto border rounded-lg p-2 mb-4">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 w-10">選取</th>
+                                        <th class="p-2">據點 / 尺寸</th>
+                                        <th class="p-2">月繳原價</th>
+                                        <th class="p-2">租期方案</th>
+                                        <th class="p-2">優惠單月價</th>
+                                        <th class="p-2">備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoice-selectable-body">
+                                    <tr><td colspan="6" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-lg border">
                             <div>
                                 <label class="block text-sm font-medium mb-1">請款日期</label>
                                 <input type="date" id="inv-date" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-1 font-bold text-amber-900">保證金收取設定 (續約客戶可選免收)</label>
+                                <label class="block text-sm font-medium mb-1 font-bold text-amber-900">保證金收取設定</label>
                                 <select id="i-deposit-mode" class="w-full border rounded-lg px-3 py-2 text-sm bg-white font-semibold">
                                     <option value="auto">自動計算 (依租期規則)</option>
                                     <option value="zero">續約免收保證金 (NT$ 0)</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div>
-                                <label class="block font-bold text-sm text-amber-900 mb-1">請款單計算基準選擇：</label>
-                                <p class="text-xs text-amber-700">指定請款單總額要採計單一特定尺寸，或是全部勾選項目加總。</p>
+                                <label class="block font-medium text-sm text-amber-900 mb-1">請款單計算基準：</label>
+                                <select id="i-calc-target" class="border rounded-lg px-3 py-2 text-sm bg-white font-semibold w-full">
+                                    <option value="all">全部勾選項目總計</option>
+                                </select>
                             </div>
-                            <select id="i-calc-target" class="border rounded-lg px-3 py-2 text-sm bg-white font-semibold">
-                                <option value="all">全部勾選項目總計</option>
-                            </select>
                         </div>
 
-                        <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用公司固定格式請款單</button>
+                        <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用會計版正式請款單</button>
                     </div>
 
-                    <!-- 公司標準正式請款單預覽區 -->
+                    <!-- 會計版正式請款單預覽區 -->
                     <div id="invoice-preview" class="bg-white p-10 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto text-slate-900">
                         <div class="flex justify-between items-start mb-6 border-b-2 border-slate-900 pb-4">
                             <div>
@@ -355,30 +375,31 @@
                                     <th class="p-2.5">材積</th>
                                     <th class="p-2.5 text-right">原價租金</th>
                                     <th class="p-2.5 text-center">租期</th>
-                                    <th class="p-2.5 text-right">優惠月租</th>
+                                    <th class="p-2.5 text-right">優惠/年約月租</th>
                                     <th class="p-2.5 text-center">月份</th>
-                                    <th class="p-2.5 text-right">保險文書/月</th>
+                                    <th class="p-2.5 text-right">保險文書處理費/月</th>
                                     <th class="p-2.5 text-right">小計</th>
                                 </tr>
                             </thead>
                             <tbody id="v-i-items" class="divide-y">
-                                <tr><td colspan="8" class="p-4 text-center text-slate-400">請先於報價單勾選項目或填入資料</td></tr>
+                                <tr><td colspan="8" class="p-4 text-center text-slate-400">請先於請款單頁面勾選項目</td></tr>
                             </tbody>
                         </table>
 
                         <div class="bg-slate-50 p-4 rounded-lg border space-y-2 text-sm mb-6 text-right">
-                            <div class="flex justify-between"><span>租金合計：</span> <span id="v-i-subtotal" class="font-bold">NT$ 0</span></div>
+                            <div class="flex justify-between"><span>合計：</span> <span id="v-i-subtotal" class="font-bold">NT$ 0</span></div>
                             <div class="flex justify-between"><span>保證金：</span> <span id="v-i-deposit">NT$ 0</span></div>
                             <div class="flex justify-between"><span>保險文書處理費：</span> <span id="v-i-fee">NT$ 0</span></div>
                             <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>應付總金額 (TWD)：</span> <span id="v-i-total">NT$ 0</span></div>
                         </div>
 
+                        <!-- 匯款資訊與備註 -->
                         <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
-                            <div class="font-bold text-slate-800">匯款資訊與備註說明：</div>
+                            <div class="font-bold text-slate-800">備註說明：</div>
                             <div>戶名：收多易股份有限公司</div>
-                            <div>銀行：國泰世華 (013) 新莊分行</div>
-                            <div>帳號：(請填入各分店或公司統一匯款帳號)</div>
-                            <div class="mt-2">請於指定期限內完成匯款，並回傳轉帳證明以完成合約手續。</div>
+                            <div>銀行：國泰世華-013 新莊分行</div>
+                            <div>帳號：________________________</div>
+                            <div class="mt-2 text-slate-500">1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。<br>2. 季繳以上押一個月原價押金，季繳以下押兩個月。<br>3. 請於期限內完成匯款。</div>
                         </div>
 
                         <div class="text-center font-bold tracking-widest text-slate-400 text-xs mb-6">THANK YOU FOR YOUR BUSINESS!</div>
@@ -411,6 +432,8 @@
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
+            } else if (tabId === 'tab-invoice') {
+                initInvoiceTab();
             }
         }
 
@@ -454,26 +477,25 @@
                 let headerRow = rawExcelJson[headerRowIdx] || [];
                 let optionsHtml = headerRow.map((colName, idx) => `<option value="${idx}">第 ${idx + 1} 欄: ${colName || '(空白)'}</option>`).join('');
                 
-                ['map-branch', 'map-size', 'map-unit', 'map-price'].forEach(id => {
+                ['map-size', 'map-unit', 'map-price'].forEach(id => {
                     document.getElementById(id).innerHTML = optionsHtml;
                 });
 
                 headerRow.forEach((colName, idx) => {
                     let name = String(colName || '');
-                    if (/據點|分店/.test(name)) document.getElementById('map-branch').value = idx;
                     if (/倉位|尺寸|編號|規格/.test(name)) document.getElementById('map-size').value = idx;
                     if (/單位|材積|立方英尺/.test(name)) document.getElementById('map-unit').value = idx;
                     if (/月繳|原價|租金/.test(name) && !/季繳|半年|年繳/.test(name)) document.getElementById('map-price').value = idx;
                 });
 
                 document.getElementById('column-mapping-box').classList.remove('hidden');
-                alert('Excel 上傳成功！請確認欄位對應後點擊確認並加入資料庫。');
+                alert('Excel 讀取成功！請設定欄位對應。');
             };
             reader.readAsArrayBuffer(file);
         }
 
         function confirmAndImportExcel() {
-            let bIdx = Number(document.getElementById('map-branch').value);
+            let inputBranch = document.getElementById('upload-branch-name').value.trim() || '未分類分店';
             let sIdx = Number(document.getElementById('map-size').value);
             let uIdx = Number(document.getElementById('map-unit').value);
             let pIdx = Number(document.getElementById('map-price').value);
@@ -483,14 +505,13 @@
                 let row = rawExcelJson[i];
                 if (!row || row.length === 0) continue;
 
-                let branch = row[bIdx] !== undefined ? String(row[bIdx]) : '未分類分店';
                 let size = row[sIdx] !== undefined ? String(row[sIdx]) : '';
                 let unit = row[uIdx] !== undefined ? String(row[uIdx]) : '-';
                 let price = row[pIdx] !== undefined ? Number(row[pIdx]) : NaN;
 
                 if (size && size !== 'undefined' && !isNaN(price) && price > 0) {
                     newItems.push({
-                        branch: branch.trim(),
+                        branch: inputBranch,
                         size: size.trim(),
                         unit: unit.trim(),
                         price: price
@@ -498,17 +519,43 @@
                 }
             }
 
-            if (newItems.length > 0) {
-                // 累積合併舊資料與新上傳資料
-                storageData = storageData.concat(newItems);
-                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                updateBranchFilter();
-                renderStorageTable();
-                document.getElementById('column-mapping-box').classList.add('hidden');
-                alert('成功新增匯入 ' + newItems.length + ' 筆倉位資料！目前總計 ' + storageData.length + ' 筆。');
-            } else {
-                alert('未能抓取到有效資料，請檢查欄位。');
+            if (newItems.length === 0) {
+                alert('未能抓取到有效資料！');
+                return;
             }
+
+            // 檢查是否已有相同分店
+            let existingBranchIndex = storageData.findIndex(item => item.branch === inputBranch);
+            if (existingBranchIndex !== -1) {
+                let choice = confirm(`系統偵測到「${inputBranch}」的資料已存在！\n\n【確定】點擊確定將覆蓋該分店舊資料。\n【取消】點擊取消將保留舊資料並新增合併。`);
+                if (choice) {
+                    // 移除舊的該分店資料
+                    storageData = storageData.filter(item => item.branch !== inputBranch);
+                }
+            }
+
+            // 檢查是否有重複倉位編號
+            let duplicateCount = 0;
+            newItems.forEach(newItem => {
+                let dup = storageData.find(existing => existing.branch === newItem.branch && existing.size === newItem.size);
+                if (dup) duplicateCount++;
+            });
+
+            if (duplicateCount > 0) {
+                let dupChoice = confirm(`注意：本次上傳中有 ${duplicateCount} 筆倉位編號與現有資料重複！\n\n【確定】覆蓋重複編號\n【取消】保留兩者`);
+                if (dupChoice) {
+                    newItems.forEach(newItem => {
+                        storageData = storageData.filter(existing => !(existing.branch === newItem.branch && existing.size === newItem.size));
+                    });
+                }
+            }
+
+            storageData = storageData.concat(newItems);
+            localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+            updateBranchFilter();
+            renderStorageTable();
+            document.getElementById('column-mapping-box').classList.add('hidden');
+            alert('成功匯入 ' + newItems.length + ' 筆倉位資料！');
         }
 
         function updateBranchFilter() {
@@ -566,7 +613,7 @@
                 return `
                     <tr class="hover:bg-slate-50 border-b">
                         <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-unit="${item.unit}" data-price="${item.price}"></td>
-                        <td class="p-2 font-medium"><span class="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded mr-1">${item.branch}</span> ${item.size}</td>
+                        <td class="p-2 font-medium"><span class="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded mr-1">${item.branch}</span> ${item.size} (${item.unit}呎)</td>
                         <td class="p-2 font-semibold">NT$ ${item.price.toLocaleString()}</td>
                         <td class="p-2">
                             <select id="term-${index}" class="border rounded px-2 py-1 text-sm bg-white font-semibold">
@@ -588,6 +635,39 @@
             updateCalcTargetOptions();
         }
 
+        function initInvoiceTab() {
+            const tbody = document.getElementById('invoice-selectable-body');
+            if (storageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">沒有符合的倉位資料，請先至報價單或倉位管理勾選</td></tr>`;
+                return;
+            }
+
+            // 同步報價單的勾選狀態與選項
+            tbody.innerHTML = storageData.map((item, index) => {
+                return `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="p-2"><input type="checkbox" class="inv-checkbox w-4 h-4 text-amber-600 rounded" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-unit="${item.unit}" data-price="${item.price}"></td>
+                        <td class="p-2 font-medium"><span class="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded mr-1">${item.branch}</span> ${item.size} (${item.unit}呎)</td>
+                        <td class="p-2 font-semibold">NT$ ${item.price.toLocaleString()}</td>
+                        <td class="p-2">
+                            <select id="inv-term-${index}" class="border rounded px-2 py-1 text-sm bg-white font-semibold">
+                                <option value="1">月繳 (1個月)</option>
+                                <option value="3">季繳 (3個月)</option>
+                                <option value="6">半年繳 (6個月)</option>
+                                <option value="12" selected>年繳 (12個月)</option>
+                            </select>
+                        </td>
+                        <td class="p-2">
+                            <input type="number" id="inv-custom-price-${index}" class="w-28 border rounded px-2 py-1 text-sm font-semibold text-amber-700 bg-amber-50" placeholder="選填單月價">
+                        </td>
+                        <td class="p-2">
+                            <input type="text" id="inv-custom-note-${index}" class="w-36 border rounded px-2 py-1 text-sm text-slate-700 bg-slate-50" placeholder="備註說明">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function updateCalcTargetOptions() {
             const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
             let optionsHtml = '<option value="all">全部勾選項目總計</option>';
@@ -601,11 +681,9 @@
             document.getElementById('i-calc-target').innerHTML = optionsHtml;
         }
 
-        function calculateItemDetails(cb) {
-            const index = cb.getAttribute('data-index');
-            const price = Number(cb.getAttribute('data-price'));
-            const termMonths = Number(document.getElementById(`term-${index}`).value);
-            const customPriceVal = document.getElementById(`custom-price-${index}`).value;
+        function calculateItemDetails(index, price, termMonthsId, customPriceId) {
+            const termMonths = Number(document.getElementById(termMonthsId).value);
+            const customPriceVal = document.getElementById(customPriceId).value;
 
             let discountRate = 1.0;
             if (termMonths === 3) discountRate = 0.95;
@@ -666,7 +744,7 @@
                 const itemBranch = cb.getAttribute('data-branch');
                 const note = document.getElementById(`custom-note-${index}`).value.trim();
 
-                let details = calculateItemDetails(cb);
+                let details = calculateItemDetails(index, price, `term-${index}`, `custom-price-${index}`);
                 let termText = details.termMonths === 1 ? '月繳(1個月)' : details.termMonths === 3 ? '季繳(3個月)' : details.termMonths === 6 ? '半年繳(6個月)' : '年繳(12個月)';
 
                 let displayMonthly = `NT$ ${details.monthlyRate.toLocaleString()}`;
@@ -716,7 +794,7 @@
             const date = document.getElementById('inv-date').value;
             const depositMode = document.getElementById('i-deposit-mode').value;
             const calcTarget = document.getElementById('i-calc-target').value;
-            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+            const checkboxes = document.querySelectorAll('.inv-checkbox:checked');
 
             document.getElementById('v-i-date').innerText = date;
             document.getElementById('v-i-client').innerText = client;
@@ -730,7 +808,7 @@
 
             const tbody = document.getElementById('v-i-items');
             if (checkboxes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">目前沒有選取項目，請先至報價單頁面勾選</td></tr>`;
+                alert('請至少在請款單頁面勾選一個項目！');
                 return;
             }
 
@@ -745,9 +823,9 @@
                 const unit = cb.getAttribute('data-unit');
                 const price = Number(cb.getAttribute('data-price'));
                 const itemBranch = cb.getAttribute('data-branch');
-                const note = document.getElementById(`custom-note-${index}`).value.trim();
+                const note = document.getElementById(`inv-custom-note-${index}`).value.trim();
 
-                let details = calculateItemDetails(cb);
+                let details = calculateItemDetails(index, price, `inv-term-${index}`, `inv-custom-price-${index}`);
                 let termText = details.termMonths === 1 ? '月繳' : details.termMonths === 3 ? '季繳' : details.termMonths === 6 ? '半年繳' : '年繳';
 
                 html += `
@@ -782,7 +860,7 @@
             document.getElementById('v-i-fee').innerText = 'NT$ ' + targetFee.toLocaleString();
             document.getElementById('v-i-total').innerText = 'NT$ ' + grandTotal.toLocaleString();
 
-            alert('正式請款單已成功套用！');
+            alert('會計版正式請款單已成功套用！');
         }
 
         renderStorageTable();
