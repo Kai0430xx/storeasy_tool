@@ -967,7 +967,7 @@
                                     <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
                                     <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款</option>
                                 </select>
-                                <select onsystem-version="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
+                                <select onchange="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
                                     <option value="yes" ${currentDep==='yes'?'selected':''}>🔒 含保證金</option>
                                     <option value="no" ${currentDep==='no'?'selected':''}>🔓 無保證金 (續約)</option>
                                 </select>
@@ -1068,7 +1068,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 完美格線與對齊的 Excel 匯出功能
+        // 完美對齊的結構化 Excel 匯出：保證有完整格線、文字不跑版、格式乾淨
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -1091,7 +1091,8 @@
             const qTotal = document.getElementById('v-q-total').innerText;
 
             let aoa = [
-                ["收多易迷你倉庫 - 報價單", "", "", "", "", "報價有效期限 7 天"],
+                ["收多易迷你倉庫", "", "", "", "", "報價有效期限 7 天"],
+                ["Storeasy Storage Solution", "", "", "", "", "報 價 單"],
                 [""],
                 ["日期:", qDate, "", "客戶名稱:", qClient],
                 ["店長:", qManager, "", "客戶電話:", qClientPhone],
@@ -1160,9 +1161,9 @@
                     if (!ws[cellAddress]) continue;
                     if (!ws[cellAddress].s) ws[cellAddress].s = {};
                     
-                    if (R >= 8 && R <= 8 + keys.length) {
+                    if (R >= 9 && R <= 9 + keys.length) {
                         ws[cellAddress].s.border = borderStyle;
-                        if (R === 8) {
+                        if (R === 9) {
                             ws[cellAddress].s.font = { bold: true };
                             ws[cellAddress].s.fill = { fgColor: { rgb: "F1F5F9" } };
                         } else if (C >= 2) {
@@ -1200,7 +1201,8 @@
             const iTotal = document.getElementById('v-i-total').innerText;
 
             let aoa = [
-                ["收多易股份有限公司 - 請款單"],
+                ["收多易股份有限公司", "", "", "", "", "", "", "", "", "請 款 單"],
+                ["Storeasy Storage Invoice Statement", "", "", "", "", "", "", "", "", ""],
                 [""],
                 ["日期:", iDate, "", "客戶名稱:", iClient],
                 ["店長:", iManager, "", "客戶電話:", iClientPhone],
@@ -1269,9 +1271,9 @@
                     let cellAddress = XLSX.utils.encode_cell({r: R, c: C});
                     if (!ws[cellAddress]) continue;
                     if (!ws[cellAddress].s) ws[cellAddress].s = {};
-                    if (R >= 8 && R <= 8 + keys.length) {
+                    if (R >= 9 && R <= 9 + keys.length) {
                         ws[cellAddress].s.border = borderStyle;
-                        if (R === 8) {
+                        if (R === 9) {
                             ws[cellAddress].s.font = { bold: true };
                             ws[cellAddress].s.fill = { fgColor: { rgb: "F1F5F9" } };
                         }
