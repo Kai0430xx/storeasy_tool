@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storeasy 營運管理工具 (報價單與請款單系統)</title>
+    <!-- Tailwind CSS 樣式框架 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-area { box-shadow: none !important; border: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- 側邊導覽列 (可由中央統一更新) -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col no-print">
+            <div class="p-5 border-b border-slate-800">
+                <h1 class="text-xl font-bold tracking-wider text-amber-400">Storeasy 內部系統</h1>
+                <p class="text-xs text-slate-400 mt-1">eLocker 營運與文件生成工具</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-2.5 rounded-lg bg-amber-500 text-slate-950 font-semibold transition">📦 倉位資料管理</button>
+                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition">📄 生成報價單</button>
+                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition">💰 生成請款單</button>
+            </nav>
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+                資料僅存於本機電腦 (Local Storage)
+            </div>
+        </aside>
+
+        <!-- 主內容區 -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print">
+                <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料管理</h2>
+                <div class="text-sm text-slate-500">系統版本：2026.08 (中央同步版)</div>
+            </header>
+
+            <div class="p-8 max-w-7xl mx-auto w-full">
+
+                <!-- 1. 倉位資料管理頁籤 -->
+                <div id="tab-storage" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">📥 上傳分店倉位 Excel (尺寸與價格)</h3>
+                        <p class="text-sm text-slate-500 mb-4">請上傳包含「據點、倉位尺寸、定價」等欄位的 Excel 檔案（例如土城店、各分店 Excel）。資料將儲存在你的瀏覽器中，供報價單勾選使用。</p>
+                        
+                        <div class="flex items-center gap-4">
+                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer">
+                            <button onclick="handleExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2 rounded-lg transition shadow-sm">解析並匯入</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-700">📋 目前已載入的倉位清單資料</h3>
+                            <button onclick="clearStorageData()" class="text-xs text-red-500 hover:underline">清空本機資料</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b text-slate-600 text-sm">
+                                        <th class="p-3">據點名稱</th>
+                                        <th class="p-3">倉位/尺寸編號</th>
+                                        <th class="p-3">規格描述</th>
+                                        <th class="p-3">價格 (NT$)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="storage-table-body" class="text-sm divide-y">
+                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">尚未匯入資料，請先上傳 Excel 檔案</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 生成報價單頁籤 -->
+                <div id="tab-quote" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單參數設定與勾選</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">客戶 / 公司名稱</label>
+                                <input type="text" id="quote-client" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客戶名稱">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">選擇據點篩選</label>
+                                <select id="quote-branch-filter" onchange="renderQuoteItems()" class="w-full border rounded-lg px-3 py-2 text-sm">
+                                    <option value="">全部據點</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">報價日期</label>
+                                <input type="date" id="quote-date" class="w-full border rounded-lg px-3 py-2 text-sm">
+                            </div>
+                        </div>
+
+                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目：</h4>
+                        <div class="max-h-60 overflow-y-auto border rounded-lg p-2 mb-4">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 w-10">選取</th>
+                                        <th class="p-2">據點</th>
+                                        <th class="p-2">倉位尺寸/規格</th>
+                                        <th class="p-2">定價</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quote-selectable-body">
+                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button onclick="generateQuote()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵生成正式報價單格式</button>
+                    </div>
+
+                    <!-- 正式報價單預覽與列印區 (固定格式) -->
+                    <div id="quote-preview" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto">
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-bold tracking-wider">收多易迷你倉庫 (Storeasy) - 報價單</h2>
+                            <p class="text-xs text-slate-500 mt-1">eLocker Smart Storage Solution</p>
+                        </div>
+                        <div class="flex justify-between text-sm mb-4 border-b pb-4">
+                            <div><strong>客戶名稱：</strong> <span id="view-quote-client">---</span></div>
+                            <div><strong>報價日期：</strong> <span id="view-quote-date">---</span></div>
+                        </div>
+                        <table class="w-full text-left border-collapse mb-6 text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-slate-800">
+                                    <th class="py-2">項次</th>
+                                    <th class="py-2">據點名稱</th>
+                                    <th class="py-2">倉位規格 / 項目</th>
+                                    <th class="py-2 text-right">數量</th>
+                                    <th class="py-2 text-right">金額 (NT$)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-quote-items" class="divide-y">
+                                <tr><td colspan="5" class="py-4 text-center text-slate-400">尚未產生內容</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="flex justify-end text-right font-bold text-lg mb-8">
+                            總計金額 (含稅)：NT$ <span id="view-quote-total">0</span>
+                        </div>
+                        <div class="flex justify-end no-print">
+                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2 rounded-lg shadow-sm">列印 / 存為 PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 生成請款單頁籤 -->
+                <div id="tab-invoice" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 請款單設定</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">買受人 / 客戶抬頭</label>
+                                <input type="text" id="inv-client" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入統一編號或抬頭">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">統一編號</label>
+                                <input type="text" id="inv-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="選填">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">請款日期</label>
+                                <input type="date" id="inv-date" class="w-full border rounded-lg px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                        <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用公司固定格式請款單</button>
+                    </div>
+
+                    <!-- 正式請款單預覽與列印區 (固定格式) -->
+                    <div id="invoice-preview" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto">
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-bold tracking-wider">收多易股份有限公司 - 請款單</h2>
+                            <p class="text-xs text-slate-500 mt-1">Invoice Statement</p>
+                        </div>
+                        <div class="flex justify-between text-sm mb-4 border-b pb-4">
+                            <div><strong>買受人：</strong> <span id="view-inv-client">---</span> (統編: <span id="view-inv-taxid">---</span>)</div>
+                            <div><strong>請款日期：</strong> <span id="view-inv-date">---</span></div>
+                        </div>
+                        <table class="w-full text-left border-collapse mb-6 text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-slate-800">
+                                    <th class="py-2">項次</th>
+                                    <th class="py-2">服務項目與據點</th>
+                                    <th class="py-2 text-right">數量</th>
+                                    <th class="py-2 text-right">金額 (NT$)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-inv-items" class="divide-y">
+                                <tr><td colspan="4" class="py-4 text-center text-slate-400">請先於報價單確認項目或填入資料</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="flex justify-end text-right font-bold text-lg mb-8">
+                            應付總額：NT$ <span id="view-inv-total">0</span>
+                        </div>
+                        <div class="flex justify-end no-print">
+                            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2 rounded-lg shadow-sm">列印 / 存為 PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript 核心互動與本機儲存邏輯 -->
+    <script>
+        // 初始化載入本機資料
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('aside nav button').forEach(el => {
+                el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
+                el.classList.add('hover:bg-slate-800');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
+            activeBtn.classList.remove('hover:bg-slate-800');
+
+            if (tabId === 'tab-quote') {
+                initQuoteTab();
+            }
+        }
+
+        // 解析 Excel 檔案
+        function handleExcelUpload() {
+            const fileInput = document.getElementById('excelFile');
+            if (fileInput.files.length === 0) {
+                alert('請先選擇一個 Excel 檔案！');
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                // 自動智慧解析 (尋找含有 據點、尺寸、價格 等欄位)
+                let parsedItems = [];
+                // 假設前幾行為標題，從第2行開始抓取 (可依你們固定格式調整)
+                for (let i = 1; i < jsonSheet.length; i++) {
+                    let row = jsonSheet[i];
+                    if (row && row.length >= 2) {
+                        // 假設欄位對應：[據點, 尺寸/倉位, 規格, 價格] (可隨時調整彈性)
+                        let branch = row[0] || '未分類據點';
+                        let sizeName = row[1] || '標準倉位';
+                        let desc = row[2] || '';
+                        let price = Number(row[3]) || 1000; // 預設價格防呆
+
+                        parsedItems.push({
+                            branch: String(branch),
+                            size: String(sizeName),
+                            desc: String(desc),
+                            price: price
+                        });
+                    }
+                }
+
+                if (parsedItems.length > 0) {
+                    storageData = parsedItems;
+                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                    renderStorageTable();
+                    alert('成功匯入 ' + parsedItems.length 筆倉位資料！');
+                } else {
+                    alert('未能成功讀取有效資料，請確認 Excel 格式。');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function renderStorageTable() {
+            const tbody = document.getElementById('storage-table-body');
+            if (storageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">目前尚無資料</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = storageData.map(item => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-medium">${item.branch}</td>
+                    <td class="p-3">${item.size}</td>
+                    <td class="p-3 text-slate-500">${item.desc}</td>
+                    <td class="p-3 font-semibold text-amber-600">NT$ ${item.price.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearStorageData() {
+            if (confirm('確定要清空本機的所有倉位資料嗎？')) {
+                storageData = [];
+                localStorage.removeItem('storeasy_storage_data');
+                renderStorageTable();
+            }
+        }
+
+        // 初始化報價單選項
+        function initQuoteTab() {
+            const branchFilter = document.getElementById('quote-branch-filter');
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            branchFilter.innerHTML = `<option value="">全部據點</option>` + branches.map(b => `<option value="${b}">${b}</option>`).join('');
+            document.getElementById('quote-date').valueAsDate = new Date();
+            document.getElementById('inv-date').valueAsDate = new Date();
+            renderQuoteItems();
+        }
+
+        function renderQuoteItems() {
+            const filter = document.getElementById('quote-branch-filter').value;
+            const tbody = document.getElementById('quote-selectable-body');
+            
+            let filtered = storageData;
+            if (filter) {
+                filtered = storageData.filter(item => item.branch === filter);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">沒有符合的倉位資料</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((item, index) => `
+                <tr class="hover:bg-slate-50 border-b">
+                    <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" data-index="${index}" data-branch="${item.branch}" data-size="${item.size}" data-price="${item.price}"></td>
+                    <td class="p-2">${item.branch}</td>
+                    <td class="p-2">${item.size} (${item.desc})</td>
+                    <td class="p-2 font-semibold">NT$ ${item.price.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 一鍵生成報價單
+        function generateQuote() {
+            const client = document.getElementById('quote-client').value || '未填寫客戶';
+            const date = document.getElementById('quote-date').value;
+            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+
+            document.getElementById('view-quote-client').innerText = client;
+            document.getElementById('view-quote-date').innerText = date;
+
+            const tbody = document.getElementById('view-quote-items');
+            if (checkboxes.length === 0) {
+                alert('請至少勾選一個倉位項目！');
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+            checkboxes.forEach((cb, idx) => {
+                const branch = cb.getAttribute('data-branch');
+                const size = cb.getAttribute('data-size');
+                const price = Number(cb.getAttribute('data-price'));
+                total += price;
+
+                html += `
+                    <tr>
+                        <td class="py-2">${idx + 1}</td>
+                        <td class="py-2">${branch}</td>
+                        <td class="py-2">智慧倉位租賃 - ${size}</td>
+                        <td class="py-2 text-right">1</td>
+                        <td class="py-2 text-right">NT$ ${price.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('view-quote-total').innerText = total.toLocaleString();
+            alert('正式報價單已成功生成！可直接點選下方列印。');
+        }
+
+        // 一鍵生成請款單
+        function generateInvoice() {
+            const client = document.getElementById('quote-client').value || document.getElementById('inv-client').value || '未填寫買受人';
+            const taxid = document.getElementById('inv-taxid').value || '---';
+            const date = document.getElementById('inv-date').value;
+
+            document.getElementById('view-inv-client').innerText = client;
+            document.getElementById('view-inv-taxid').innerText = taxid;
+            document.getElementById('view-inv-date').innerText = date;
+
+            // 同步帶入剛剛報價單勾選的項目
+            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+            const tbody = document.getElementById('view-inv-items');
+            
+            if (checkboxes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">目前沒有選取任何項目，請先至報價單頁面勾選</td></tr>`;
+                document.getElementById('view-inv-total').innerText = '0';
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+            checkboxes.forEach((cb, idx) => {
+                const branch = cb.getAttribute('data-branch');
+                const size = cb.getAttribute('data-size');
+                const price = Number(cb.getAttribute('data-price'));
+                total += price;
+
+                html += `
+                    <tr>
+                        <td class="py-2">${idx + 1}</td>
+                        <td class="py-2">${branch} - 倉位租賃 (${size})</td>
+                        <td class="py-2 text-right">1</td>
+                        <td class="py-2 text-right">NT$ ${price.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('view-inv-total').innerText = total.toLocaleString();
+            alert('公司固定格式請款單已成功套用！');
+        }
+
+        // 頁面初次載入渲染
+        renderStorageTable();
+    </script>
+</body>
+</html>
