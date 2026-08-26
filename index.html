@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全域/分店彈性搜尋與按鈕修復版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (報價單移除折數標示版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -85,10 +85,10 @@
                                         <th class="p-3">尺寸 (W*L*H)</th>
                                         <th class="p-3">材積 (材)</th>
                                         <th class="p-3">月繳/原價</th>
-                                        <th class="p-3">季繳/95折</th>
-                                        <th class="p-3">半年繳/9折</th>
-                                        <th class="p-3">年繳/85折</th>
-                                        <th class="p-3">年繳/8折</th>
+                                        <th class="p-3">季繳</th>
+                                        <th class="p-3">半年繳</th>
+                                        <th class="p-3">年繳(85折)</th>
+                                        <th class="p-3">年繳(8折)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="storage-table-body" class="text-sm divide-y">
@@ -145,7 +145,7 @@
                             </div>
                         </div>
 
-                        <!-- 據點選擇與搜尋框 (支援未選據點時直接全域搜尋) -->
+                        <!-- 據點選擇與搜尋框 -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
                             <div>
                                 <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
@@ -212,15 +212,16 @@
                             <div class="col-span-2"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
                         </div>
 
+                        <!-- 報價單表格標題已移除折數文字 -->
                         <table id="quote-export-table" class="w-full text-left border-collapse mb-6 text-sm">
                             <thead>
                                 <tr class="bg-slate-900 text-white text-center">
                                     <th class="p-2.5 border border-slate-700">單位<br>(材)</th>
                                     <th class="p-2.5 border border-slate-700">倉位尺寸</th>
-                                    <th class="p-2.5 border border-slate-700">月繳/月<br>(原價)</th>
-                                    <th class="p-2.5 border border-slate-700">季繳/月<br>(95折)</th>
-                                    <th class="p-2.5 border border-slate-700">半年繳/月<br>(9折)</th>
-                                    <th class="p-2.5 border border-slate-700">年繳/月<br>(85折/8折)</th>
+                                    <th class="p-2.5 border border-slate-700">月繳/月</th>
+                                    <th class="p-2.5 border border-slate-700">季繳/月</th>
+                                    <th class="p-2.5 border border-slate-700">半年繳/月</th>
+                                    <th class="p-2.5 border border-slate-700">年繳/月</th>
                                 </tr>
                             </thead>
                             <tbody id="v-q-items" class="divide-y text-center">
@@ -381,7 +382,8 @@
 
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        let selectedQuoteItems = {}; // key = globalIndex, value = { ...item, term: '12' }
+        let selectedQuoteItems = {}; 
+        let selectedInvoiceItems = {}; 
         let rawExcelJson = [];
 
         function switchTab(tabId) {
@@ -621,12 +623,10 @@
             }
 
             let branchItems = storageData;
-            // 如果有選據點，先過濾該據點；沒選據點則全域搜尋
             if (selectedBranch) {
                 branchItems = branchItems.filter(item => item.branch === selectedBranch);
             }
             
-            // 關鍵字搜尋過濾 (支援編號或材積)
             if (searchKw) {
                 branchItems = branchItems.filter(item => 
                     item.code.toLowerCase().includes(searchKw) || 
