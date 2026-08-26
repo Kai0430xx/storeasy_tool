@@ -17,17 +17,17 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans">
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- 側邊導覽列 (可由中央統一更新) -->
-        <aside class="w-64 bg-slate-900 text-white flex flex-col no-print">
-            <div class="p-5 border-b border-slate-800">
+    <div class="flex min-h-screen">
+        <!-- 側邊導覽列 -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col shrink-0 no-print shadow-lg">
+            <div class="p-6 border-b border-slate-800">
                 <h1 class="text-xl font-bold tracking-wider text-amber-400">Storeasy 內部系統</h1>
                 <p class="text-xs text-slate-400 mt-1">eLocker 營運與文件生成工具</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-2.5 rounded-lg bg-amber-500 text-slate-950 font-semibold transition">📦 倉位資料管理</button>
-                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition">📄 生成報價單</button>
-                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition">💰 生成請款單</button>
+                <button onclick="switchTab('tab-storage')" id="btn-tab-storage" class="w-full text-left px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition shadow-sm">📦 倉位資料管理</button>
+                <button onclick="switchTab('tab-quote')" id="btn-tab-quote" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">📄 生成報價單</button>
+                <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 生成請款單</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
                 資料僅存於本機電腦 (Local Storage)
@@ -35,10 +35,10 @@
         </aside>
 
         <!-- 主內容區 -->
-        <main class="flex-1 flex flex-col overflow-y-auto">
-            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print">
+        <main class="flex-1 flex flex-col min-w-0">
+            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料管理</h2>
-                <div class="text-sm text-slate-500">系統版本：2026.08 (中央同步版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.08</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -46,12 +46,12 @@
                 <!-- 1. 倉位資料管理頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">📥 上傳分店倉位 Excel (尺寸與價格)</h3>
-                        <p class="text-sm text-slate-500 mb-4">請上傳包含「據點、倉位尺寸、定價」等欄位的 Excel 檔案（例如土城店、各分店 Excel）。資料將儲存在你的瀏覽器中，供報價單勾選使用。</p>
+                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳分店倉位 Excel (尺寸與價格)</h3>
+                        <p class="text-sm text-slate-500 mb-4">請上傳包含「據點、倉位尺寸、價格」等欄位的 Excel 檔案。資料將安全儲存於你的瀏覽器中。</p>
                         
-                        <div class="flex items-center gap-4">
-                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer">
-                            <button onclick="handleExcelUpload()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-5 py-2 rounded-lg transition shadow-sm">解析並匯入</button>
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer border rounded-lg p-1">
+                            <button onclick="handleExcelUpload()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition shadow-sm whitespace-nowrap">解析並匯入</button>
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@
                         <button onclick="generateQuote()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵生成正式報價單格式</button>
                     </div>
 
-                    <!-- 正式報價單預覽與列印區 (固定格式) -->
+                    <!-- 正式報價單預覽與列印區 -->
                     <div id="quote-preview" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto">
                         <div class="text-center mb-6">
                             <h2 class="text-2xl font-bold tracking-wider">收多易迷你倉庫 (Storeasy) - 報價單</h2>
@@ -172,7 +172,7 @@
                         <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用公司固定格式請款單</button>
                     </div>
 
-                    <!-- 正式請款單預覽與列印區 (固定格式) -->
+                    <!-- 正式請款單預覽與列印區 -->
                     <div id="invoice-preview" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 print-area max-w-4xl mx-auto">
                         <div class="text-center mb-6">
                             <h2 class="text-2xl font-bold tracking-wider">收多易股份有限公司 - 請款單</h2>
@@ -208,28 +208,25 @@
         </main>
     </div>
 
-    <!-- JavaScript 核心互動與本機儲存邏輯 -->
     <script>
-        // 初始化載入本機資料
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('aside nav button').forEach(el => {
                 el.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
-                el.classList.add('hover:bg-slate-800');
+                el.classList.add('hover:bg-slate-800', 'text-slate-300');
             });
             document.getElementById(tabId).classList.remove('hidden');
             const activeBtn = document.getElementById('btn-' + tabId);
             activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-            activeBtn.classList.remove('hover:bg-slate-800');
+            activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
             }
         }
 
-        // 解析 Excel 檔案
         function handleExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -246,17 +243,14 @@
                 const worksheet = workbook.Sheets[firstSheetName];
                 const jsonSheet = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
-                // 自動智慧解析 (尋找含有 據點、尺寸、價格 等欄位)
                 let parsedItems = [];
-                // 假設前幾行為標題，從第2行開始抓取 (可依你們固定格式調整)
                 for (let i = 1; i < jsonSheet.length; i++) {
                     let row = jsonSheet[i];
                     if (row && row.length >= 2) {
-                        // 假設欄位對應：[據點, 尺寸/倉位, 規格, 價格] (可隨時調整彈性)
                         let branch = row[0] || '未分類據點';
                         let sizeName = row[1] || '標準倉位';
                         let desc = row[2] || '';
-                        let price = Number(row[3]) || 1000; // 預設價格防呆
+                        let price = Number(row[3]) || 1000;
 
                         parsedItems.push({
                             branch: String(branch),
@@ -271,7 +265,7 @@
                     storageData = parsedItems;
                     localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                     renderStorageTable();
-                    alert('成功匯入 ' + parsedItems.length 筆倉位資料！');
+                    alert('成功匯入 ' + parsedItems.length + ' 筆倉位資料！');
                 } else {
                     alert('未能成功讀取有效資料，請確認 Excel 格式。');
                 }
@@ -303,7 +297,6 @@
             }
         }
 
-        // 初始化報價單選項
         function initQuoteTab() {
             const branchFilter = document.getElementById('quote-branch-filter');
             const branches = [...new Set(storageData.map(item => item.branch))];
@@ -337,7 +330,6 @@
             `).join('');
         }
 
-        // 一鍵生成報價單
         function generateQuote() {
             const client = document.getElementById('quote-client').value || '未填寫客戶';
             const date = document.getElementById('quote-date').value;
@@ -373,10 +365,9 @@
 
             tbody.innerHTML = html;
             document.getElementById('view-quote-total').innerText = total.toLocaleString();
-            alert('正式報價單已成功生成！可直接點選下方列印。');
+            alert('正式報價單已成功生成！');
         }
 
-        // 一鍵生成請款單
         function generateInvoice() {
             const client = document.getElementById('quote-client').value || document.getElementById('inv-client').value || '未填寫買受人';
             const taxid = document.getElementById('inv-taxid').value || '---';
@@ -386,7 +377,6 @@
             document.getElementById('view-inv-taxid').innerText = taxid;
             document.getElementById('view-inv-date').innerText = date;
 
-            // 同步帶入剛剛報價單勾選的項目
             const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
             const tbody = document.getElementById('view-inv-items');
             
@@ -419,7 +409,6 @@
             alert('公司固定格式請款單已成功套用！');
         }
 
-        // 頁面初次載入渲染
         renderStorageTable();
     </script>
 </body>
