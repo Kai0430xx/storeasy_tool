@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (年繳 85折/8折 智慧推導版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (支援編號/材積快速搜尋版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -48,7 +48,7 @@
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-lg font-bold mb-2 text-slate-700">📥 一鍵上傳各店空倉表 Excel</h3>
-                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識編號、尺寸、材積與月繳原價；若檔案僅寫「年繳」未寫明折數，會自動智慧推導 85折 或 8折（維持個位數為0）。</p>
+                        <p class="text-sm text-slate-500 mb-4">系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
@@ -71,7 +71,10 @@
                                     <option value="all">全部據點</option>
                                 </select>
                             </div>
-                            <button onclick="clearStorageData()" class="text-xs text-red-500 hover:underline">清空全部本機資料</button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="deleteSelectedBranchData()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-3 py-2 rounded-lg transition">🗑️ 刪除目前選取的分店</button>
+                                <button onclick="clearStorageData()" class="text-xs text-slate-400 hover:text-red-500 hover:underline">清空全部本機資料</button>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
@@ -89,7 +92,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="storage-table-body" class="text-sm divide-y">
-                                    <tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料，請先上傳 Excel 檔案</td></tr>
+                                    <tr><td colspan="9" class="p-4 text-center text-slate-400">尚未匯入資料</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -99,7 +102,7 @@
                 <!-- 2. 生成正式報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與跨據點勾選</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與快速搜尋勾選</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
@@ -142,22 +145,41 @@
                             </div>
                         </div>
 
-                        <h4 class="font-bold text-sm mb-2 text-slate-600">勾選欲報價的倉位項目：</h4>
-                        <div class="max-h-80 overflow-y-auto border rounded-lg p-2 mb-4">
+                        <!-- 據點選擇與搜尋框 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
+                            <div>
+                                <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點：</label>
+                                <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                    <option value="">-- 請選擇分店據點 --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
+                                <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
+                            </div>
+                        </div>
+
+                        <div class="max-h-60 overflow-y-auto border rounded-lg p-2 mb-4">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-slate-50 sticky top-0">
                                     <tr>
                                         <th class="p-2 w-10">選取</th>
                                         <th class="p-2">據點</th>
-                                        <th class="p-2">編號 / 尺寸</th>
+                                        <th class="p-2">編號 / 尺寸 / 材積</th>
                                         <th class="p-2">月繳原價</th>
                                         <th class="p-2">年繳優惠價</th>
                                     </tr>
                                 </thead>
                                 <tbody id="quote-selectable-body">
-                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- 已勾選項目持久清單 -->
+                        <div class="bg-slate-50 p-4 rounded-xl border mb-6">
+                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">✅ 已選取的報價項目總覽 (跨據點保留)：</h5>
+                            <div id="selected-items-summary" class="text-xs text-slate-500">尚未勾選任何項目</div>
                         </div>
 
                         <!-- 試算參數設定 -->
@@ -267,7 +289,7 @@
                 <!-- 3. 生成請款單頁籤 -->
                 <div id="tab-invoice" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定與快速搜尋勾選</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
@@ -308,6 +330,43 @@
                                 <label class="block text-sm font-medium mb-1">統一編號</label>
                                 <input type="text" id="i-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
                             </div>
+                        </div>
+
+                        <!-- 請款單據點選擇與搜尋框 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
+                            <div>
+                                <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點：</label>
+                                <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                    <option value="">-- 請選擇分店據點 --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-sm text-slate-600 mb-1">🔍 快速搜尋 (輸入編號或材積)：</label>
+                                <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-white" placeholder="例如: QD335 或 75">
+                            </div>
+                        </div>
+
+                        <div class="max-h-60 overflow-y-auto border rounded-lg p-2 mb-4">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 w-10">選取</th>
+                                        <th class="p-2">據點</th>
+                                        <th class="p-2">編號 / 尺寸</th>
+                                        <th class="p-2">月繳原價</th>
+                                        <th class="p-2">年繳優惠價</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoice-selectable-body">
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 已勾選請款項目持久清單 -->
+                        <div class="bg-slate-50 p-4 rounded-xl border mb-6">
+                            <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">✅ 已選取的請款項目總覽 (跨據點保留)：</h5>
+                            <div id="invoice-selected-summary" class="text-xs text-slate-500">尚未勾選任何請款項目</div>
                         </div>
 
                         <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用會計版正式請款單</button>
@@ -387,6 +446,8 @@
 
     <script>
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let selectedQuoteItems = {}; 
+        let selectedInvoiceItems = {}; 
         let rawExcelJson = [];
 
         function switchTab(tabId) {
@@ -402,6 +463,8 @@
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
+            } else if (tabId === 'tab-invoice') {
+                initInvoiceTab();
             }
         }
 
@@ -411,7 +474,6 @@
             XLSX.writeFile(wb, filename);
         }
 
-        // 智慧推導年繳折數並自動四捨五入至十位數的匯入引擎
         function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (fileInput.files.length === 0) {
@@ -435,7 +497,6 @@
 
                 let inputBranch = document.getElementById('upload-branch-name').value.trim() || '土城店';
 
-                // 搜尋表頭列與精準對應欄位
                 let headerRowIdx = 0;
                 let colMap = { code: -1, size: -1, unit: -1, p1: -1, p3: -1, p6: -1, p12_85: -1, p12_80: -1 };
 
@@ -452,10 +513,7 @@
                         else if (/半年繳|9折/.test(text)) colMap.p6 = c;
                         else if (/85折/.test(text)) colMap.p12_85 = c;
                         else if (/80折|8折/.test(text)) colMap.p12_80 = c;
-                        else if (/年繳/.test(text) && !/80折|8折|85折/.test(text)) {
-                            // 若只有籠統的「年繳」，根據金額大小或預設歸類到 85折
-                            if (colMap.p12_85 === -1) colMap.p12_85 = c;
-                        }
+                        else if (/年繳/.test(text) && !/80折|8折|85折/.test(text) && colMap.p12_85 === -1) colMap.p12_85 = c;
                     }
                     if (colMap.p1 !== -1) {
                         headerRowIdx = r;
@@ -473,7 +531,6 @@
                     let unit = colMap.unit !== -1 && row[colMap.unit] !== undefined ? String(row[colMap.unit]).trim() : '-';
                     let price1 = colMap.p1 !== -1 ? Number(row[colMap.p1]) : NaN;
 
-                    // 若未抓到真實月租，智慧掃描整行尋找合適金額 (>300)
                     if (isNaN(price1) || price1 <= 200) {
                         for (let c = 0; c < row.length; c++) {
                             let val = Number(row[c]);
@@ -493,14 +550,9 @@
                         }
                         if (!code) code = `R${i}`;
 
-                        // 抓取檔案中的各折扣價；若檔案中無該欄位則依公司標準規則計算（四捨五入至十位數，個位數維持0）
                         let price3 = colMap.p3 !== -1 && !isNaN(Number(row[colMap.p3])) && Number(row[colMap.p3]) > 200 ? Number(row[colMap.p3]) : Math.round((price1 * 0.95) / 10) * 10;
                         let price6 = colMap.p6 !== -1 && !isNaN(Number(row[colMap.p6])) && Number(row[colMap.p6]) > 200 ? Number(row[colMap.p6]) : Math.round((price1 * 0.90) / 10) * 10;
-                        
-                        // 若檔案有 85折 欄位則讀取，否則自動推導 85折
                         let price12_85 = colMap.p12_85 !== -1 && !isNaN(Number(row[colMap.p12_85])) && Number(row[colMap.p12_85]) > 200 ? Number(row[colMap.p12_85]) : Math.round((price1 * 0.85) / 10) * 10;
-                        
-                        // 若檔案有 8折 欄位則讀取，否則自動推導 8折
                         let price12_80 = colMap.p12_80 !== -1 && !isNaN(Number(row[colMap.p12_80])) && Number(row[colMap.p12_80]) > 200 ? Number(row[colMap.p12_80]) : Math.round((price1 * 0.80) / 10) * 10;
 
                         newItems.push({
@@ -518,7 +570,7 @@
                 }
 
                 if (newItems.length === 0) {
-                    alert('未能自動抓取到有效資料，請確認 Excel 內容格式。');
+                    alert('未能自動抓取到有效資料！');
                     return;
                 }
 
@@ -586,59 +638,224 @@
             `).join('');
         }
 
+        function deleteSelectedBranchData() {
+            const filterVal = document.getElementById('storage-branch-filter').value;
+            if (!filterVal || filterVal === 'all') {
+                alert('請先在上方選擇您想要刪除的「特定分店」！');
+                return;
+            }
+            if (confirm(`確定要刪除分店「${filterVal}」的所有倉位資料嗎？`)) {
+                storageData = storageData.filter(item => item.branch !== filterVal);
+                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                renderStorageTable();
+                alert(`已成功刪除 ${filterVal} 的資料！`);
+            }
+        }
+
         function clearStorageData() {
-            if (confirm('確定要清空全部本機的倉位資料嗎？')) {
+            if (confirm('確定要清空全部本機的所有倉位資料嗎？')) {
                 storageData = [];
                 localStorage.removeItem('storeasy_storage_data');
                 renderStorageTable();
             }
         }
 
+        // --- 報價單據點聯動與快速搜尋 ---
         function initQuoteTab() {
             document.getElementById('quote-date').valueAsDate = new Date();
             document.getElementById('inv-date').valueAsDate = new Date();
             
+            const branchSelect = document.getElementById('quote-branch-select');
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            
+            let html = '<option value="">-- 請選擇分店據點 --</option>';
+            branches.forEach(b => {
+                html += `<option value="${b}">${b}</option>`;
+            });
+            branchSelect.innerHTML = html;
+            renderQuoteSelectableItems();
+        }
+
+        function renderQuoteSelectableItems() {
+            const selectedBranch = document.getElementById('quote-branch-select').value;
+            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
             const tbody = document.getElementById('quote-selectable-body');
-            if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
+
+            if (!selectedBranch) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
                 return;
             }
 
-            let html = '';
-            const branches = [...new Set(storageData.map(item => item.branch))];
+            let branchItems = storageData.filter(item => item.branch === selectedBranch);
             
-            branches.forEach(branch => {
-                let branchItems = storageData.filter(item => item.branch === branch);
-                html += `<tr class="bg-slate-100 font-bold text-slate-700"><td colspan="5" class="p-2">📍 ${branch} 分店 (${branchItems.length} 筆)</td></tr>`;
-                branchItems.forEach((item) => {
-                    let globalIndex = storageData.indexOf(item);
-                    html += `
-                        <tr class="hover:bg-slate-50 border-b">
-                            <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-code="${item.code}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12_85="${item.price12_85}" data-p12_80="${item.price12_80}"></td>
-                            <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                            <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
-                            <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
-                            <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
-                        </tr>
-                    `;
-                });
-            });
+            // 關鍵字搜尋過濾 (支援編號或材積)
+            if (searchKw) {
+                branchItems = branchItems.filter(item => 
+                    item.code.toLowerCase().includes(searchKw) || 
+                    String(item.unit).toLowerCase().includes(searchKw) ||
+                    item.size.toLowerCase().includes(searchKw)
+                );
+            }
 
-            tbody.innerHTML = html;
+            if (branchItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">找不到符合的倉位資料</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = branchItems.map((item) => {
+                let globalIndex = storageData.indexOf(item);
+                let isChecked = selectedQuoteItems[globalIndex] ? 'checked' : '';
+                return `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="p-2"><input type="checkbox" class="q-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
+                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}呎)</td>
+                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
+                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleQuoteItem(globalIndex) {
+            const chk = document.querySelector(`input.q-item-chk[data-index="${globalIndex}"]`);
+            if (chk && chk.checked) {
+                selectedQuoteItems[globalIndex] = storageData[globalIndex];
+            } else {
+                delete selectedQuoteItems[globalIndex];
+            }
+            renderSelectedQuoteSummary();
             updateCalcTargetOptions();
         }
 
+        function removeQuoteItem(globalIndex) {
+            delete selectedQuoteItems[globalIndex];
+            renderQuoteSelectableItems();
+            renderSelectedQuoteSummary();
+            updateCalcTargetOptions();
+        }
+
+        function renderSelectedQuoteSummary() {
+            const summaryEl = document.getElementById('selected-items-summary');
+            const keys = Object.keys(selectedQuoteItems);
+            if (keys.length === 0) {
+                summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何項目</span>';
+                return;
+            }
+
+            let html = '<div class="flex flex-wrap gap-2">';
+            keys.forEach(idx => {
+                let item = selectedQuoteItems[idx];
+                html += `
+                    <div class="inline-flex items-center gap-1.5 bg-white border border-amber-300 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-amber-900">
+                        <span>[${item.branch}] <b>${item.code}</b> (${item.size}) - NT$ ${item.price1.toLocaleString()}</span>
+                        <button onclick="removeQuoteItem(${idx})" class="text-red-500 hover:text-red-700 font-bold ml-1">×</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            summaryEl.innerHTML = html;
+        }
+
         function updateCalcTargetOptions() {
-            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+            const keys = Object.keys(selectedQuoteItems);
             let optionsHtml = '<option value="all">全部勾選項目總計</option>';
-            checkboxes.forEach(cb => {
-                const code = cb.getAttribute('data-code');
-                const size = cb.getAttribute('data-size');
-                const branch = cb.getAttribute('data-branch');
-                const idx = cb.getAttribute('data-index');
-                optionsHtml += `<option value="${idx}">單獨計算: [${branch}] ${code} (${size})</option>`;
+            keys.forEach(idx => {
+                let item = selectedQuoteItems[idx];
+                optionsHtml += `<option value="${idx}">單獨計算: [${item.branch}] ${item.code} (${item.size})</option>`;
             });
             document.getElementById('q-calc-target').innerHTML = optionsHtml;
+        }
+
+        // --- 請款單據點聯動與快速搜尋 ---
+        function initInvoiceTab() {
+            const branchSelect = document.getElementById('invoice-branch-select');
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            
+            let html = '<option value="">-- 請選擇分店據點 --</option>';
+            branches.forEach(b => {
+                html += `<option value="${b}">${b}</option>`;
+            });
+            branchSelect.innerHTML = html;
+            renderInvoiceSelectableItems();
+        }
+
+        function renderInvoiceSelectableItems() {
+            const selectedBranch = document.getElementById('invoice-branch-select').value;
+            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
+            const tbody = document.getElementById('invoice-selectable-body');
+
+            if (!selectedBranch) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
+                return;
+            }
+
+            let branchItems = storageData.filter(item => item.branch === selectedBranch);
+            
+            if (searchKw) {
+                branchItems = branchItems.filter(item => 
+                    item.code.toLowerCase().includes(searchKw) || 
+                    String(item.unit).toLowerCase().includes(searchKw) ||
+                    item.size.toLowerCase().includes(searchKw)
+                );
+            }
+
+            if (branchItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">找不到符合的請款項目</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = branchItems.map((item) => {
+                let globalIndex = storageData.indexOf(item);
+                let isChecked = selectedInvoiceItems[globalIndex] ? 'checked' : '';
+                return `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="p-2"><input type="checkbox" class="i-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
+                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
+                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
+                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleInvoiceItem(globalIndex) {
+            const chk = document.querySelector(`input.i-item-chk[data-index="${globalIndex}"]`);
+            if (chk && chk.checked) {
+                selectedInvoiceItems[globalIndex] = storageData[globalIndex];
+            } else {
+                delete selectedInvoiceItems[globalIndex];
+            }
+            renderSelectedInvoiceSummary();
+        }
+
+        function removeInvoiceItem(globalIndex) {
+            delete selectedInvoiceItems[globalIndex];
+            renderInvoiceSelectableItems();
+            renderSelectedInvoiceSummary();
+        }
+
+        function renderSelectedInvoiceSummary() {
+            const summaryEl = document.getElementById('invoice-selected-summary');
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) {
+                summaryEl.innerHTML = '<span class="text-slate-400">尚未勾選任何請款項目</span>';
+                return;
+            }
+
+            let html = '<div class="flex flex-wrap gap-2">';
+            keys.forEach(idx => {
+                let item = selectedInvoiceItems[idx];
+                html += `
+                    <div class="inline-flex items-center gap-1.5 bg-white border border-amber-300 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-amber-900">
+                        <span>[${item.branch}] <b>${item.code}</b> (${item.size}) - NT$ ${item.price1.toLocaleString()}</span>
+                        <button onclick="removeInvoiceItem(${idx})" class="text-red-500 hover:text-red-700 font-bold ml-1">×</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            summaryEl.innerHTML = html;
         }
 
         function generateQuote() {
@@ -655,7 +872,12 @@
             const calcTarget = document.getElementById('q-calc-target').value;
             const calcTerm = document.getElementById('q-calc-term').value;
             const depositMode = document.getElementById('q-deposit-mode').value;
-            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+            
+            const keys = Object.keys(selectedQuoteItems);
+            if (keys.length === 0) {
+                alert('請至少勾選一個報價倉位項目！');
+                return;
+            }
 
             document.getElementById('v-q-date').innerText = date;
             document.getElementById('v-q-client').innerText = client;
@@ -668,11 +890,6 @@
             document.getElementById('v-q-tel').innerText = tel;
 
             const tbody = document.getElementById('v-q-items');
-            if (checkboxes.length === 0) {
-                alert('請至少勾選一個倉位項目！');
-                return;
-            }
-
             let html = '';
             let targetRent = 0;
             let targetFee = 0;
@@ -688,22 +905,18 @@
 
             document.getElementById('v-q-term-text').innerText = termTextName;
 
-            checkboxes.forEach((cb) => {
-                const index = cb.getAttribute('data-index');
-                const code = cb.getAttribute('data-code');
-                const size = cb.getAttribute('data-size');
-                const unit = cb.getAttribute('data-unit');
-                const p1 = Number(cb.getAttribute('data-p1'));
-                const p3 = Number(cb.getAttribute('data-p3'));
-                const p6 = Number(cb.getAttribute('data-p6'));
-                const p12_85 = Number(cb.getAttribute('data-p12_85'));
-                const p12_80 = Number(cb.getAttribute('data-p12_80'));
-                const itemBranch = cb.getAttribute('data-branch');
+            keys.forEach((idx) => {
+                let item = selectedQuoteItems[idx];
+                let p1 = item.price1;
+                let p3 = item.price3;
+                let p6 = item.price6;
+                let p12_85 = item.price12_85;
+                let p12_80 = item.price12_80;
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700">${unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium"><b>${code}</b><br>${size}</td>
+                        <td class="p-2.5 border border-slate-700">${item.unit}</td>
+                        <td class="p-2.5 border border-slate-700 font-medium"><b>${item.code}</b><br>${item.size}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
@@ -722,13 +935,13 @@
                 let itemFee = feePerMonth * termMonths;
                 let itemDeposit = termMonths <= 2 ? (p1 * 2) : p1;
 
-                if (calcTarget === 'all' || calcTarget === index) {
+                if (calcTarget === 'all' || calcTarget === idx) {
                     targetRent += itemTotalRent;
                     targetFee += itemFee;
                     targetDeposit += itemDeposit;
                 }
-                if (calcTarget === index) {
-                    calcModeText = `[${itemBranch}] ${code} (${size})`;
+                if (calcTarget === idx) {
+                    calcModeText = `[${item.branch}] ${item.code} (${item.size})`;
                 }
             });
 
@@ -759,7 +972,12 @@
             const taxid = document.getElementById('i-taxid').value || '---';
             const date = document.getElementById('inv-date').value;
             const calcTerm = document.getElementById('q-calc-term').value;
-            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+            
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) {
+                alert('請至少勾選一個請款項目！');
+                return;
+            }
 
             document.getElementById('v-i-date').innerText = date;
             document.getElementById('v-i-client').innerText = client;
@@ -772,11 +990,6 @@
             document.getElementById('v-i-address').innerText = address;
 
             const tbody = document.getElementById('v-i-items');
-            if (checkboxes.length === 0) {
-                alert('請先於報價單頁面勾選項目！');
-                return;
-            }
-
             let html = '';
             let totalRentInc = 0;
             let totalDeposit = 0;
@@ -785,15 +998,13 @@
             else if (calcTerm === '6') termMonths = 6;
             else if (calcTerm === '12' || calcTerm === '12_80') termMonths = 12;
 
-            checkboxes.forEach((cb) => {
-                const code = cb.getAttribute('data-code');
-                const size = cb.getAttribute('data-size');
-                const unit = cb.getAttribute('data-unit');
-                const p1 = Number(cb.getAttribute('data-p1'));
-                const p3 = Number(cb.getAttribute('data-p3'));
-                const p6 = Number(cb.getAttribute('data-p6'));
-                const p12_85 = Number(cb.getAttribute('data-p12_85'));
-                const p12_80 = Number(cb.getAttribute('data-p12_80'));
+            keys.forEach((idx) => {
+                let item = selectedInvoiceItems[idx];
+                let p1 = item.price1;
+                let p3 = item.price3;
+                let p6 = item.price6;
+                let p12_85 = item.price12_85;
+                let p12_80 = item.price12_80;
 
                 let monthlyRate = p1;
                 if (calcTerm === '3') monthlyRate = p3;
@@ -812,8 +1023,8 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">${code}</td>
-                        <td class="p-2.5 border border-slate-700">${unit}呎</td>
+                        <td class="p-2.5 border border-slate-700 font-bold">${item.code}</td>
+                        <td class="p-2.5 border border-slate-700">${item.unit}呎</td>
                         <td class="p-2.5 border border-slate-700 text-right">${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">${monthlyRate.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-center">${termMonths}</td>
