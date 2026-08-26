@@ -31,7 +31,7 @@
                 <button onclick="switchTab('tab-invoice')" id="btn-tab-invoice" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition">💰 會計版請款單生成</button>
             </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-                資料僅存於本機瀏覽器 (Local Storage)
+                資料已永久儲存於本機瀏覽器
             </div>
         </aside>
 
@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與多據點管理</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (公司標準報價單版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (據點聯動與持久化版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -47,13 +47,13 @@
                 <!-- 1. 倉位資料與多據點管理頁籤 -->
                 <div id="tab-storage" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel (對應各方案價格)</h3>
-                        <p class="text-sm text-slate-500 mb-4">請上傳包含原價、季繳、半年繳、年繳等金額的 Excel 檔案，並在下方設定對應欄位。</p>
+                        <h3 class="text-lg font-bold mb-2 text-slate-700">📥 上傳各店空倉表 Excel</h3>
+                        <p class="text-sm text-slate-500 mb-4">上傳後請指定分店名稱，系統會自動儲存至本機，重新整理也不會遺失。</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店名稱</label>
-                                <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="例如: 士林店、土城店">
+                                <input type="text" id="upload-branch-name" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店" placeholder="例如: 士林店、土城店">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium mb-1">選擇 Excel 檔案</label>
@@ -65,7 +65,7 @@
 
                     <!-- 欄位對應設定區 -->
                     <div id="column-mapping-box" class="bg-amber-50 p-6 rounded-xl shadow-sm border border-amber-200 hidden space-y-4">
-                        <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認 (請對應公司報價表各欄位)</h3>
+                        <h3 class="text-base font-bold text-amber-900">⚙️ 欄位對應確認</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div>
                                 <label class="block font-semibold mb-1 text-slate-700">單位 / 材積欄位</label>
@@ -76,7 +76,7 @@
                                 <select id="map-size" class="w-full border rounded-lg px-3 py-2 bg-white"></select>
                             </div>
                             <div>
-                                <label class="block font-semibold mb-1 text-slate-700">月繳/月 (原價) 欄位</label>
+                                <label class="block font-semibold mb-1 text-slate-900 font-bold">⭐ 月繳/月 (原價) 欄位</label>
                                 <select id="map-price-1" class="w-full border rounded-lg px-3 py-2 bg-white font-bold text-amber-700"></select>
                             </div>
                             <div>
@@ -131,10 +131,16 @@
                 <!-- 2. 生成正式報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與試算參數</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與據點選擇</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium mb-1">分店名稱</label>
+                                <label class="block text-sm font-medium mb-1">選擇要報價的分店據點</label>
+                                <select id="quote-select-branch" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                    <option value="">-- 請先選擇分店據點 --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
                                 <input type="text" id="q-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店">
                             </div>
                             <div>
@@ -142,16 +148,16 @@
                                 <input type="text" id="q-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="阮陳彥 Tony">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-1">分店地址</label>
-                                <input type="text" id="q-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
-                            </div>
-                            <div>
                                 <label class="block text-sm font-medium mb-1">聯繫電話</label>
                                 <input type="text" id="q-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="02-2882-8008">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium mb-1">分店地址</label>
+                                <input type="text" id="q-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
+                            </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">客戶名稱</label>
                                 <input type="text" id="q-client-name" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客戶姓名">
@@ -160,6 +166,9 @@
                                 <label class="block text-sm font-medium mb-1">客戶聯繫電話</label>
                                 <input type="text" id="q-client-tel" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="輸入客電">
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium mb-1">公司抬頭</label>
                                 <input type="text" id="q-company" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="抬頭">
@@ -168,7 +177,7 @@
                                 <label class="block text-sm font-medium mb-1">統一編號</label>
                                 <input type="text" id="q-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
                             </div>
-                            <div class="md:col-span-2">
+                            <div>
                                 <label class="block text-sm font-medium mb-1">報價日期</label>
                                 <input type="date" id="quote-date" class="w-full border rounded-lg px-3 py-2 text-sm">
                             </div>
@@ -180,18 +189,18 @@
                                 <thead class="bg-slate-50 sticky top-0">
                                     <tr>
                                         <th class="p-2 w-10">選取</th>
-                                        <th class="p-2">據點 / 尺寸 / 材積</th>
+                                        <th class="p-2">尺寸 / 材積</th>
                                         <th class="p-2">月繳原價</th>
                                         <th class="p-2">年繳優惠價</th>
                                     </tr>
                                 </thead>
                                 <tbody id="quote-selectable-body">
-                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先至「倉位資料管理」上傳 Excel 資料</td></tr>
+                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
                                 </tbody>
                             </table>
                         </div>
 
-                        <!-- 試算參數設定 (選擇繳費方式) -->
+                        <!-- 試算參數設定 -->
                         <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 mb-6 space-y-4">
                             <h4 class="font-bold text-sm text-amber-900">📊 費用試算設定</h4>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -248,7 +257,6 @@
                             <div class="col-span-2"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
                         </div>
 
-                        <!-- 公司正式報價單主表格 (精準對應各方案金額) -->
                         <table id="quote-export-table" class="w-full text-left border-collapse mb-6 text-sm">
                             <thead>
                                 <tr class="bg-slate-900 text-white text-center">
@@ -273,7 +281,6 @@
                             <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
                         </div>
 
-                        <!-- 匯款資料與 5 項經典備註 -->
                         <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
                             <div class="font-bold text-slate-800">匯款資訊：</div>
                             <div>戶名：收多易股份有限公司</div>
@@ -296,13 +303,19 @@
                     </div>
                 </div>
 
-                <!-- 3. 生成請款單頁籤 (會計版) -->
+                <!-- 3. 生成請款單頁籤 -->
                 <div id="tab-invoice" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 會計版請款單設定與據點選擇</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium mb-1">分店名稱</label>
+                                <label class="block text-sm font-medium mb-1">選擇要請款的分店據點</label>
+                                <select id="inv-select-branch" onchange="renderInvoiceSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
+                                    <option value="">-- 請先選擇分店據點 --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
                                 <input type="text" id="i-branch" class="w-full border rounded-lg px-3 py-2 text-sm" value="士林店">
                             </div>
                             <div>
@@ -310,16 +323,16 @@
                                 <input type="text" id="i-manager" class="w-full border rounded-lg px-3 py-2 text-sm" value="阮陳彥 Tony">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-1">分店地址</label>
-                                <input type="text" id="i-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
-                            </div>
-                            <div>
                                 <label class="block text-sm font-medium mb-1">聯繫電話</label>
                                 <input type="text" id="i-tel" class="w-full border rounded-lg px-3 py-2 text-sm" value="02-2882-8008">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium mb-1">分店地址</label>
+                                <input type="text" id="i-address" class="w-full border rounded-lg px-3 py-2 text-sm" value="台北市士林區承德路四段179巷7號B1">
+                            </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">客戶名稱</label>
                                 <input type="text" id="i-client" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="姓名">
@@ -328,6 +341,9 @@
                                 <label class="block text-sm font-medium mb-1">客戶聯繫電話</label>
                                 <input type="text" id="i-client-phone" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="客電">
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium mb-1">公司抬頭</label>
                                 <input type="text" id="i-company" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="抬頭">
@@ -336,10 +352,27 @@
                                 <label class="block text-sm font-medium mb-1">統一編號</label>
                                 <input type="text" id="i-taxid" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="統編">
                             </div>
-                            <div class="md:col-span-2">
+                            <div>
                                 <label class="block text-sm font-medium mb-1">請款日期</label>
                                 <input type="date" id="inv-date" class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
                             </div>
+                        </div>
+
+                        <h4 class="font-bold text-sm mb-2 text-slate-600">請款單品項勾選：</h4>
+                        <div class="max-h-72 overflow-y-auto border rounded-lg p-2 mb-4">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 w-10">選取</th>
+                                        <th class="p-2">尺寸 / 材積</th>
+                                        <th class="p-2">月繳原價</th>
+                                        <th class="p-2">年繳優惠價</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoice-selectable-body">
+                                    <tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
+                                </tbody>
+                            </table>
                         </div>
 
                         <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用會計版正式請款單</button>
@@ -372,7 +405,7 @@
                         <table id="invoice-export-table" class="w-full text-left border-collapse mb-6 text-sm">
                             <thead>
                                 <tr class="bg-slate-900 text-white text-center">
-                                    <th class="p-2.5 border border-slate-700">倉位編號</th>
+                                    <th class="p-2.5 border border-slate-700">倉位尺寸</th>
                                     <th class="p-2.5 border border-slate-700">材積</th>
                                     <th class="p-2.5 border border-slate-700 text-right">原價租金</th>
                                     <th class="p-2.5 border border-slate-700 text-right">優惠租金</th>
@@ -385,7 +418,7 @@
                                 </tr>
                             </thead>
                             <tbody id="v-i-items" class="divide-y text-center">
-                                <tr><td colspan="10" class="p-4 text-center text-slate-400">請先於報價單頁面勾選項目與繳費方式</td></tr>
+                                <tr><td colspan="10" class="p-4 text-center text-slate-400">請先於請款單頁面勾選項目與繳費方式</td></tr>
                             </tbody>
                         </table>
 
@@ -395,7 +428,6 @@
                             <div class="flex justify-between text-base font-black border-t pt-2 text-amber-700"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
                         </div>
 
-                        <!-- 請款單專屬付款資料 -->
                         <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
                             <div class="font-bold text-slate-800">付款資料：</div>
                             <div>帳戶名稱：收多易股份有限公司</div>
@@ -435,6 +467,8 @@
 
             if (tabId === 'tab-quote') {
                 initQuoteTab();
+            } else if (tabId === 'tab-invoice') {
+                initInvoiceTab();
             }
         }
 
@@ -599,26 +633,79 @@
         }
 
         function initQuoteTab() {
-            const tbody = document.getElementById('quote-selectable-body');
             document.getElementById('quote-date').valueAsDate = new Date();
             document.getElementById('inv-date').valueAsDate = new Date();
+            
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            let optHtml = '<option value="">-- 請先選擇分店據點 --</option>';
+            branches.forEach(b => {
+                optHtml += `<option value="${b}">${b}</option>`;
+            });
+            document.getElementById('quote-select-branch').innerHTML = optHtml;
+            document.getElementById('invoice-select-branch').innerHTML = optHtml;
+            renderQuoteSelectableItems();
+            renderInvoiceSelectableItems();
+        }
 
-            if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">沒有符合的倉位資料，請先上傳 Excel</td></tr>`;
+        function initInvoiceTab() {
+            initQuoteTab();
+        }
+
+        function renderQuoteSelectableItems() {
+            const selectedBranch = document.getElementById('quote-select-branch').value;
+            const tbody = document.getElementById('quote-selectable-body');
+
+            if (!selectedBranch) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = storageData.map((item, index) => {
+            let filtered = storageData.filter(item => item.branch === selectedBranch);
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">該據點尚無倉位資料</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((item, index) => {
+                let globalIndex = storageData.indexOf(item);
                 return `
                     <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${index}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
-                        <td class="p-2 font-medium"><span class="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded mr-1">${item.branch}</span> ${item.size} (${item.unit}呎)</td>
+                        <td class="p-2"><input type="checkbox" class="quote-checkbox w-4 h-4 text-amber-600 rounded" onchange="updateCalcTargetOptions()" data-index="${globalIndex}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
+                        <td class="p-2 font-medium">${item.size} (${item.unit}呎)</td>
                         <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
                         <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
             updateCalcTargetOptions();
+        }
+
+        function renderInvoiceSelectableItems() {
+            const selectedBranch = document.getElementById('invoice-select-branch').value;
+            const tbody = document.getElementById('invoice-selectable-body');
+
+            if (!selectedBranch) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
+                return;
+            }
+
+            let filtered = storageData.filter(item => item.branch === selectedBranch);
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">該據點尚無倉位資料</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((item, index) => {
+                let globalIndex = storageData.indexOf(item);
+                return `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="p-2"><input type="checkbox" class="inv-checkbox w-4 h-4 text-amber-600 rounded" data-index="${globalIndex}" data-branch="${item.branch}" data-unit="${item.unit}" data-size="${item.size}" data-p1="${item.price1}" data-p3="${item.price3}" data-p6="${item.price6}" data-p12="${item.price12}"></td>
+                        <td class="p-2 font-medium">${item.size} (${item.unit}呎)</td>
+                        <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
+                        <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function updateCalcTargetOptions() {
@@ -686,7 +773,7 @@
                 html += `
                     <tr>
                         <td class="p-2.5 border border-slate-700">${unit}</td>
-                        <td class="p-2.5 border border-slate-700 font-medium">[${itemBranch}] ${size}</td>
+                        <td class="p-2.5 border border-slate-700 font-medium">${size}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p3.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p6.toLocaleString()}</td>
@@ -694,7 +781,6 @@
                     </tr>
                 `;
 
-                // 根據試算選擇的繳費方式計算單月租金與總租金
                 let selectedMonthlyRate = p1;
                 if (calcTerm === 3) selectedMonthlyRate = p3;
                 else if (calcTerm === 6) selectedMonthlyRate = p6;
@@ -742,7 +828,7 @@
             const taxid = document.getElementById('i-taxid').value || '---';
             const date = document.getElementById('inv-date').value;
             const calcTerm = Number(document.getElementById('q-calc-term').value);
-            const checkboxes = document.querySelectorAll('.quote-checkbox:checked');
+            const checkboxes = document.querySelectorAll('.inv-checkbox:checked');
 
             document.getElementById('v-i-date').innerText = date;
             document.getElementById('v-i-client').innerText = client;
@@ -756,7 +842,7 @@
 
             const tbody = document.getElementById('v-i-items');
             if (checkboxes.length === 0) {
-                alert('請先於報價單勾選項目！');
+                alert('請至少於請款單勾選一個項目！');
                 return;
             }
 
@@ -793,7 +879,7 @@
 
                 html += `
                     <tr>
-                        <td class="p-2.5 border border-slate-700 font-bold">[${itemBranch}]</td>
+                        <td class="p-2.5 border border-slate-700 font-bold">${size}</td>
                         <td class="p-2.5 border border-slate-700">${unit}呎</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${p1.toLocaleString()}</td>
                         <td class="p-2.5 border border-slate-700 text-right">NT$ ${monthlyRate.toLocaleString()}</td>
