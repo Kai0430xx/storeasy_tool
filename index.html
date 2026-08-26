@@ -39,7 +39,7 @@
         <main class="flex-1 flex flex-col min-w-0">
             <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center no-print border-b">
                 <h2 id="page-title" class="text-xl font-bold text-slate-700">📦 倉位資料與一鍵智慧匯入</h2>
-                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (彈性試算與不列入總計版)</div>
+                <div class="text-sm text-slate-500 font-medium">系統版本：2026.09 (全域/分店彈性搜尋與按鈕修復版)</div>
             </header>
 
             <div class="p-8 max-w-7xl mx-auto w-full">
@@ -102,7 +102,7 @@
                 <!-- 2. 生成正式報價單頁籤 -->
                 <div id="tab-quote" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與跨據點勾選</h3>
+                        <h3 class="text-lg font-bold mb-4 text-slate-700">⚙️ 報價單設定與彈性搜尋勾選</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">分店顯示名稱</label>
@@ -145,12 +145,12 @@
                             </div>
                         </div>
 
-                        <!-- 據點選擇與搜尋框 -->
+                        <!-- 據點選擇與搜尋框 (支援未選據點時直接全域搜尋) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-center">
                             <div>
-                                <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點：</label>
+                                <label class="block font-bold text-sm text-slate-600 mb-1">選擇分店據點 (可不選直接搜尋全部)：</label>
                                 <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 font-bold text-amber-900">
-                                    <option value="">-- 請選擇分店據點 --</option>
+                                    <option value="">-- 全部據點 / 不限分店 --</option>
                                 </select>
                             </div>
                             <div>
@@ -171,12 +171,12 @@
                                     </tr>
                                 </thead>
                                 <tbody id="quote-selectable-body">
-                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">請在上方選擇據點或直接輸入關鍵字搜尋</td></tr>
                                 </tbody>
                             </table>
                         </div>
 
-                        <!-- 已勾選項目持久清單 (可選擇方案或不列入試算) -->
+                        <!-- 已勾選項目持久清單 -->
                         <div class="bg-slate-50 p-4 rounded-xl border mb-6 space-y-3">
                             <h5 class="font-bold text-xs text-slate-700 uppercase tracking-wider">✅ 已選取的報價項目 (可獨立設定方案或選擇「不列入試算」)：</h5>
                             <div id="selected-items-summary" class="space-y-2 text-xs text-slate-600">
@@ -184,7 +184,7 @@
                             </div>
                         </div>
 
-                        <button onclick="generateQuote()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵生成公司標準格式報價單</button>
+                        <button onclick="generateQuote()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">📄 一鍵生成公司標準格式報價單</button>
                     </div>
 
                     <!-- 公司標準正式報價單預覽區 -->
@@ -304,7 +304,7 @@
                             </div>
                         </div>
 
-                        <button onclick="generateInvoice()" class="bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-slate-800 transition">一鍵套用會計版正式請款單</button>
+                        <button onclick="generateInvoice()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">💰 一鍵套用會計版正式請款單</button>
                     </div>
 
                     <!-- 會計版正式請款單預覽區 -->
@@ -359,7 +359,7 @@
 
                         <div class="text-xs text-slate-600 space-y-1 mb-8 border-t pt-4 bg-slate-50 p-4 rounded-lg">
                             <div class="font-bold text-slate-800">付款資料：</div>
-                            <div>帳戶名稱：收多易股份有限公司</div>
+                            <div>戶名：收多易股份有限公司</div>
                             <div>銀行代碼：013 國泰世華 新莊分行</div>
                             <div>帳號號碼：________________________</div>
                             <div>支票付款抬頭請開：收多易股份有限公司</div>
@@ -398,7 +398,6 @@
             if (tabId === 'tab-quote') {
                 initQuoteTab();
             } else if (tabId === 'tab-invoice') {
-                // 自動同步報價單勾選的項目到請款單
                 initInvoiceTab();
             }
         }
@@ -595,7 +594,7 @@
             }
         }
 
-        // --- 報價單據點聯動與快速搜尋 ---
+        // --- 報價單據點聯動與彈性搜尋 ---
         function initQuoteTab() {
             document.getElementById('quote-date').valueAsDate = new Date();
             document.getElementById('inv-date').valueAsDate = new Date();
@@ -603,7 +602,7 @@
             const branchSelect = document.getElementById('quote-branch-select');
             const branches = [...new Set(storageData.map(item => item.branch))];
             
-            let html = '<option value="">-- 請選擇分店據點 --</option>';
+            let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
             branches.forEach(b => {
                 html += `<option value="${b}">${b}</option>`;
             });
@@ -616,13 +615,18 @@
             const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
             const tbody = document.getElementById('quote-selectable-body');
 
-            if (!selectedBranch) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">請先在上方選擇分店據點</td></tr>`;
+            if (storageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">尚未上傳或載入倉位資料</td></tr>`;
                 return;
             }
 
-            let branchItems = storageData.filter(item => item.branch === selectedBranch);
+            let branchItems = storageData;
+            // 如果有選據點，先過濾該據點；沒選據點則全域搜尋
+            if (selectedBranch) {
+                branchItems = branchItems.filter(item => item.branch === selectedBranch);
+            }
             
+            // 關鍵字搜尋過濾 (支援編號或材積)
             if (searchKw) {
                 branchItems = branchItems.filter(item => 
                     item.code.toLowerCase().includes(searchKw) || 
@@ -643,7 +647,7 @@
                     <tr class="hover:bg-slate-50 border-b">
                         <td class="p-2"><input type="checkbox" class="q-item-chk w-4 h-4 text-amber-600 rounded" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td class="p-2 text-amber-900 font-semibold">${item.branch}</td>
-                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size})</td>
+                        <td class="p-2 font-medium"><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
                         <td class="p-2 font-semibold">NT$ ${item.price1.toLocaleString()}</td>
                         <td class="p-2 text-emerald-600 font-semibold">NT$ ${item.price12_85.toLocaleString()}</td>
                     </tr>
@@ -742,7 +746,6 @@
             const company = document.getElementById('q-company').value || '---';
             const taxid = document.getElementById('q-taxid').value || '---';
             const date = document.getElementById('quote-date').value;
-            const depositMode = document.getElementById('q-deposit-mode').value;
             
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -786,7 +789,6 @@
                     </tr>
                 `;
 
-                // 若選擇「不列入試算」，則不累加金額到下方總計
                 if (term !== 'none') {
                     let termMonths = 1;
                     let selectedMonthlyRate = p1;
@@ -801,10 +803,6 @@
                     targetDeposit += (termMonths <= 2 ? (p1 * 2) : p1);
                 }
             });
-
-            if (depositMode === 'zero') {
-                targetDeposit = 0;
-            }
 
             tbody.innerHTML = html;
 
