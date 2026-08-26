@@ -61,7 +61,7 @@
         .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
         .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-bottom: 24px; }
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
-        .table-container { max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
+        .table-container { max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
         /* 完美列印控制 */
         @media print {
@@ -96,7 +96,7 @@
     <main>
         <header class="no-print">
             <h2 id="page-title">📦 倉位資料</h2>
-            <div class="version">系統版本：2026.09 (專業格線與排版版)</div>
+            <div class="version">系統版本：2026.09 (全方案顯示一致版)</div>
         </header>
 
         <div class="content-body">
@@ -158,7 +158,7 @@
             <!-- 2. 生成報價單頁籤 -->
             <div id="panel-quote" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 報價單設定與彈性搜尋勾選（不顯示編號）</h3>
+                    <h3>⚙️ 報價單設定與完整方案勾選（不顯示編號）</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店顯示名稱</label><input type="text" id="q-branch" value="土城店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="q-manager" value="經辦人員"></div>
@@ -179,8 +179,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>🔍 快速搜尋 (編號或材積)：</label>
-                            <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: QD335 或 75">
+                            <label>🔍 快速搜尋 (尺寸或材積)：</label>
+                            <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: 0.9 或 75">
                         </div>
                     </div>
 
@@ -191,18 +191,21 @@
                                     <th style="width: 40px;">選取</th>
                                     <th>據點</th>
                                     <th>尺寸(寬*深*高 m) / 材積</th>
-                                    <th>月繳原價</th>
-                                    <th>年繳優惠價</th>
+                                    <th>月繳/原價</th>
+                                    <th>季繳</th>
+                                    <th>半年繳</th>
+                                    <th>年繳(85折)</th>
+                                    <th>年繳(8折)</th>
                                 </tr>
                             </thead>
                             <tbody id="quote-selectable-body">
-                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
+                                <tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目：</h5>
+                        <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目（方案與額外優惠）：</h5>
                         <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
                             <span style="color: #94a3b8;">尚未勾選任何項目</span>
                         </div>
@@ -621,7 +624,7 @@
         function deleteSelectedBranchData() {
             const filterVal = document.getElementById('storage-branch-filter').value;
             if (!filterVal || filterVal === 'all') {
-                alert('請先在上方選擇您想要刪除的「特定分店」！');
+                alert('請先在上方選擇您想要刪除的分店！');
                 return;
             }
             if (confirm(`確定要刪除分店「${filterVal}」的所有倉位資料嗎？`)) {
@@ -640,7 +643,7 @@
             }
         }
 
-        // 報價單邏輯（不顯示編號）
+        // 報價單邏輯（完整方案顯示與勾選）
         function initQuoteTab() {
             const qDate = document.getElementById('quote-date');
             if (qDate && !qDate.value) qDate.valueAsDate = new Date();
@@ -664,7 +667,7 @@
             if (!tbody) return;
 
             if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
                 return;
             }
 
@@ -674,14 +677,13 @@
             }
             if (searchKw) {
                 branchItems = branchItems.filter(item => 
-                    item.code.toLowerCase().includes(searchKw) || 
-                    String(item.unit).toLowerCase().includes(searchKw) ||
-                    item.size.toLowerCase().includes(searchKw)
+                    item.size.toLowerCase().includes(searchKw) || 
+                    String(item.unit).toLowerCase().includes(searchKw)
                 );
             }
 
             if (branchItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的倉位資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的倉位資料</td></tr>`;
                 return;
             }
 
@@ -693,8 +695,11 @@
                         <td><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
                         <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
                         <td><b>${item.size}</b> (${item.unit}材)</td>
-                        <td style="font-weight: 600;">NT$ ${item.price1.toLocaleString()}</td>
-                        <td style="font-weight: 600; color: #059669;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td>NT$ ${item.price1.toLocaleString()}</td>
+                        <td>NT$ ${item.price3.toLocaleString()}</td>
+                        <td>NT$ ${item.price6.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -703,7 +708,7 @@
         function toggleQuoteItem(globalIndex) {
             const chk = document.querySelector(`input.q-item-chk[data-index="${globalIndex}"]`);
             if (chk && chk.checked) {
-                selectedQuoteItems[globalIndex] = { ...storageData[globalIndex], term: '12' };
+                selectedQuoteItems[globalIndex] = { ...storageData[globalIndex], term: '12', extraNote: '' };
             } else {
                 delete selectedQuoteItems[globalIndex];
             }
@@ -713,6 +718,12 @@
         function updateItemTerm(globalIndex, termVal) {
             if (selectedQuoteItems[globalIndex]) {
                 selectedQuoteItems[globalIndex].term = termVal;
+            }
+        }
+
+        function updateItemExtraNote(globalIndex, noteVal) {
+            if (selectedQuoteItems[globalIndex]) {
+                selectedQuoteItems[globalIndex].extraNote = noteVal;
             }
         }
 
@@ -735,18 +746,22 @@
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
                 let currentTerm = item.term || '12';
+                let currentNote = item.extraNote || '';
                 html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px;">
-                        <span style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.size}</b> (${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <select onchange="updateItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
-                                <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
-                                <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
-                                <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
-                                <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
-                                <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
-                                <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
-                            </select>
+                    <div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">
+                        <div style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.size}</b> (${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}</div>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <select onchange="updateItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
+                                    <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
+                                    <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
+                                    <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
+                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
+                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
+                                    <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
+                                </select>
+                                <input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="${currentNote}" oninput="updateItemExtraNote(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">
+                            </div>
                             <button type="button" onclick="removeQuoteItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
                         </div>
                     </div>
@@ -796,25 +811,30 @@
                 let p12_85 = item.price12_85;
                 let p12_80 = item.price12_80;
                 let term = item.term || '12';
+                let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
+
+                let selectedMonthlyRate = p1;
+                if (term === '3') selectedMonthlyRate = p3;
+                else if (term === '6') selectedMonthlyRate = p6;
+                else if (term === '12') selectedMonthlyRate = p12_85;
+                else if (term === '12_80') selectedMonthlyRate = p12_80;
 
                 html += `
                     <tr>
                         <td style="border: 1px solid #cbd5e1; padding: 10px;">${item.unit}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold;">[${item.branch}] ${item.size}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold;">[${item.branch}] ${item.size}${extraNote}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p1.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p3.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p6.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">NT$ ${p12_85.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">NT$ ${selectedMonthlyRate.toLocaleString()}</td>
                     </tr>
                 `;
 
                 if (term !== 'none') {
                     let termMonths = 1;
-                    let selectedMonthlyRate = p1;
-                    if (term === '3') { termMonths = 3; selectedMonthlyRate = p3; }
-                    else if (term === '6') { termMonths = 6; selectedMonthlyRate = p6; }
-                    else if (term === '12') { termMonths = 12; selectedMonthlyRate = p12_85; }
-                    else if (term === '12_80') { termMonths = 12; selectedMonthlyRate = p12_80; }
+                    if (term === '3') termMonths = 3;
+                    else if (term === '6') termMonths = 6;
+                    else if (term === '12' || term === '12_80') termMonths = 12;
 
                     targetRent += (selectedMonthlyRate * termMonths);
                     let feePerMonth = selectedMonthlyRate >= 3000 ? 150 : 80;
@@ -944,7 +964,7 @@
                                     <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                     <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
                                     <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
-                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
+                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
                                     <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入請款</option>
                                 </select>
                                 <select onchange="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
@@ -1048,7 +1068,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 專業樣式與完整格線的 Excel 匯出功能
+        // 具備完整黑色格線與正確框線樣式的 Excel 匯出功能
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) {
@@ -1084,13 +1104,22 @@
 
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
+                let term = item.term || '12';
+                let selectedMonthlyRate = item.price1;
+                if (term === '3') selectedMonthlyRate = item.price3;
+                else if (term === '6') selectedMonthlyRate = item.price6;
+                else if (term === '12') selectedMonthlyRate = item.price12_85;
+                else if (term === '12_80') selectedMonthlyRate = item.price12_80;
+
+                let noteStr = item.extraNote ? ` (${item.extraNote})` : '';
+
                 aoa.push([
                     item.unit,
-                    `[${item.branch}] ${item.size}`,
+                    `[${item.branch}] ${item.size}${noteStr}`,
                     item.price1,
                     item.price3,
                     item.price6,
-                    item.price12_85
+                    selectedMonthlyRate
                 ]);
             });
 
@@ -1116,7 +1145,7 @@
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-            // 套用專業格線與對齊格式
+            // 強制帶入格線與儲存格樣式
             const borderStyle = {
                 top: { style: "thin", color: { rgb: "000000" } },
                 bottom: { style: "thin", color: { rgb: "000000" } },
@@ -1129,22 +1158,21 @@
                 for (let C = range.s.c; C <= range.e.c; ++C) {
                     let cellAddress = XLSX.utils.encode_cell({r: R, c: C});
                     if (!ws[cellAddress]) continue;
-                    
-                    // 初始化樣式物件
                     if (!ws[cellAddress].s) ws[cellAddress].s = {};
                     
-                    // 替表格標題與價目表加上格線
                     if (R >= 8 && R <= 8 + keys.length) {
                         ws[cellAddress].s.border = borderStyle;
                         if (R === 8) {
                             ws[cellAddress].s.font = { bold: true };
                             ws[cellAddress].s.fill = { fgColor: { rgb: "F1F5F9" } };
+                        } else if (C >= 2) {
+                            ws[cellAddress].s.alignment = { horizontal: "right" };
                         }
                     }
                 }
             }
 
-            ws['!cols'] = [{wch: 12}, {wch: 28}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}];
+            ws['!cols'] = [{wch: 12}, {wch: 32}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}];
 
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "報價單");
@@ -1227,7 +1255,6 @@
 
             const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-            // 套用表格框線
             const borderStyle = {
                 top: { style: "thin", color: { rgb: "000000" } },
                 bottom: { style: "thin", color: { rgb: "000000" } },
