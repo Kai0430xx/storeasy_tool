@@ -117,7 +117,7 @@
                     </div>
                     <div class="form-group">
                         <label>🔍 快速搜尋：</label>
-                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: QD335 或 75">
+                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: 0.9 或 75">
                     </div>
                 </div>
 
@@ -133,11 +133,12 @@
                                 <th>月繳/原價</th>
                                 <th>季繳</th>
                                 <th>半年繳</th>
-                                <th>年繳優惠金額</th>
+                                <th>年繳(85折)</th>
+                                <th>年繳(8折)</th>
                             </tr>
                         </thead>
                         <tbody id="quote-selectable-body">
-                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
+                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -179,7 +180,7 @@
 
                 <table>
                     <thead>
-                        <tr style="background-color: #f1f5f9; text-align: center;">
+                        <tr style="background-color: #f8fafc; text-align: center;">
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">單位<br>(材)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位尺寸<br>(寬*深*高 m)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">月繳/月</th>
@@ -226,6 +227,7 @@
         })();
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
         let selectedQuoteItems = {};
 
         function initQuoteTab() {
@@ -246,12 +248,13 @@
             if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
             if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
 
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
 
             tbody.innerHTML = list.map(item => {
                 let idx = storageData.indexOf(item);
                 let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
-                let dLabel = (item.discountType === '0.80' || item.price12 === Math.round(item.price1 * 0.8)) ? '年繳(8折)' : '年繳(85折)';
+                let p12_85 = Math.round((item.price1 * 0.85) / 10) * 10;
+                let p12_80 = Math.round((item.price1 * 0.8) / 10) * 10;
                 return `
                     <tr>
                         <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
@@ -262,7 +265,8 @@
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
                         <td>NT$ ${item.price3.toLocaleString()}</td>
                         <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12.toLocaleString()} <span style="font-size:0.75rem; color:#64748b;">(${dLabel})</span></td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${p12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${p12_80.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -271,7 +275,11 @@
         function toggleQuoteItem(idx) {
             const chk = document.querySelector(`input.q-item-chk[data-index="${idx}"]`);
             if (chk && chk.checked) {
-                selectedQuoteItems[idx] = { ...storageData[idx], term: '12', extraNote: '' };
+                let item = storageData[idx];
+                let defaultTerm = '12_85';
+                let bDisc = branchDiscounts[item.branch];
+                if (bDisc === '0.80') defaultTerm = '12_80';
+                selectedQuoteItems[idx] = { ...item, term: defaultTerm, extraNote: '' };
             } else {
                 delete selectedQuoteItems[idx];
             }
@@ -285,7 +293,7 @@
             
             summaryEl.innerHTML = keys.map(idx => {
                 let item = selectedQuoteItems[idx];
-                let currentTerm = item.term || '12';
+                let currentTerm = item.term || '12_85';
                 let currentNote = item.extraNote || '';
                 return `
                     <div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">
@@ -296,7 +304,8 @@
                                     <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
                                     <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                     <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
-                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳優惠</option>
+                                    <option value="12_85" ${currentTerm==='12_85'?'selected':''}>年繳 (85折)</option>
+                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
                                     <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
                                 </select>
                                 <input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="${currentNote}" oninput="selectedQuoteItems[${idx}].extraNote = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">
@@ -311,6 +320,26 @@
         function generateQuote() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
+
+            // 💡 檢查是否有覆蓋原本分店年繳設定的防呆通知
+            let mismatchDetected = false;
+            keys.forEach(idx => {
+                let item = selectedQuoteItems[idx];
+                let term = item.term;
+                if (term === '12_85' || term === '12_80') {
+                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
+                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
+                    if (chosenDiscount !== originalDiscount) {
+                        mismatchDetected = true;
+                    }
+                }
+            });
+
+            if (mismatchDetected) {
+                let confirmed = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n按【確定】代表您同意以此筆單據後面選擇的折扣進行計算（不會修改後台倉位資料），按【取消】可返回修改。`);
+                if (!confirmed) return;
+            }
+
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
             document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
@@ -324,11 +353,16 @@
             let tbody = document.getElementById('v-q-items'), html = '', rent = 0, fee = 0, deposit = 0;
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
-                let term = item.term || '12';
+                let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                let p = term === '3' ? item.price3 : term === '6' ? item.price6 : (term === '12' ? item.price12 : item.price1);
-                let months = term === '3' ? 3 : term === '6' ? 6 : (term === '12' ? 12 : 1);
+                let p = item.price1;
+                if (term === '3') p = item.price3;
+                else if (term === '6') p = item.price6;
+                else if (term === '12_85') p = Math.round((item.price1 * 0.85) / 10) * 10;
+                else if (term === '12_80') p = Math.round((item.price1 * 0.8) / 10) * 10;
+
+                let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
 
                 let unitText = item.unit;
