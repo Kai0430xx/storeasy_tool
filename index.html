@@ -389,6 +389,7 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
                     </div>
 
+                    <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅) &amp; 保證金明細</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
@@ -410,6 +411,7 @@
                         </tbody>
                     </table>
 
+                    <div style="margin-top: 24px; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">雜費明細</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
@@ -1145,7 +1147,6 @@
                 let p1 = item.price1;
                 let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
 
-                // 🏆 承租月份完全根據日曆起訖日精確計算月數
                 let termMonths = 1;
                 if (item.startDate && item.endDate) {
                     let d1 = new Date(item.startDate);
