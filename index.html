@@ -53,7 +53,7 @@
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-        th { background-color: #f8fafc; font-weight: 600; color: #475569; text-align: center !important; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
 
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
@@ -130,7 +130,7 @@
             <div id="panel-storage" class="tab-content active">
                 <div class="card">
                     <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                    <p>系統會自動辨識編號、尺寸、材積、原價與各方案金額</p>
+                    <p>系統會自動辨識編號,尺寸,材積,原價與各方案金額</p>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>分店名稱 (可下拉選擇或自行手打)</label>
@@ -161,15 +161,15 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>據點名稱</th>
-                                    <th>倉位編號</th>
-                                    <th>尺寸 (寬*深*高 m)</th>
-                                    <th>材積 (材)</th>
-                                    <th>月繳/原價</th>
-                                    <th>季繳</th>
-                                    <th>半年繳</th>
-                                    <th>年繳(85折)</th>
-                                    <th>年繳(8折)</th>
+                                    <th style="text-align: left;">據點名稱</th>
+                                    <th style="text-align: left;">倉位編號</th>
+                                    <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
+                                    <th style="text-align: left;">材積 (材)</th>
+                                    <th style="text-align: left;">月繳/原價</th>
+                                    <th style="text-align: left;">季繳</th>
+                                    <th style="text-align: left;">半年繳</th>
+                                    <th style="text-align: left;">年繳(85折)</th>
+                                    <th style="text-align: left;">年繳(8折)</th>
                                 </tr>
                             </thead>
                             <tbody id="storage-table-body">
@@ -212,14 +212,14 @@
                         <table>
                             <thead>
                                 <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                                    <th style="width: 40px;">選取</th>
-                                    <th>據點</th>
-                                    <th>尺寸(寬*深*高 m) / 材積</th>
-                                    <th>月繳原價</th>
-                                    <th>季繳</th>
-                                    <th>半年繳</th>
-                                    <th>年繳(85折)</th>
-                                    <th>年繳(8折)</th>
+                                    <th style="width: 40px; text-align: left;">選取</th>
+                                    <th style="text-align: left;">據點</th>
+                                    <th style="text-align: left;">尺寸(寬*深*高 m) / 材積</th>
+                                    <th style="text-align: left;">月繳原價</th>
+                                    <th style="text-align: left;">季繳</th>
+                                    <th style="text-align: left;">半年繳</th>
+                                    <th style="text-align: left;">年繳(85折)</th>
+                                    <th style="text-align: left;">年繳(8折)</th>
                                 </tr>
                             </thead>
                             <tbody id="quote-selectable-body">
@@ -339,14 +339,14 @@
                         <table>
                             <thead>
                                 <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                                    <th style="width: 40px;">選取</th>
-                                    <th>據點</th>
-                                    <th>編號 / 尺寸(寬*深*高 m) / 材積</th>
-                                    <th>月繳原價</th>
+                                    <th style="width: 40px; text-align: left;">選取</th>
+                                    <th style="text-align: left;">據點</th>
+                                    <th style="text-align: left;">編號 / 尺寸(寬*深*高 m) / 材積</th>
+                                    <th style="text-align: left;">月繳原價</th>
                                 </tr>
                             </thead>
                             <tbody id="invoice-selectable-body">
-                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
+                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -667,15 +667,15 @@
             }
             tbody.innerHTML = filtered.map(item => `
                 <tr>
-                    <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
-                    <td style="font-weight: bold;">${item.code}</td>
-                    <td>${item.size}</td>
-                    <td style="color: #64748b;">${item.unit}</td>
-                    <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
-                    <td>NT$ ${item.price3.toLocaleString()}</td>
-                    <td>NT$ ${item.price6.toLocaleString()}</td>
-                    <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
-                    <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                    <td style="font-weight: 500; color: #b45309; text-align: left;">${item.branch}</td>
+                    <td style="font-weight: bold; text-align: left;">${item.code}</td>
+                    <td style="text-align: left;">${item.size}</td>
+                    <td style="color: #64748b; text-align: left;">${item.unit}</td>
+                    <td style="font-weight: 600; color: #d97706; text-align: left;">NT$ ${item.price1.toLocaleString()}</td>
+                    <td style="text-align: left;">NT$ ${item.price3.toLocaleString()}</td>
+                    <td style="text-align: left;">NT$ ${item.price6.toLocaleString()}</td>
+                    <td style="color: #059669; font-weight: 600; text-align: left;">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <td style="color: #047857; font-weight: 600; text-align: left;">NT$ ${item.price12_80.toLocaleString()}</td>
                 </tr>
             `).join('');
         }
@@ -751,14 +751,14 @@
                 let isChecked = selectedQuoteItems[globalIndex] ? 'checked' : '';
                 return `
                     <tr>
-                        <td><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
-                        <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
-                        <td><b>${item.size}</b> (${item.unit}材)</td>
-                        <td>NT$ ${item.price1.toLocaleString()}</td>
-                        <td>NT$ ${item.price3.toLocaleString()}</td>
-                        <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                        <td style="text-align: left;"><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td style="font-weight: 600; color: #92400e; text-align: left;">${item.branch}</td>
+                        <td style="text-align: left;"><b>${item.size}</b> (${item.unit}材)</td>
+                        <td style="text-align: left;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td style="text-align: left;">NT$ ${item.price3.toLocaleString()}</td>
+                        <td style="text-align: left;">NT$ ${item.price6.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600; text-align: left;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600; text-align: left;">NT$ ${item.price12_80.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -935,7 +935,7 @@
             if (!tbody) return;
 
             if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
                 return;
             }
 
@@ -952,7 +952,7 @@
             }
 
             if (branchItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的請款項目</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的請款項目</td></tr>`;
                 return;
             }
 
@@ -961,11 +961,10 @@
                 let isChecked = selectedInvoiceItems[globalIndex] ? 'checked' : '';
                 return `
                     <tr>
-                        <td><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
-                        <td style="font-weight: 600; color: #92400e;">${item.branch}</td>
-                        <td><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
-                        <td style="font-weight: 600;">NT$ ${item.price1.toLocaleString()}</td>
-                        <td style="font-weight: 600; color: #059669;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="text-align: left;"><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
+                        <td style="font-weight: 600; color: #92400e; text-align: left;">${item.branch}</td>
+                        <td style="text-align: left;"><b>${item.code}</b> (${item.size} / ${item.unit}材)</td>
+                        <td style="font-weight: 600; text-align: left;">NT$ ${item.price1.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -977,7 +976,7 @@
                 const todayStr = new Date().toISOString().split('T')[0];
                 selectedInvoiceItems[globalIndex] = { 
                     ...storageData[globalIndex], 
-                    term: '12', 
+                    term: '1', 
                     depositOption: 'yes',
                     lateFee: 0,
                     packingFee: 0,
@@ -1022,7 +1021,7 @@
             let html = '';
             keys.forEach(idx => {
                 let item = selectedInvoiceItems[idx];
-                let currentTerm = item.term || '12';
+                let currentTerm = item.term || '1';
                 let currentDep = item.depositOption || 'yes';
                 html += `
                     <div style="background: #fff; border: 1px solid #cbd5e1; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px;" data-index="${idx}">
@@ -1139,11 +1138,11 @@
 
             keys.forEach((idx) => {
                 let item = selectedInvoiceItems[idx];
-                let term = item.term || '12';
+                let term = item.term || '1';
                 if (term === 'none') return;
 
                 let p1 = item.price1;
-                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
+                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : (term === '12' ? item.price12_85 : p1);
 
                 let termMonths = 1;
                 if (item.startDate && item.endDate) {
