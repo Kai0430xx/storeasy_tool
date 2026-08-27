@@ -374,8 +374,7 @@
             });
 
             if (mismatchDetected) {
-                let msg = "⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折扣去試算費用？\n(若點擊【確定】，費用試算將會以您新選的折扣計算；同時正式報價單的價格表，仍會依照原本分店設定的預設折扣金額來呈現)";
-                let confirmCalc = confirm(msg);
+                let confirmCalc = confirm("⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。是否要照您後面選擇的折扣去試算費用？");
                 if (!confirmCalc) return;
             }
 
