@@ -393,13 +393,20 @@
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
+            
+            let clientName = document.getElementById('q-client-name').value || '客戶';
+            let branchName = document.getElementById('q-branch').value || '分店';
+            let dateStr = document.getElementById('quote-date').value;
+
             let wsData = [
                 ["收多易迷你倉庫 - 報價單"],
-                ["日期", document.getElementById('quote-date').value, "客戶名稱", document.getElementById('q-client-name').value],
-                ["分店", document.getElementById('q-branch').value, "聯絡電話", document.getElementById('q-client-tel'].value],
+                ["報價日期", dateStr, "分店名稱", branchName],
+                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel').value || '---'],
+                ["公司抬頭", document.getElementById('q-company').value || '---', "統一編號", document.getElementById('q-taxid').value || '---'],
                 [],
-                ["單位(材)", "倉位尺寸", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
+                ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "季繳/月 (NT$)", "半年繳/月 (NT$)", "年繳/月 (NT$)"]
             ];
+
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
                 if (item.term === 'none') return;
@@ -407,13 +414,23 @@
                 let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
                 let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
                 let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
-                wsData.push([unitText, `[${item.branch}] ${item.size}`, item.price1, item.price3, item.price6, tableAnnualPrice]);
+                let sizeText = `[${item.branch}] ${item.size}`;
+                wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
             });
-            wsData.push([], ["租金總計", document.getElementById('v-q-rent').innerText], ["保證金總計", document.getElementById('v-q-deposit').innerText], ["保險文書處理費", document.getElementById('v-q-fee').innerText], ["合計", document.getElementById('v-q-total').innerText]);
+
+            wsData.push(
+                [],
+                ["費用試算彙總"],
+                ["租金總計 (NT$)", document.getElementById('v-q-rent').innerText],
+                ["保證金總計 (NT$)", document.getElementById('v-q-deposit').innerText],
+                ["保險文書處理費總計 (NT$)", document.getElementById('v-q-fee').innerText],
+                ["合計總金額 (NT$)", document.getElementById('v-q-total'].innerText]
+            );
+
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, "報價單");
-            XLSX.writeFile(wb, `報價單_${document.getElementById('q-client-name').value || '客戶'}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "報價單試算");
+            XLSX.writeFile(wb, `報價單_${clientName}.xlsx`);
         }
 
         initQuoteTab();
