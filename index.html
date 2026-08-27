@@ -56,7 +56,7 @@
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
 
-        .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 900px; margin: 0 auto; width: 100%; }
+        .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
         .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
         .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
         .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-bottom: 24px; }
@@ -339,9 +339,9 @@
                         </table>
                     </div>
 
-                    <!-- 各倉位獨立雜費設定區 -->
+                    <!-- 各倉位獨立雜費與日曆租期設定區 -->
                     <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">💵 已選取倉位之各別雜費設定 (可針對各個倉位獨立填寫)：</h5>
+                        <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">📅 已選取倉位之日曆租期 (西元年月日) 與各別雜費 (含稅) 設定：</h5>
                         <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
                             <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>
                         </div>
@@ -379,7 +379,6 @@
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位編號</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">材積</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">原價租金</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">優惠租金</th>
@@ -388,6 +387,7 @@
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">稅金</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">含稅小計</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">保證金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">租期</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">小計</th>
                             </tr>
                         </thead>
@@ -396,7 +396,7 @@
                         </tbody>
                     </table>
 
-                    <div style="margin-top: 24px; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">雜費明細 (各倉位獨立)</div>
+                    <div style="margin-top: 24px; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">雜費明細 (各倉位獨立 - 皆為含稅)</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
@@ -962,6 +962,7 @@
         function toggleInvoiceItem(globalIndex) {
             const chk = document.querySelector(`input.i-item-chk[data-index="${globalIndex}"]`);
             if (chk && chk.checked) {
+                const todayStr = new Date().toISOString().split('T')[0];
                 selectedInvoiceItems[globalIndex] = { 
                     ...storageData[globalIndex], 
                     term: '12', 
@@ -969,7 +970,9 @@
                     lateFee: 0,
                     packingFee: 0,
                     movingFee: 0,
-                    otherFee: 0
+                    otherFee: 0,
+                    startDate: todayStr,
+                    endDate: todayStr
                 };
             } else {
                 delete selectedInvoiceItems[globalIndex];
@@ -996,6 +999,12 @@
             }
         }
 
+        function updatePerItemDate(globalIndex, dateType, val) {
+            if (selectedInvoiceItems[globalIndex]) {
+                selectedInvoiceItems[globalIndex][dateType] = val;
+            }
+        }
+
         function removeInvoiceItem(globalIndex) {
             delete selectedInvoiceItems[globalIndex];
             renderInvoiceSelectableItems();
@@ -1016,24 +1025,32 @@
             keys.forEach(idx => {
                 let item = selectedInvoiceItems[idx];
                 html += `
-                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px;">
                         <div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：${item.code} ([${item.branch}] ${item.size})</div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
                             <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">滯納金 (NT$)</label>
-                                <input type="number" value="${item.lateFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'lateFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期起日 (西元)</label>
+                                <input type="date" value="${item.startDate || ''}" onchange="updatePerItemDate(${idx}, 'startDate', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">包材費 (NT$)</label>
-                                <input type="number" value="${item.packingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'packingFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期訖日 (西元)</label>
+                                <input type="date" value="${item.endDate || ''}" onchange="updatePerItemDate(${idx}, 'endDate', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">搬運費 (NT$)</label>
-                                <input type="number" value="${item.movingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'movingFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                                <label style="font-size: 0.75rem; color: #64748b;">滯納金 (含稅)</label>
+                                <input type="number" value="${item.lateFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'lateFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">其它費 (NT$)</label>
-                                <input type="number" value="${item.otherFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'otherFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                                <label style="font-size: 0.75rem; color: #64748b;">包材費 (含稅)</label>
+                                <input type="number" value="${item.packingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'packingFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; color: #64748b;">搬運費 (含稅)</label>
+                                <input type="number" value="${item.movingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'movingFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; color: #64748b;">其它費 (含稅)</label>
+                                <input type="number" value="${item.otherFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'otherFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                         </div>
                     </div>
@@ -1047,7 +1064,7 @@
             if (!summaryEl) return;
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) {
-                summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何請款項目</span>';
+                summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>';
                 return;
             }
 
@@ -1139,10 +1156,21 @@
                 totalFeeInc += insuranceFee;
                 totalDeposit += deposit;
 
+                // 格式化西元年月日租期 (YYYY/MM/DD - YYYY/MM/DD)
+                let formatDate = (dStr) => {
+                    if (!dStr) return '';
+                    let parts = dStr.split('-');
+                    if (parts.length === 3) return `${parts[0]}/${parts[1]}/${parts[2]}`;
+                    return dStr;
+                };
+                let startF = formatDate(item.startDate);
+                let endF = formatDate(item.endDate);
+                let dateRangeStr = (startF && endF) ? `${startF} － ${endF}` : (startF || endF || '未填租期');
+
+                // 租金與保證金明細列 (已移除倉位尺寸欄位)
                 itemsHtml += `
                     <tr>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">${item.code}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">[${item.branch}] ${item.size}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${item.unit}材</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${p1.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${monthlyRate.toLocaleString()}</td>
@@ -1151,6 +1179,7 @@
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${(rentSubtotal - Math.round(rentSubtotal/1.05)).toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${rentSubtotal.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${deposit.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; font-size: 0.8rem;">${dateRangeStr}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">${lineTotal.toLocaleString()}</td>
                     </tr>
                 `;
@@ -1252,6 +1281,7 @@
                     table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 20px; margin-bottom: 20px; }
                     th, td { border: 1px solid #000000 !important; padding: 12px; vertical-align: middle; }
                     th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                    td:nth-child(1), td:nth-child(2), td:nth-child(5), td:nth-child(10) { text-align: center !important; }
                 </style></head>
                 <body>${clone.innerHTML}</body>
                 </html>
