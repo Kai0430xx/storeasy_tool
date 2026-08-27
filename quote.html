@@ -180,7 +180,7 @@
 
                 <table>
                     <thead>
-                        <tr style="background-color: #f8fafc; text-align: center;">
+                        <tr style="background-color: #f1f5f9; text-align: center;">
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">單位<br>(材)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位尺寸<br>(寬*深*高 m)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">月繳/月</th>
@@ -321,7 +321,6 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
-            // 💡 檢查是否有覆蓋原本分店年繳設定的防呆通知
             let mismatchDetected = false;
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
@@ -356,11 +355,17 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                let p = item.price1;
-                if (term === '3') p = item.price3;
-                else if (term === '6') p = item.price6;
-                else if (term === '12_85') p = Math.round((item.price1 * 0.85) / 10) * 10;
-                else if (term === '12_80') p = Math.round((item.price1 * 0.8) / 10) * 10;
+                // 💡 報價單表格顯示：展示該倉位原生的固定方案價格（不因上方選單切換而變動）
+                let tableAnnualPrice = Math.round((item.price1 * 0.85) / 10) * 10;
+                let bDisc = branchDiscounts[item.branch];
+                if (bDisc === '0.80') tableAnnualPrice = Math.round((item.price1 * 0.8) / 10) * 10;
+
+                // 💡 費用試算計算金額：根據上方選取的方案決定
+                let calcPrice = item.price1;
+                if (term === '3') calcPrice = item.price3;
+                else if (term === '6') calcPrice = item.price6;
+                else if (term === '12_85') calcPrice = Math.round((item.price1 * 0.85) / 10) * 10;
+                else if (term === '12_80') calcPrice = Math.round((item.price1 * 0.8) / 10) * 10;
 
                 let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
@@ -370,10 +375,10 @@
                     unitText = '上層' + item.unit;
                 }
 
-                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
+                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${tableAnnualPrice.toLocaleString()}</td></tr>`;
                 
-                rent += p * months; 
-                fee += (p >= 3000 ? 150 : 80) * months; 
+                rent += calcPrice * months; 
+                fee += (calcPrice >= 3000 ? 150 : 80) * months; 
                 deposit += (months <= 2 ? item.price1 * 2 : item.price1);
             });
             tbody.innerHTML = html;
