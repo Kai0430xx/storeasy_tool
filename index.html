@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
+    <!-- SheetJS 用於解析 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -38,7 +38,7 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        .form-group input, .form-group select, .form-group datalist { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
         .form-group input:focus, .form-group select:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1); }
 
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
@@ -76,7 +76,7 @@
 </head>
 <body>
 
-    <!-- 共用據點下拉選項 (Datalist 支援下拉選取或直接手打) -->
+    <!-- 共用據點下拉選項 (支援選取與手打) -->
     <datalist id="branch-list">
         <option value="土城店">
         <option value="南東店">
@@ -115,7 +115,7 @@
             <div id="panel-storage" class="tab-content active">
                 <div class="card">
                     <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                    <p>系統會自動辨識編號, 尺寸, 材積, 原價與各方案金額，個位數維持0。</p>
+                    <p>系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>分店名稱 (可下拉選擇或自行手打)</label>
@@ -168,7 +168,7 @@
             <!-- 2. 生成報價單頁籤 -->
             <div id="panel-quote" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 報價單設定與完整方案勾選（資料請自行填寫）</h3>
+                    <h3>⚙️ 報價單設定與完整方案勾選</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="q-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="q-manager" placeholder="請輸入店長姓名"></div>
@@ -296,7 +296,7 @@
             <!-- 3. 生成請款單頁籤 -->
             <div id="panel-invoice" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 會計版請款單設定與彈性搜尋勾選（資料請自行填寫）</h3>
+                    <h3>⚙️ 會計版請款單設定與彈性搜尋勾選</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="i-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
@@ -353,7 +353,7 @@
                 <div id="invoice-preview" class="preview-box">
                     <div class="preview-header">
                         <div>
-                            <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易股份有限公司</h1>
+                            <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
                             <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Invoice Statement</p>
                         </div>
                         <div style="text-align: right;">
@@ -376,25 +376,25 @@
                     <table>
                         <thead>
                             <tr style="background-color: #f1f5f9; text-align: center;">
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位編號</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">材積</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">原價租金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">優惠租金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">月租金</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">承租月份</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">未稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">稅金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">含稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">租金小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">保險文書處理費</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">保證金</th>
                                 <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">小計</th>
                             </tr>
                         </thead>
                         <tbody id="v-i-items" style="text-align: center;">
-                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">請先於請款單頁面勾選項目與繳費方式</td></tr>
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">請先於請款單頁面勾選項目與繳費方式</td></tr>
                         </tbody>
                     </table>
 
                     <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 24px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; text-align: right; font-size: 0.9rem;">
                         <div style="display: flex; justify-content: space-between;"><span>租金合計：</span> <span id="v-i-subtotal" style="font-weight: bold;">NT$ 0</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>保險文書處理費合計：</span> <span id="v-i-fee-total">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保證金合計：</span> <span id="v-i-deposit">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 8px; color: #b45309;"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
                     </div>
@@ -1031,6 +1031,7 @@
             const tbody = document.getElementById('v-i-items');
             let html = '';
             let totalRentInc = 0;
+            let totalFeeInc = 0;
             let totalDeposit = 0;
 
             keys.forEach((idx) => {
@@ -1051,30 +1052,31 @@
                 else if (term === '12') { termMonths = 12; monthlyRate = p12_85; }
                 else if (term === '12_80') { termMonths = 12; monthlyRate = p12_80; }
 
-                let incSubtotal = monthlyRate * termMonths;
-                let exSubtotal = Math.round(incSubtotal / 1.05);
-                let tax = incSubtotal - exSubtotal;
+                let rentSubtotal = monthlyRate * termMonths;
+                let feePerMonth = monthlyRate >= 3000 ? 150 : 80;
+                let feeSubtotal = feePerMonth * termMonths;
                 
                 let deposit = 0;
                 if (item.depositOption === 'yes') {
                     deposit = termMonths <= 2 ? (p1 * 2) : p1;
                 }
                 
-                let lineTotal = incSubtotal + deposit;
+                let lineTotal = rentSubtotal + feeSubtotal + deposit;
 
-                totalRentInc += incSubtotal;
+                totalRentInc += rentSubtotal;
+                totalFeeInc += feeSubtotal;
                 totalDeposit += deposit;
 
                 html += `
                     <tr>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">[${item.branch}] ${item.size}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">${item.code}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">[${item.branch}] ${item.size}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${item.unit}材</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${p1.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${monthlyRate.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${termMonths}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${exSubtotal.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${tax.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${incSubtotal.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${rentSubtotal.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${feeSubtotal.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${deposit.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">${lineTotal.toLocaleString()}</td>
                     </tr>
@@ -1083,180 +1085,39 @@
 
             tbody.innerHTML = html;
             document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentInc.toLocaleString();
+            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeInc.toLocaleString();
             document.getElementById('v-i-deposit').innerText = 'NT$ ' + totalDeposit.toLocaleString();
-            document.getElementById('v-i-total').innerText = (totalRentInc + totalDeposit).toLocaleString();
+            document.getElementById('v-i-total').innerText = (totalRentInc + totalFeeInc + totalDeposit).toLocaleString();
 
             alert('會計版請款單已成功套用！');
         }
 
-        // 🏆 精準 Excel 2003 XML 格式匯出引擎 (確保格線、底色、區塊間隔、緊湊試算與帳號完整)
+        // 完美 HTML 匯出，確保列印與預覽 100% 正常
         function exportQuoteExcel() {
             const previewEl = document.getElementById('quote-preview');
             if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
                 alert('目前尚無生成的報價單內容可供匯出！');
                 return;
             }
+            const clone = previewEl.cloneNode(true);
+            clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
-            const qDate = document.getElementById('v-q-date').innerText;
-            const qClient = document.getElementById('v-q-client').innerText;
-            const qManager = document.getElementById('v-q-manager').innerText;
-            const qClientPhone = document.getElementById('v-q-client-phone').innerText;
-            const qBranch = document.getElementById('v-q-branch').innerText;
-            const qCompany = document.getElementById('v-q-company').innerText;
-            const qTel = document.getElementById('v-q-tel').innerText;
-            const qTaxid = document.getElementById('v-q-taxid').innerText;
-            const qAddress = document.getElementById('v-q-address').innerText;
-            const qRent = document.getElementById('v-q-rent').innerText;
-            const qDeposit = document.getElementById('v-q-deposit').innerText;
-            const qFee = document.getElementById('v-q-fee').innerText;
-            const qTotal = document.getElementById('v-q-total').innerText;
-
-            let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-            <?mso-application progid="Excel.Sheet"?>
-            <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-              xmlns:o="urn:schemas-microsoft-com:office:office"
-              xmlns:x="urn:schemas-microsoft-com:office:excel"
-              xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-              xmlns:html="http://www.w3.org/TR/REC-html40">
-             <Styles>
-              <Style ss:ID="Default" ss:Name="Normal">
-               <Alignment ss:Vertical="Center"/>
-               <Borders/>
-               <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#1E293B"/>
-               <Interior/>
-              </Style>
-              <Style ss:ID="Header">
-               <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-               </Borders>
-               <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#0F172A"/>
-               <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-              </Style>
-              <Style ss:ID="CellCenter">
-               <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
-              <Style ss:ID="CellRight">
-               <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
-              <Style ss:ID="TitleMain">
-               <Font ss:FontName="Segoe UI" ss:Size="18" ss:Bold="1" ss:Color="#0F172A"/>
-              </Style>
-              <Style ss:ID="TitleSub">
-               <Font ss:FontName="Segoe UI" ss:Size="14" ss:Bold="1" ss:Color="#1E293B"/>
-               <Alignment ss:Horizontal="Right"/>
-              </Style>
-              <Style ss:ID="InfoBox">
-               <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
-             </Styles>
-             <Worksheet ss:Name="報價單">
-              <Table>
-               <Column ss:Width="130"/><Column ss:Width="200"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/>
-               
-               <!-- 頂部標題列 -->
-               <Row ss:Height="30">
-                <Cell ss:StyleID="TitleMain"><Data ss:Type="String">收多易迷你倉庫</Data></Cell>
-                <Cell/><Cell/><Cell/>
-                <Cell ss:StyleID="TitleSub"><Data ss:Type="String">報 價 單</Data></Cell>
-                <Cell><Data ss:Type="String">有效期限 7 天</Data></Cell>
-               </Row>
-               <Row ss:Height="20">
-                <Cell><Data ss:Type="String">Storeasy Storage Solution</Data></Cell>
-               </Row>
-               <Row><Cell/></Row>
-
-               <!-- 左右分欄資訊區 -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qBranch}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qClient}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">店長：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qManager}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qClientPhone}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">聯繫電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qTel}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">公司抬頭：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qCompany}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qAddress}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qTaxid}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qDate}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               
-               <Row><Cell/></Row>
-
-               <!-- 價格表表頭 -->
-               <Row ss:Height="25">
-                <Cell ss:StyleID="Header"><Data ss:Type="String">單位(材)</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">倉位尺寸(寬*深*高 m)</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">月繳/月</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">季繳/月</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">半年繳/月</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">年繳/月</Data></Cell>
-               </Row>
-
-               <!-- 動態方案列 -->
-               ${Object.keys(selectedQuoteItems).map(idx => {
-                   let item = selectedQuoteItems[idx];
-                   let term = item.term || '12';
-                   let smr = term==='3'?item.price3:term==='6'?item.price6:term==='12_80'?item.price12_80:item.price12_85;
-                   return `
-                   <Row ss:Height="22">
-                    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${item.unit}</Data></Cell>
-                    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">[${item.branch}] ${item.size}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${item.price1.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${item.price3.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${item.price6.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${smr.toLocaleString()}</Data></Cell>
-                   </Row>`;
-               }).join('')}
-
-               <Row><Cell/></Row>
-
-               <!-- 費用試算表（項目與金額緊鄰，不隔太遠） -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">費用試算表 (不含額外優惠)</Data></Cell><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">租金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qRent}</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">保證金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qDeposit}</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">保險文書處理費總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qFee}</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String" style="font-weight:bold;">合計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold; color:#B45309;">NT$ ${qTotal}</Data></Cell></Row>
-
-               <Row><Cell/></Row>
-
-               <!-- 匯款資訊（包含帳號） -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">匯款資訊：</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">銀行：國泰世華 新莊分行 (代碼 013)</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell></Row>
-
-               <Row><Cell/></Row>
-
-               <!-- 備註 -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">備註：</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">4. 付款方式: 轉帳、即期支票。</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</Data></Cell></Row>
-
-               <Row><Cell/></Row>
-               <Row><Cell ss:StyleID="CellCenter"><Data ss:Type="String">THANK YOU FOR YOUR BUSINESS!</Data></Cell></Row>
-
-              </Table>
-             </Worksheet>
-            </Workbook>`;
-
-            let blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel' });
+            let htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="utf-8"><style>
+                    body { font-family: sans-serif; background-color: #ffffff; padding: 30px; color: #1e293b; }
+                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 24px; }
+                    .preview-info { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 24px; font-size: 10pt; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 24px; margin-bottom: 24px; font-size: 10pt; }
+                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.5; margin-top: 20px; }
+                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 15px; margin-bottom: 15px; }
+                    th, td { border: 1px solid #000000 !important; padding: 10px; vertical-align: middle; }
+                    th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                </style></head>
+                <body>${clone.innerHTML}</body>
+                </html>
+            `;
+            let blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
@@ -1265,163 +1126,34 @@
         }
 
         function exportInvoiceExcel() {
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                alert('目前尚無請款單內容可匯出！');
+            const previewEl = document.getElementById('invoice-preview');
+            if (!previewEl || document.getElementById('v-i-items').innerText.includes('請先於')) {
+                alert('目前尚無生成的請款單內容可供匯出！');
                 return;
             }
+            const clone = previewEl.cloneNode(true);
+            clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
-            const iDate = document.getElementById('v-i-date').innerText;
-            const iClient = document.getElementById('v-i-client').innerText;
-            const iManager = document.getElementById('v-i-manager').innerText;
-            const iClientPhone = document.getElementById('v-i-client-phone').innerText;
-            const iBranch = document.getElementById('v-i-branch').innerText;
-            const iCompany = document.getElementById('v-i-company').innerText;
-            const iTel = document.getElementById('v-i-tel').innerText;
-            const iTaxid = document.getElementById('v-i-taxid').innerText;
-            const iAddress = document.getElementById('v-i-address').innerText;
-            const iSubtotal = document.getElementById('v-i-subtotal').innerText;
-            const iDeposit = document.getElementById('v-i-deposit').innerText;
-            const iTotal = document.getElementById('v-i-total').innerText;
+            // 確保收多易股份有限公司左上角正確
+            const h1 = clone.querySelector('h1');
+            if (h1) h1.innerText = "收多易迷你倉庫";
 
-            let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-            <?mso-application progid="Excel.Sheet"?>
-            <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-              xmlns:o="urn:schemas-microsoft-com:office:office"
-              xmlns:x="urn:schemas-microsoft-com:office:excel"
-              xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-              xmlns:html="http://www.w3.org/TR/REC-html40">
-             <Styles>
-              <Style ss:ID="Default" ss:Name="Normal">
-               <Alignment ss:Vertical="Center"/>
-               <Borders/>
-               <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#1E293B"/>
-               <Interior/>
-              </Style>
-              <Style ss:ID="Header">
-               <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-               </Borders>
-               <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#0F172A"/>
-               <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-              </Style>
-              <Style ss:ID="CellCenter">
-               <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
-              <Style ss:ID="CellRight">
-               <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
-              <Style ss:ID="TitleMain">
-               <Font ss:FontName="Segoe UI" ss:Size="18" ss:Bold="1" ss:Color="#0F172A"/>
-              </Style>
-              <Style ss:ID="TitleSub">
-               <Font ss:FontName="Segoe UI" ss:Size="14" ss:Bold="1" ss:Color="#1E293B"/>
-               <Alignment ss:Horizontal="Right"/>
-              </Style>
-              <Style ss:ID="InfoBox">
-               <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
-             </Styles>
-             <Worksheet ss:Name="請款單">
-              <Table>
-               <Column ss:Width="160"/><Column ss:Width="80"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="70"/><Column ss:Width="90"/><Column ss:Width="70"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="110"/>
-               
-               <Row ss:Height="30">
-                <Cell ss:StyleID="TitleMain"><Data ss:Type="String">收多易迷你倉庫</Data></Cell>
-                <Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/>
-                <Cell ss:StyleID="TitleSub"><Data ss:Type="String">請 款 單</Data></Cell>
-               </Row>
-               <Row ss:Height="20">
-                <Cell><Data ss:Type="String">Storeasy Storage Invoice Statement</Data></Cell>
-               </Row>
-               <Row><Cell/></Row>
-
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iBranch}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iClient}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">店長：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iManager}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iClientPhone}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">聯繫電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iTel}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">公司抬頭：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iCompany}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iAddress}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iTaxid}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iDate}</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               
-               <Row><Cell/></Row>
-
-               <Row ss:Height="25">
-                <Cell ss:StyleID="Header"><Data ss:Type="String">倉位尺寸(寬*深*高 m)</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">材積</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">原價租金</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">優惠租金</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">承租月份</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">未稅小計</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">稅金</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">含稅小計</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">保證金</Data></Cell>
-                <Cell ss:StyleID="Header"><Data ss:Type="String">小計</Data></Cell>
-               </Row>
-
-               ${Object.keys(selectedInvoiceItems).map(idx => {
-                   let item = selectedInvoiceItems[idx];
-                   let term = item.term || '12';
-                   if (term === 'none') return '';
-                   let p1 = item.price1;
-                   let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
-                   let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
-                   let incSub = monthlyRate * termMonths;
-                   let exSub = Math.round(incSub / 1.05);
-                   let tax = incSub - exSub;
-                   let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                   let lineTotal = incSub + dep;
-                   return `
-                   <Row ss:Height="22">
-                    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">[${item.branch}] ${item.size}</Data></Cell>
-                    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${item.unit}材</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${p1.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${monthlyRate.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${termMonths}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${exSub.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${tax.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${incSub.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${dep.toLocaleString()}</Data></Cell>
-                    <Cell ss:StyleID="CellRight"><Data ss:Type="String">${lineTotal.toLocaleString()}</Data></Cell>
-                   </Row>`;
-               }).join('')}
-
-               <Row><Cell/></Row>
-
-               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">租金合計：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">${iSubtotal}</Data></Cell></Row>
-               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">保證金合計：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">${iDeposit}</Data></Cell></Row>
-               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">請款總金額：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold;">${iTotal}</Data></Cell></Row>
-
-               <Row><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">付款資料：</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell></Row>
-
-              </Table>
-             </Worksheet>
-            </Workbook>`;
-
-            let blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel' });
+            let htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="utf-8"><style>
+                    body { font-family: sans-serif; background-color: #ffffff; padding: 30px; color: #1e293b; }
+                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 24px; }
+                    .preview-info { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 24px; font-size: 10pt; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 24px; margin-bottom: 24px; font-size: 10pt; }
+                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.5; margin-top: 20px; }
+                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 15px; margin-bottom: 15px; }
+                    th, td { border: 1px solid #000000 !important; padding: 10px; vertical-align: middle; }
+                    th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                </style></head>
+                <body>${clone.innerHTML}</body>
+                </html>
+            `;
+            let blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
