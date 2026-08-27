@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收多易迷你倉庫 - 生成請款單</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
+        .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
+        .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        
+        nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .menu-group { display: flex; flex-direction: column; gap: 4px; }
+        .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
+        
+        nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
+        nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
+        nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+
+        .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
+
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-dark { background-color: #0f172a; color: #fff; }
+        .btn-amber { background-color: #f59e0b; color: #0f172a; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+
+        .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
+        .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
+        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
+        .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
+        .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
+        .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            aside, header.no-print, .card.no-print, .no-print { display: none !important; }
+            #invoice-preview, #invoice-preview * { visibility: visible; }
+            #invoice-preview { position: absolute; left: 0; top: 0; width: 100% !important; margin: 0 !important; padding: 10px !important; box-shadow: none !important; border: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="no-print">
+        <div class="sidebar-header">
+            <h1>收多易迷你倉庫</h1>
+            <p>Storeasy Storage</p>
+        </div>
+        <nav>
+            <div class="menu-group">
+                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <div class="menu-items">
+                    <a href="index.html" class="sub-btn">📦 倉位資料</a>
+                    <a href="quote.html" class="sub-btn">📄 生成報價單</a>
+                    <a href="invoice.html" class="sub-btn active">💰 生成請款單</a>
+                </div>
+            </div>
+            <div class="menu-group" style="margin-top: 8px;">
+                <button type="button" class="menu-category"><span>🗄️ 快存櫃 (eLocker)</span><span>▶</span></button>
+                <div class="menu-items">
+                    <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
+                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
+                    <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
+                </div>
+            </div>
+        </nav>
+        <div class="sidebar-footer">資料已永久儲存於本機瀏覽器</div>
+    </aside>
+
+    <main>
+        <header class="no-print">
+            <h2>💰 生成請款單</h2>
+            <div class="version" id="system-version">系統版本：載入中...</div>
+        </header>
+
+        <div class="content-body">
+            <div class="card no-print">
+                <div class="form-grid">
+                    <div class="form-group"><label>分店名稱</label><input type="text" id="i-branch" placeholder="請輸入分店"></div>
+                    <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
+                    <div class="form-group"><label>聯繫電話</label><input type="text" id="i-tel" placeholder="請輸入分店電話"></div>
+                    <div class="form-group"><label>請款日期</label><input type="date" id="inv-date"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="i-address" placeholder="請輸入分店地址"></div>
+                    <div class="form-group"><label>客戶名稱</label><input type="text" id="i-client" placeholder="姓名"></div>
+                    <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
+                    <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
+                    <div class="form-group"><label>統一編號</label><input type="text" id="i-taxid" placeholder="統編"></div>
+                </div>
+
+                <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label>選擇分店據點篩選：</label>
+                        <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
+                            <option value="">-- 全部據點 / 不限分店 --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>🔍 快速搜尋：</label>
+                        <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" placeholder="例如: QD335 或 75">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                                <th style="width: 40px;">選取</th>
+                                <th>據點名稱</th>
+                                <th>倉位編號</th>
+                                <th>尺寸 (寬*深*高 m)</th>
+                                <th>材積 (材)</th>
+                                <th>月繳/原價</th>
+                                <th>季繳</th>
+                                <th>半年繳</th>
+                                <th>年繳(85折)</th>
+                                <th>年繳(8折)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-selectable-body">
+                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取倉位設定：</h5>
+                    <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
+                        <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>
+                    </div>
+                </div>
+
+                <button type="button" onclick="generateInvoice()" class="btn btn-dark">💰 生成請款單</button>
+            </div>
+
+            <!-- 請款單預覽區 -->
+            <div id="invoice-preview" class="preview-box">
+                <div class="preview-header">
+                    <div>
+                        <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
+                        <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Invoice Statement</p>
+                    </div>
+                    <div style="text-align: right;"><h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">請 款 單</h2></div>
+                </div>
+
+                <div class="preview-info">
+                    <div><strong>日  期：</strong> <span id="v-i-date">---</span></div>
+                    <div><strong>客 戶 名 稱：</strong> <span id="v-i-client">---</span></div>
+                    <div><strong>店  長：</strong> <span id="v-i-manager">---</span></div>
+                    <div><strong>客 戶 電 話：</strong> <span id="v-i-client-phone">---</span></div>
+                    <div><strong>分店名稱：</strong> <span id="v-i-branch">---</span></div>
+                    <div><strong>公 司 抬 頭：</strong> <span id="v-i-company">---</span></div>
+                    <div><strong>聯 繫 電 話：</strong> <span id="v-i-tel">---</span></div>
+                    <div><strong>統  編：</strong> <span id="v-i-taxid">---</span></div>
+                    <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
+                </div>
+
+                <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅) &amp; 保證金明細</div>
+                <table>
+                    <thead>
+                        <tr style="background-color: #f8fafc; text-align: center;">
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位編號</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">材積</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">原價租金</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">優惠租金</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">承租月份</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">含稅小計</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">保證金</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">租期</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">小計</th>
+                        </tr>
+                    </thead>
+                    <tbody id="v-i-items" style="text-align: center;">
+                        <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">請先勾選項目</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="summary-box">
+                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算總表</div>
+                    <div style="display: flex; justify-content: space-between;"><span>租金合計：</span> <span id="v-i-subtotal" style="font-weight: bold;">0</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>保證金合計：</span> <span id="v-i-deposit">0</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>保險文書處理費合計：</span> <span id="v-i-fee-total">0</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 8px; color: #b45309;"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
+                </div>
+
+                <div class="notes-box">
+                    <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">付款資料：</div>
+                    <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 南門分行 ｜ 帳號：________________________</div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
+                    <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="login.js"></script>
+    <script>
+        (function() {
+            const now = new Date();
+            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+            document.getElementById('inv-date').valueAsDate = new Date();
+        })();
+
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let selectedInvoiceItems = {};
+
+        function initInvoiceTab() {
+            const branchSelect = document.getElementById('invoice-branch-select');
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
+            branches.forEach(b => html += `<option value="${b}">${b}</option>`);
+            branchSelect.innerHTML = html;
+            renderInvoiceSelectableItems();
+        }
+
+        function renderInvoiceSelectableItems() {
+            const selectedBranch = document.getElementById('invoice-branch-select').value;
+            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
+            const tbody = document.getElementById('invoice-selectable-body');
+            
+            let list = storageData;
+            if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
+            if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
+
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的請款項目</td></tr>`; return; }
+
+            tbody.innerHTML = list.map(item => {
+                let idx = storageData.indexOf(item);
+                let isChecked = selectedInvoiceItems[idx] ? 'checked' : '';
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="i-item-chk" ${isChecked} onchange="toggleInvoiceItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px;"></td>
+                        <td style="color: #b45309; font-weight: 500;">${item.branch}</td>
+                        <td style="font-weight: bold;">${item.code}</td>
+                        <td>${item.size}</td>
+                        <td style="color: #64748b;">${item.unit}</td>
+                        <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td>NT$ ${item.price3.toLocaleString()}</td>
+                        <td>NT$ ${item.price6.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleInvoiceItem(idx) {
+            const chk = document.querySelector(`input.i-item-chk[data-index="${idx}"]`);
+            if (chk && chk.checked) {
+                let today = new Date().toISOString().split('T')[0];
+                selectedInvoiceItems[idx] = { ...storageData[idx], term: '1', depositOption: 'yes', startDate: today, endDate: today };
+            } else {
+                delete selectedInvoiceItems[idx];
+            }
+            renderPerItemFeesInputs();
+        }
+
+        function renderPerItemFeesInputs() {
+            const container = document.getElementById('per-item-fees-container');
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) { container.innerHTML = `<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>`; return; }
+            container.innerHTML = keys.map(idx => {
+                let item = selectedInvoiceItems[idx];
+                return `
+                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>[${item.branch}] <b>${item.code}</b></div>
+                        <div style="display: flex; gap: 8px;">
+                            <select onchange="selectedInvoiceItems[${idx}].term = this.value" style="padding: 4px; font-weight: bold;">
+                                <option value="1">月繳</option><option value="3">季繳</option><option value="6">半年繳</option><option value="12">年繳(85折)</option><option value="12_80">年繳(8折)</option>
+                            </select>
+                            <button type="button" onclick="delete selectedInvoiceItems[${idx}]; renderInvoiceSelectableItems(); renderPerItemFeesInputs();" style="border:none; background:none; color:red; font-weight:bold; cursor:pointer;">×</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function generateInvoice() {
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
+            document.getElementById('v-i-date').innerText = document.getElementById('inv-date').value;
+            document.getElementById('v-i-client').innerText = document.getElementById('i-client').value || '未填寫';
+            document.getElementById('v-i-manager').innerText = document.getElementById('i-manager').value || '---';
+            document.getElementById('v-i-company').innerText = document.getElementById('i-company').value || '---';
+            document.getElementById('v-i-taxid').innerText = document.getElementById('i-taxid').value || '---';
+            document.getElementById('v-i-branch').innerText = document.getElementById('i-branch').value || '---';
+            document.getElementById('v-i-client-phone').innerText = document.getElementById('i-client-phone').value || '---';
+            document.getElementById('v-i-address').innerText = document.getElementById('i-address').value || '---';
+            document.getElementById('v-i-tel').innerText = document.getElementById('i-tel').value || '---';
+
+            let tbody = document.getElementById('v-i-items'), html = '', rentTotal = 0, feeTotal = 0, depositTotal = 0;
+            keys.forEach(idx => {
+                let item = selectedInvoiceItems[idx];
+                let p = item.term === '3' ? item.price3 : item.term === '6' ? item.price6 : item.term === '12_80' ? item.price12_80 : (item.term === '12' ? item.price12_85 : item.price1);
+                let months = item.term === '3' ? 3 : item.term === '6' ? 6 : (item.term.startsWith('12') ? 12 : 1);
+                let sub = p * months, dep = item.price1 * (months <= 2 ? 2 : 1);
+                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; font-weight:bold;">${item.code}</td><td style="border:1px solid #cbd5e1; padding:10px;">${item.unit}材</td><td style="border:1px solid #cbd5e1; padding:10px;">${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px;">${p.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px;">${months}</td><td style="border:1px solid #cbd5e1; padding:10px;">${sub.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px;">${dep.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px;">${item.startDate}</td><td style="border:1px solid #cbd5e1; padding:10px; font-weight:bold; color:#b45309;">${(sub+dep).toLocaleString()}</td></tr>`;
+                rentTotal += sub; depositTotal += dep; feeTotal += (p >= 3000 ? 150 : 80) * months;
+            });
+            tbody.innerHTML = html;
+            document.getElementById('v-i-subtotal').innerText = 'NT$ ' + rentTotal.toLocaleString();
+            document.getElementById('v-i-deposit').innerText = 'NT$ ' + depositTotal.toLocaleString();
+            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + feeTotal.toLocaleString();
+            document.getElementById('v-i-total').innerText = (rentTotal + depositTotal + feeTotal).toLocaleString();
+            alert('請款單已成功生成！');
+        }
+
+        initInvoiceTab();
+    </script>
+</body>
+</html>
