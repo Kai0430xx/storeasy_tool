@@ -117,16 +117,18 @@
                     </div>
                     <div class="form-group">
                         <label>🔍 快速搜尋：</label>
-                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: 0.9 或 75">
+                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: QD335 或 75">
                     </div>
                 </div>
 
+                <!-- 💡 選擇倉位表格：這裡保留了「倉位編號」供勾選識別 -->
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
                                 <th style="width: 40px;">選取</th>
                                 <th>據點名稱</th>
+                                <th>倉位編號</th>
                                 <th>尺寸 (寬*深*高 m)</th>
                                 <th>材積 (材)</th>
                                 <th>月繳/原價</th>
@@ -137,7 +139,7 @@
                             </tr>
                         </thead>
                         <tbody id="quote-selectable-body">
-                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
+                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -152,7 +154,7 @@
                 <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 生成報價單</button>
             </div>
 
-            <!-- 報價單預覽區 (無倉位編號) -->
+            <!-- 報價單預覽區 (💡 絕對沒有倉位編號) -->
             <div id="quote-preview" class="preview-box">
                 <div class="preview-header">
                     <div>
@@ -244,9 +246,9 @@
             
             let list = storageData;
             if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
-            if (searchKw) list = list.filter(item => item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
+            if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
 
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
 
             tbody.innerHTML = list.map(item => {
                 let idx = storageData.indexOf(item);
@@ -255,6 +257,7 @@
                     <tr>
                         <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
                         <td style="color: #b45309; font-weight: 500;">${item.branch}</td>
+                        <td style="font-weight: bold;">${item.code}</td>
                         <td>${item.size}</td>
                         <td style="color: #64748b;">${item.unit}</td>
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
@@ -288,7 +291,7 @@
                 let currentNote = item.extraNote || '';
                 return `
                     <div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.size}</b> (${item.unit}材) - 月繳原價: NT$ ${item.price1.toLocaleString()}</div>
+                        <div style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> - ${item.size} (${item.unit}材) - 月繳原價: NT$ ${item.price1.toLocaleString()}</div>
                         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
                             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                                 <select onchange="selectedQuoteItems[${idx}].term = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
@@ -331,7 +334,7 @@
                 let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
 
-                // 💡 報價單表格內：絕對沒有倉位編號 (item.code)
+                // 💡 生成的報價單預覽：只有單位與尺寸，沒有編號
                 html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${item.unit}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
                 rent += p * months; fee += (p >= 3000 ? 150 : 80) * months; deposit += (months <= 2 ? item.price1 * 2 : item.price1);
             });
