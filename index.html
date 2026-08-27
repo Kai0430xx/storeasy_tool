@@ -296,7 +296,7 @@
             <!-- 3. 生成請款單頁籤 -->
             <div id="panel-invoice" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 會計版請款單設定與雜費填寫</h3>
+                    <h3>⚙️ 會計版請款單設定與多倉位獨立雜費設定</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="i-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
@@ -307,17 +307,6 @@
                         <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
                         <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
                         <div class="form-group"><label>統一編號</label><input type="text" id="i-taxid" placeholder="統編"></div>
-                    </div>
-
-                    <!-- 額外雜費輸入區 -->
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">💵 額外雜費金額設定 (選填)：</h5>
-                        <div class="form-grid" style="margin-bottom: 0;">
-                            <div class="form-group"><label>滯納金 (NT$)</label><input type="number" id="extra-late-fee" value="0" min="0"></div>
-                            <div class="form-group"><label>包材費 (NT$)</label><input type="number" id="extra-packing-fee" value="0" min="0"></div>
-                            <div class="form-group"><label>搬運費 (NT$)</label><input type="number" id="extra-moving-fee" value="0" min="0"></div>
-                            <div class="form-group"><label>其它費用 (NT$)</label><input type="number" id="extra-other-fee" value="0" min="0"></div>
-                        </div>
                     </div>
 
                     <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
@@ -350,10 +339,11 @@
                         </table>
                     </div>
 
+                    <!-- 各倉位獨立雜費設定區 -->
                     <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的請款項目 (可選方案與保證金)：</h5>
-                        <div id="invoice-selected-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
-                            <span style="color: #94a3b8;">尚未勾選任何請款項目</span>
+                        <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">💵 已選取倉位之各別雜費設定 (可針對各個倉位獨立填寫)：</h5>
+                        <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
+                            <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>
                         </div>
                     </div>
 
@@ -384,42 +374,41 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
                     </div>
 
-                    <!-- 會計版明細表格 (對齊官方範本格式) -->
-                    <div style="margin-bottom: 16px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅)&amp;保證金明細 / 月</div>
+                    <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅) &amp; 保證金明細 / 月</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位編號</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px;">材積</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">原價租金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">優惠租金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">承租月份</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">未稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">稅金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">含稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">保證金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位編號</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸(寬*深*高 m)</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">材積</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">原價租金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">優惠租金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">承租月份</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">未稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">稅金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">含稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">保證金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">小計</th>
                             </tr>
                         </thead>
                         <tbody id="v-i-items" style="text-align: center;">
-                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">請先於請款單頁面勾選項目與繳費方式</td></tr>
+                            <tr><td colspan="11" style="text-align: center; color: #94a3b8; padding: 24px;">請先於請款單頁面勾選項目與繳費方式</td></tr>
                         </tbody>
                     </table>
 
-                    <!-- 雜費明細表格 (對齊官方範本格式) -->
-                    <div style="margin-top: 24px; margin-bottom: 16px; font-size: 0.85rem; font-weight: bold; color: #334155;">雜費明細</div>
+                    <div style="margin-top: 24px; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">雜費明細 (各倉位獨立)</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位編號</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">滯納金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">保險文書處理費</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">包材</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">搬運</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">其它</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">未稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">稅金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">含稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位編號</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">滯納金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">保險文書處理費</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">包材</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">搬運</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">其它</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">未稅小計</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">稅金</th>
+                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">含稅小計</th>
                             </tr>
                         </thead>
                         <tbody id="v-i-fees" style="text-align: center;">
@@ -432,7 +421,7 @@
                         <div style="display: flex; justify-content: space-between;"><span>租金合計：</span> <span id="v-i-subtotal" style="font-weight: bold;">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保證金合計：</span> <span id="v-i-deposit">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保險文書處理費合計：</span> <span id="v-i-fee-total">NT$ 0</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>雜費合計 (滯納金/包材/搬運/其它)：</span> <span id="v-i-extra-total">NT$ 0</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>其他雜費合計 (滯納金/包材/搬運/其它)：</span> <span id="v-i-extra-total">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 8px; color: #b45309;"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
                     </div>
 
@@ -973,10 +962,19 @@
         function toggleInvoiceItem(globalIndex) {
             const chk = document.querySelector(`input.i-item-chk[data-index="${globalIndex}"]`);
             if (chk && chk.checked) {
-                selectedInvoiceItems[globalIndex] = { ...storageData[globalIndex], term: '12', depositOption: 'yes' };
+                selectedInvoiceItems[globalIndex] = { 
+                    ...storageData[globalIndex], 
+                    term: '12', 
+                    depositOption: 'yes',
+                    lateFee: 0,
+                    packingFee: 0,
+                    movingFee: 0,
+                    otherFee: 0
+                };
             } else {
                 delete selectedInvoiceItems[globalIndex];
             }
+            renderPerItemFeesInputs();
             renderSelectedInvoiceSummary();
         }
 
@@ -992,10 +990,56 @@
             }
         }
 
+        function updatePerItemFee(globalIndex, feeType, val) {
+            if (selectedInvoiceItems[globalIndex]) {
+                selectedInvoiceItems[globalIndex][feeType] = Number(val) || 0;
+            }
+        }
+
         function removeInvoiceItem(globalIndex) {
             delete selectedInvoiceItems[globalIndex];
             renderInvoiceSelectableItems();
+            renderPerItemFeesInputs();
             renderSelectedInvoiceSummary();
+        }
+
+        function renderPerItemFeesInputs() {
+            const container = document.getElementById('per-item-fees-container');
+            if (!container) return;
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) {
+                container.innerHTML = `<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>`;
+                return;
+            }
+
+            let html = '';
+            keys.forEach(idx => {
+                let item = selectedInvoiceItems[idx];
+                html += `
+                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：${item.code} ([${item.branch}] ${item.size})</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+                            <div>
+                                <label style="font-size: 0.75rem; color: #64748b;">滯納金 (NT$)</label>
+                                <input type="number" value="${item.lateFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'lateFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; color: #64748b;">包材費 (NT$)</label>
+                                <input type="number" value="${item.packingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'packingFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; color: #64748b;">搬運費 (NT$)</label>
+                                <input type="number" value="${item.movingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'movingFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; color: #64748b;">其它費 (NT$)</label>
+                                <input type="number" value="${item.otherFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'otherFee', this.value)" style="padding: 4px 8px; font-size: 0.85rem;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
         function renderSelectedInvoiceSummary() {
@@ -1073,12 +1117,7 @@
             let totalRentInc = 0;
             let totalFeeInc = 0;
             let totalDeposit = 0;
-
-            let lateFee = Number(document.getElementById('extra-late-fee').value) || 0;
-            let packingFee = Number(document.getElementById('extra-packing-fee').value) || 0;
-            let movingFee = Number(document.getElementById('extra-moving-fee').value) || 0;
-            let otherFee = Number(document.getElementById('extra-other-fee').value) || 0;
-            let extraFeesTotal = lateFee + packingFee + movingFee + otherFee;
+            let grandExtraTotal = 0;
 
             keys.forEach((idx) => {
                 let item = selectedInvoiceItems[idx];
@@ -1089,14 +1128,15 @@
                 let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
                 let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
 
-                let incSubtotal = monthlyRate * termMonths;
-                let exSubtotal = Math.round(incSubtotal / 1.05);
-                let tax = incSubtotal - exSubtotal;
+                let rentSubtotal = monthlyRate * termMonths;
+                let feePerMonth = monthlyRate >= 3000 ? 150 : 80;
+                let insuranceFee = feePerMonth * termMonths;
                 
                 let deposit = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                let lineTotal = incSubtotal + deposit;
+                let lineTotal = rentSubtotal + insuranceFee + deposit;
 
-                totalRentInc += incSubtotal;
+                totalRentInc += rentSubtotal;
+                totalFeeInc += insuranceFee;
                 totalDeposit += deposit;
 
                 itemsHtml += `
@@ -1107,47 +1147,39 @@
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${p1.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${monthlyRate.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${termMonths}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${exSubtotal.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${tax.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${incSubtotal.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${Math.round(rentSubtotal/1.05).toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${(rentSubtotal - Math.round(rentSubtotal/1.05)).toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${rentSubtotal.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${deposit.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">${lineTotal.toLocaleString()}</td>
                     </tr>
                 `;
-            });
 
-            // 處理保險文書處理費 (對應租金總計的比例或依項目加總)
-            keys.forEach((idx) => {
-                let item = selectedInvoiceItems[idx];
-                let term = item.term || '12';
-                if (term === 'none') return;
-                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
-                let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
-                let feePerMonth = monthlyRate >= 3000 ? 150 : 80;
-                let feeSubtotal = feePerMonth * termMonths;
-                totalFeeInc += feeSubtotal;
+                // 各倉位獨立雜費
+                let lFee = item.lateFee || 0;
+                let pFee = item.packingFee || 0;
+                let mFee = item.movingFee || 0;
+                let oFee = item.otherFee || 0;
+                let itemExtraSum = lFee + insuranceFee + pFee + mFee + oFee;
+                grandExtraTotal += (lFee + pFee + mFee + oFee);
 
-                let feeEx = Math.round(feeSubtotal / 1.05);
-                let feeTax = feeSubtotal - feeEx;
+                let exFee = Math.round(itemExtraSum / 1.05);
+                let taxFee = itemExtraSum - exFee;
 
                 feesHtml += `
                     <tr>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">${item.code}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${lateFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${feeSubtotal.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${packingFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${movingFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${otherFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${(feeEx + Math.round(extraFeesTotal/1.05)).toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${(feeTax + (extraFeesTotal - Math.round(extraFeesTotal/1.05))).toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold;">${(feeSubtotal + extraFeesTotal).toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${lFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${insuranceFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${pFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${mFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${oFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${exFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">${taxFee.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold;">${itemExtraSum.toLocaleString()}</td>
                     </tr>
                 `;
             });
-
-            if (!feesHtml) {
-                feesHtml = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 16px;">無額外雜費</td></tr>`;
-            }
 
             tbodyItems.innerHTML = itemsHtml;
             tbodyFees.innerHTML = feesHtml;
@@ -1155,15 +1187,15 @@
             document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentInc.toLocaleString();
             document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeInc.toLocaleString();
             document.getElementById('v-i-deposit').innerText = 'NT$ ' + totalDeposit.toLocaleString();
-            document.getElementById('v-i-extra-total').innerText = 'NT$ ' + extraFeesTotal.toLocaleString();
+            document.getElementById('v-i-extra-total').innerText = 'NT$ ' + grandExtraTotal.toLocaleString();
             
-            let grandTotal = totalRentInc + totalFeeInc + totalDeposit + extraFeesTotal;
+            let grandTotal = totalRentInc + totalFeeInc + totalDeposit + grandExtraTotal;
             document.getElementById('v-i-total').innerText = grandTotal.toLocaleString();
 
             alert('會計版請款單已成功套用！');
         }
 
-        // 🏆 匯出 Excel 完整功能：完美對齊預覽、列印與會計版格式
+        // 匯出報價單與請款單 Excel
         function exportQuoteExcel() {
             const previewEl = document.getElementById('quote-preview');
             if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
