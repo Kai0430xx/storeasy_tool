@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -392,7 +392,8 @@
                         </tbody>
                     </table>
 
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 24px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; text-align: right; font-size: 0.9rem;">
+                    <div class="summary-box">
+                        <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表</div>
                         <div style="display: flex; justify-content: space-between;"><span>租金合計：</span> <span id="v-i-subtotal" style="font-weight: bold;">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保險文書處理費合計：</span> <span id="v-i-fee-total">NT$ 0</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>保證金合計：</span> <span id="v-i-deposit">NT$ 0</span></div>
@@ -1092,7 +1093,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 完美 HTML 匯出，確保列印與預覽 100% 正常
+        // 🏆 終極精準 HTML 匯出：保證 Excel 內建預覽、列印、標題平行對齊、B 欄舒適、區塊嚴格間隔
         function exportQuoteExcel() {
             const previewEl = document.getElementById('quote-preview');
             if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
@@ -1106,13 +1107,18 @@
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="utf-8"><style>
                     body { font-family: sans-serif; background-color: #ffffff; padding: 30px; color: #1e293b; }
-                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 24px; }
-                    .preview-info { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 24px; font-size: 10pt; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 24px; margin-bottom: 24px; font-size: 10pt; }
-                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.5; margin-top: 20px; }
-                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 15px; margin-bottom: 15px; }
-                    th, td { border: 1px solid #000000 !important; padding: 10px; vertical-align: middle; }
+                    /* 標題平行對齊 */
+                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 30px; }
+                    /* 左右分欄資訊與適當欄寬 */
+                    .preview-info { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 30px !important; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 30px; font-size: 10pt; }
+                    /* 區塊中間嚴格間隔 */
+                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 30px; margin-bottom: 30px; font-size: 10pt; }
+                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.6; margin-top: 30px; margin-bottom: 20px; }
+                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 20px; margin-bottom: 20px; }
+                    th, td { border: 1px solid #000000 !important; padding: 12px; vertical-align: middle; }
                     th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                    /* 尺寸與材積數值置中 */
+                    td:nth-child(1), td:nth-child(2) { text-align: center !important; }
                 </style></head>
                 <body>${clone.innerHTML}</body>
                 </html>
@@ -1134,7 +1140,7 @@
             const clone = previewEl.cloneNode(true);
             clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
-            // 確保收多易股份有限公司左上角正確
+            // 確保左上角標題為「收多易迷你倉庫」
             const h1 = clone.querySelector('h1');
             if (h1) h1.innerText = "收多易迷你倉庫";
 
@@ -1142,13 +1148,14 @@
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="utf-8"><style>
                     body { font-family: sans-serif; background-color: #ffffff; padding: 30px; color: #1e293b; }
-                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 24px; }
-                    .preview-info { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 24px; font-size: 10pt; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 24px; margin-bottom: 24px; font-size: 10pt; }
-                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.5; margin-top: 20px; }
-                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 15px; margin-bottom: 15px; }
-                    th, td { border: 1px solid #000000 !important; padding: 10px; vertical-align: middle; }
+                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 30px; }
+                    .preview-info { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 30px !important; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 30px; font-size: 10pt; }
+                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 30px; margin-bottom: 30px; font-size: 10pt; }
+                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.6; margin-top: 30px; margin-bottom: 20px; }
+                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 20px; margin-bottom: 20px; }
+                    th, td { border: 1px solid #000000 !important; padding: 12px; vertical-align: middle; }
                     th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
+                    td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(5) { text-align: center !important; }
                 </style></head>
                 <body>${clone.innerHTML}</body>
                 </html>
