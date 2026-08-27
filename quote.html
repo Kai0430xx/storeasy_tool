@@ -321,6 +321,7 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
+            // 💡 步驟 1：檢查是否有選擇與分店預設不同的年繳折數
             let mismatchDetected = false;
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
@@ -334,9 +335,20 @@
                 }
             });
 
+            let finalTableDiscount = null; // 記錄報價單內表格要用幾折呈現
+
             if (mismatchDetected) {
-                let confirmed = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n按【確定】代表您同意以此筆單據後面選擇的折扣進行計算（不會修改後台倉位資料），按【取消】可返回修改。`);
-                if (!confirmed) return;
+                // 詢問 1：是否照後面選擇的折數去試算？
+                let confirmCalc = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折數去試算費用？\n(按【確定】繼續，按【取消】返回修改)`);
+                if (!confirmCalc) return;
+
+                // 詢問 2：報價單內的價格表中年繳的部分要以幾折的金額呈現？
+                let tableChoice = prompt(`請輸入報價單內價格表「年繳」要以幾折呈現？\n請輸入【85】(85折) 或【80】(8折)：`, "85");
+                if (tableChoice === '80' || tableChoice === '8折') {
+                    finalTableDiscount = '0.80';
+                } else {
+                    finalTableDiscount = '0.85';
+                }
             }
 
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
@@ -355,12 +367,17 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                // 💡 報價單表格顯示：展示該倉位原生的固定方案價格（不因上方選單切換而變動）
-                let tableAnnualPrice = Math.round((item.price1 * 0.85) / 10) * 10;
-                let bDisc = branchDiscounts[item.branch];
-                if (bDisc === '0.80') tableAnnualPrice = Math.round((item.price1 * 0.8) / 10) * 10;
+                // 💡 報價單表格內價格呈現：若有透過步驟2指定，則依指定折數；否則依分店預設
+                let tableDiscountRate = 0.85;
+                if (finalTableDiscount) {
+                    tableDiscountRate = Number(finalTableDiscount);
+                } else {
+                    let bDisc = branchDiscounts[item.branch];
+                    if (bDisc === '0.80') tableDiscountRate = 0.8;
+                }
+                let tableAnnualPrice = Math.round((item.price1 * tableDiscountRate) / 10) * 10;
 
-                // 💡 費用試算計算金額：根據上方選取的方案決定
+                // 💡 費用試算金額：完全依據上方選單各自選擇的方案計算
                 let calcPrice = item.price1;
                 if (term === '3') calcPrice = item.price3;
                 else if (term === '6') calcPrice = item.price6;
