@@ -240,16 +240,33 @@
             }
         });
 
-        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
+        function getStorageData() {
+            try {
+                return JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function getBranchDiscounts() {
+            try {
+                return JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
+            } catch(e) {
+                return {};
+            }
+        }
+
         let selectedQuoteItems = {};
 
         function initQuoteTab() {
             const branchSelect = document.getElementById('quote-branch-select');
             if (!branchSelect) return;
+            let storageData = getStorageData();
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
-            branches.forEach(b => html += '<option value="' + b + '">' + b + '</option>');
+            branches.forEach(function(b) {
+                html += '<option value="' + b + '">' + b + '</option>';
+            });
             branchSelect.innerHTML = html;
             renderQuoteSelectableItems();
         }
@@ -260,19 +277,28 @@
             const tbody = document.getElementById('quote-selectable-body');
             if (!tbody) return;
 
+            let storageData = getStorageData();
             const selectedBranch = branchSelect ? branchSelect.value : '';
             const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
             
             let list = storageData;
-            if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
-            if (searchKw) list = list.filter(item => (item.code && item.code.toLowerCase().includes(searchKw)) || (item.size && item.size.toLowerCase().includes(searchKw)) || (item.unit && String(item.unit).toLowerCase().includes(searchKw)));
+            if (selectedBranch) {
+                list = list.filter(function(item) { return item.branch === selectedBranch; });
+            }
+            if (searchKw) {
+                list = list.filter(function(item) {
+                    return (item.code && item.code.toLowerCase().includes(searchKw)) || 
+                           (item.size && item.size.toLowerCase().includes(searchKw)) || 
+                           (item.unit && String(item.unit).toLowerCase().includes(searchKw));
+                });
+            }
 
             if (list.length === 0) { 
                 tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>'; 
                 return; 
             }
 
-            tbody.innerHTML = list.map(item => {
+            tbody.innerHTML = list.map(function(item) {
                 let idx = storageData.indexOf(item);
                 let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
                 let p12_85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
@@ -294,6 +320,8 @@
 
         function toggleQuoteItem(idx) {
             const chk = document.querySelector('input.q-item-chk[data-index="' + idx + '"]');
+            let storageData = getStorageData();
+            let branchDiscounts = getBranchDiscounts();
             if (chk && chk.checked) {
                 let item = storageData[idx];
                 if (!item) return;
@@ -313,7 +341,7 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>'; return; }
             
-            summaryEl.innerHTML = keys.map(idx => {
+            summaryEl.innerHTML = keys.map(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let currentTerm = item.term || '12_85';
                 let currentNote = item.extraNote || '';
@@ -341,6 +369,8 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
+            let branchDiscounts = getBranchDiscounts();
+
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
             document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
@@ -352,7 +382,7 @@
             document.getElementById('v-q-tel').innerText = document.getElementById('q-tel').value || '---';
 
             let tbody = document.getElementById('v-q-items'), html = '', rent = 0, fee = 0, deposit = 0;
-            keys.forEach(idx => {
+            keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let term = item.term || '12_85';
                 if (term === 'none') return;
@@ -400,6 +430,7 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
             
+            let branchDiscounts = getBranchDiscounts();
             let clientName = document.getElementById('q-client-name').value || '客戶';
             let branchName = document.getElementById('q-branch').value || '分店';
             let dateStr = document.getElementById('quote-date').value;
@@ -413,7 +444,7 @@
                 ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "季繳/月 (NT$)", "半年繳/月 (NT$)", "年繳/月 (NT$)"]
             ];
 
-            keys.forEach(idx => {
+            keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
                 if (item.term === 'none') return;
                 let bDisc = branchDiscounts[item.branch];
