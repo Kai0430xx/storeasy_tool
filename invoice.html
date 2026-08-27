@@ -143,7 +143,7 @@
                     </table>
                 </div>
 
-                <!-- ⚙️ 各倉位獨立設定區 (方案折扣、保證金、日曆租期、含稅雜費) -->
+                <!-- 各倉位獨立設定區 -->
                 <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                     <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取倉位之方案折扣、保證金、日曆租期與含稅雜費設定：</h5>
                     <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
@@ -414,6 +414,8 @@
                 totalFeeInc += insuranceFee;
                 totalDeposit += deposit;
 
+                let unTax = Math.round(rentSubtotal / 1.05);
+                let tax = rentSubtotal - unTax;
                 let dateRangeStr = (item.startDate && item.endDate) ? `${item.startDate.replace(/-/g,'/')} － ${item.endDate.replace(/-/g,'/')}` : '未填租期';
 
                 itemsHtml += `
@@ -423,6 +425,8 @@
                         <td style="border: 1px solid #cbd5e1; padding: 10px;">${item.price1.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px;">${monthlyRate.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px;">${termMonths}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px;">${unTax.toLocaleString()}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 10px;">${tax.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px;">${rentSubtotal.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px;">${deposit.toLocaleString()}</td>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; font-size: 0.75rem;">${dateRangeStr}</td>
@@ -456,6 +460,7 @@
             document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentInc.toLocaleString();
             document.getElementById('v-i-deposit').innerText = 'NT$ ' + totalDeposit.toLocaleString();
             document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeInc.toLocaleString();
+            document.getElementById('v-i-extra-total').innerText = 'NT$ ' + grandExtraTotal.toLocaleString();
             let grandTotal = totalRentInc + totalFeeInc + totalDeposit + grandExtraTotal;
             document.getElementById('v-i-total').innerText = grandTotal.toLocaleString();
 
