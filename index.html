@@ -92,17 +92,17 @@
         <div class="content-body">
             <div class="card">
                 <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                <p>系統會自動辨識編號,尺寸,材積,原價與各方案金額，並可指定該店年繳折扣方案</p>
+                <p>系統會自動辨識編號,尺寸,材積,原價與各方案金額，並可指定該店預設年繳折扣方案</p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>分店名稱</label>
                         <input type="text" id="upload-branch-name" list="branch-list" value="土城店">
                     </div>
                     <div class="form-group">
-                        <label>該店年繳優惠方案</label>
+                        <label>該店預設年繳方案</label>
                         <select id="branch-annual-discount" style="background: #fef3c7; font-weight: bold; color: #92400e;">
-                            <option value="0.85">年繳 85 折</option>
-                            <option value="0.80">年繳 8 折</option>
+                            <option value="0.85">年繳 (85折)</option>
+                            <option value="0.80">年繳 (8折)</option>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
@@ -137,11 +137,12 @@
                                 <th style="text-align: left;">月繳/原價</th>
                                 <th style="text-align: left;">季繳</th>
                                 <th style="text-align: left;">半年繳</th>
-                                <th id="th-annual-label" style="text-align: left;">年繳</th>
+                                <th id="th-annual-85" style="text-align: left;">年繳 (85折)</th>
+                                <th id="th-annual-80" style="text-align: left;">年繳 (8折)</th>
                             </tr>
                         </thead>
                         <tbody id="storage-table-body">
-                            <tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -193,14 +194,13 @@
                             }
                         }
                         if (code && !isNaN(price1) && price1 > 200) {
-                            let p12 = Math.round((price1 * Number(discountVal)) / 10) * 10;
                             newItems.push({
                                 branch: branch, code: code, size: size !== '-' ? size + ' m' : '標準尺寸',
                                 unit: unit !== '-' ? unit : '50', price1: price1,
                                 price3: Math.round((price1 * 0.95) / 10) * 10,
                                 price6: Math.round((price1 * 0.90) / 10) * 10,
-                                price12: p12,
-                                discountType: discountVal
+                                price12_85: Math.round((price1 * 0.85) / 10) * 10,
+                                price12_80: Math.round((price1 * 0.8) / 10) * 10
                             });
                         }
                     }
@@ -233,24 +233,31 @@
         function renderStorageTable() {
             updateBranchFilter();
             let filter = document.getElementById('storage-branch-filter').value;
-            let thLabel = document.getElementById('th-annual-label');
+            let th85 = document.getElementById('th-annual-85');
+            let th80 = document.getElementById('th-annual-80');
             
-            // 💡 動態控制表頭：如果單選某個分店，顯示對應折扣；如果是全部據點，只顯示「年繳」
+            // 💡 動態判斷標題：若單選某分店，對應其預設設定加上紅字 (已設定)
+            let activeBranchDisc = null;
             if (filter && filter !== 'all') {
-                let dVal = branchDiscounts[filter];
-                if (!dVal) {
-                    let found = storageData.find(i => i.branch === filter);
-                    dVal = found ? found.discountType : '0.85';
-                }
-                thLabel.innerText = dVal === '0.80' ? '年繳 (8折)' : '年繳 (85折)';
+                activeBranchDisc = branchDiscounts[filter] || '0.85';
+            }
+
+            if (activeBranchDisc === '0.80') {
+                th85.innerHTML = '年繳 (85折)';
+                th80.innerHTML = '年繳 (8折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
+            } else if (activeBranchDisc === '0.85') {
+                th85.innerHTML = '年繳 (85折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
+                th80.innerHTML = '年繳 (8折)';
             } else {
-                thLabel.innerText = '年繳';
+                // 顯示全部據點時不加紅字標籤
+                th85.innerHTML = '年繳 (85折)';
+                th80.innerHTML = '年繳 (8折)';
             }
 
             let list = filter === 'all' ? storageData : storageData.filter(i => i.branch === filter);
             let tbody = document.getElementById('storage-table-body');
             if (!tbody) return;
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
             
             tbody.innerHTML = list.map(item => {
                 return `
@@ -262,7 +269,8 @@
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
                         <td>NT$ ${item.price3.toLocaleString()}</td>
                         <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
