@@ -228,7 +228,7 @@
                 const now = new Date();
                 const verEl = document.getElementById('system-version');
                 if (verEl) {
-                    verEl.innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+                    verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
                 }
                 const dateEl = document.getElementById('quote-date');
                 if (dateEl) {
@@ -264,7 +264,7 @@
             let storageData = getStorageData();
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
-            branches.forEach(b => html += `<option value="${b}">${b}</option>`);
+            branches.forEach(b => html += '<option value="' + b + '">' + b + '</option>');
             branchSelect.innerHTML = html;
             renderQuoteSelectableItems();
         }
@@ -284,7 +284,7 @@
             if (searchKw) list = list.filter(item => (item.code && item.code.toLowerCase().includes(searchKw)) || (item.size && item.size.toLowerCase().includes(searchKw)) || (item.unit && String(item.unit).toLowerCase().includes(searchKw)));
 
             if (list.length === 0) { 
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>`; 
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>'; 
                 return; 
             }
 
@@ -293,25 +293,23 @@
                 let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
                 let p12_85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
                 let p12_80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
-                return `
-                    <tr>
-                        <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
-                        <td style="color: #b45309; font-weight: 500;">${item.branch}</td>
-                        <td style="font-weight: bold;">${item.code}</td>
-                        <td>${item.size}</td>
-                        <td style="color: #64748b;">${item.unit}</td>
-                        <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
-                        <td>NT$ ${item.price3.toLocaleString()}</td>
-                        <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${p12_85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600;">NT$ ${p12_80.toLocaleString()}</td>
-                    </tr>
-                `;
+                return '<tr>' +
+                    '<td><input type="checkbox" class="q-item-chk" ' + isChecked + ' onchange="toggleQuoteItem(' + idx + ')" data-index="' + idx + '" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>' +
+                    '<td style="color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
+                    '<td style="font-weight: bold;">' + item.code + '</td>' +
+                    '<td>' + item.size + '</td>' +
+                    '<td style="color: #64748b;">' + item.unit + '</td>' +
+                    '<td style="font-weight: 600; color: #d97706;">NT$ ' + item.price1.toLocaleString() + '</td>' +
+                    '<td>NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td>NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td style="color: #059669; font-weight: 600;">NT$ ' + p12_85.toLocaleString() + '</td>' +
+                    '<td style="color: #047857; font-weight: 600;">NT$ ' + p12_80.toLocaleString() + '</td>' +
+                '</tr>';
             }).join('');
         }
 
         function toggleQuoteItem(idx) {
-            const chk = document.querySelector(`input.q-item-chk[data-index="${idx}"]`);
+            const chk = document.querySelector('input.q-item-chk[data-index="' + idx + '"]');
             let storageData = getStorageData();
             let branchDiscounts = getBranchDiscounts();
             if (chk && chk.checked) {
@@ -320,7 +318,7 @@
                 let defaultTerm = '12_85';
                 let bDisc = branchDiscounts[item.branch];
                 if (bDisc === '0.80') defaultTerm = '12_80';
-                selectedQuoteItems[idx] = { ...item, term: defaultTerm, extraNote: '' };
+                selectedQuoteItems[idx] = Object.assign({}, item, { term: defaultTerm, extraNote: '' });
             } else {
                 delete selectedQuoteItems[idx];
             }
@@ -337,25 +335,23 @@
                 let item = selectedQuoteItems[idx];
                 let currentTerm = item.term || '12_85';
                 let currentNote = item.extraNote || '';
-                return `
-                    <div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> - ${item.size} (${item.unit}材) - 月繳原價: NT$ ${item.price1.toLocaleString()}</div>
-                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                <select onchange="selectedQuoteItems[${idx}].term = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
-                                    <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
-                                    <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
-                                    <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
-                                    <option value="12_85" ${currentTerm==='12_85'?'selected':''}>年繳 (85折)</option>
-                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折)</option>
-                                    <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
-                                </select>
-                                <input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="${currentNote}" oninput="selectedQuoteItems[${idx}].extraNote = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">
-                            </div>
-                            <button type="button" onclick="delete selectedQuoteItems[${idx}]; renderQuoteSelectableItems(); renderSelectedQuoteSummary();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
-                        </div>
-                    </div>
-                `;
+                return '<div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #92400e;">[' + item.branch + '] <b>' + item.code + '</b> - ' + item.size + ' (' + item.unit + '材) - 月繳原價: NT$ ' + item.price1.toLocaleString() + '</div>' +
+                    '<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">' +
+                        '<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">' +
+                            '<select onchange="selectedQuoteItems[' + idx + '].term = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">' +
+                                '<option value="1" ' + (currentTerm==='1'?'selected':'') + '>月繳 (1個月)</option>' +
+                                '<option value="3" ' + (currentTerm==='3'?'selected':'') + '>季繳 (95折)</option>' +
+                                '<option value="6" ' + (currentTerm==='6'?'selected':'') + '>半年繳 (9折)</option>' +
+                                '<option value="12_85" ' + (currentTerm==='12_85'?'selected':'') + '>年繳 (85折)</option>' +
+                                '<option value="12_80" ' + (currentTerm==='12_80'?'selected':'') + '>年繳 (8折)</option>' +
+                                '<option value="none" ' + (currentTerm==='none'?'selected':'') + '>❌ 不列入試算</option>' +
+                            '</select>' +
+                            '<input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="' + currentNote + '" oninput="selectedQuoteItems[' + idx + '].extraNote = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">' +
+                        '</div>' +
+                        '<button type="button" onclick="delete selectedQuoteItems[' + idx + ']; renderQuoteSelectableItems(); renderSelectedQuoteSummary();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>' +
+                    '</div>' +
+                '</div>';
             }).join('');
         }
 
@@ -409,14 +405,21 @@
                 else if (term === '12_85') { calcPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
                 else if (term === '12_80') { calcPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
 
-                let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
+                let extraNote = item.extraNote ? ' <span style="color: #dc2626; font-size:0.75rem;">(' + item.extraNote + ')</span>' : '';
 
                 let unitText = item.unit;
                 if (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') {
                     unitText = '上層' + item.unit;
                 }
 
-                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${tableAnnualPrice.toLocaleString()}</td></tr>`;
+                html += '<tr>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">' + unitText + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price1.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ' + tableAnnualPrice.toLocaleString() + '</td>' +
+                '</tr>';
                 
                 rent += calcPrice * months; 
                 fee += (calcPrice >= 3000 ? 150 : 80) * months; 
@@ -455,7 +458,7 @@
                 let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
                 let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
                 let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
-                let sizeText = `[${item.branch}] ${item.size}`;
+                let sizeText = "[" + item.branch + "] " + item.size;
                 wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
             });
 
@@ -471,7 +474,7 @@
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
             XLSX.utils.book_append_sheet(wb, ws, "報價單試算");
-            XLSX.writeFile(wb, `報價單_${clientName}.xlsx`);
+            XLSX.writeFile(wb, "報價單_" + clientName + ".xlsx");
         }
     </script>
 </body>
