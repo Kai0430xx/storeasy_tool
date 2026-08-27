@@ -281,7 +281,7 @@
                         <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
                         <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
                         <div>4. 付款方式: 轉帳、即期支票。</div>
-                        <div>5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張; 公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</div>
+                        <div>5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</div>
                     </div>
 
                     <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
@@ -296,7 +296,7 @@
             <!-- 3. 生成請款單頁籤 -->
             <div id="panel-invoice" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 會計版請款單設定與多倉位獨立折扣、保證金及雜費設定</h3>
+                    <h3>⚙️ 會計版請款單設定與多倉位獨立方案、保證金及雜費設定</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="i-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
@@ -339,7 +339,7 @@
                         </table>
                     </div>
 
-                    <!-- 各倉位獨立設定區 (方案折扣、保證金、日曆租期、含稅雜費) -->
+                    <!-- 各倉位獨立設定區 (方案、保證金、日曆租期、含稅雜費) -->
                     <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                         <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取倉位之方案折扣、保證金、日曆租期與含稅雜費設定：</h5>
                         <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
@@ -978,14 +978,12 @@
                 delete selectedInvoiceItems[globalIndex];
             }
             renderPerItemFeesInputs();
-            renderSelectedInvoiceSummary();
         }
 
         function updateInvoiceItemTerm(globalIndex, termVal) {
             if (selectedInvoiceItems[globalIndex]) {
                 selectedInvoiceItems[globalIndex].term = termVal;
             }
-            renderPerItemFeesInputs();
         }
 
         function updateInvoiceItemDeposit(globalIndex, depVal) {
@@ -1010,7 +1008,6 @@
             delete selectedInvoiceItems[globalIndex];
             renderInvoiceSelectableItems();
             renderPerItemFeesInputs();
-            renderSelectedInvoiceSummary();
         }
 
         function renderPerItemFeesInputs() {
@@ -1075,28 +1072,6 @@
                 `;
             });
             container.innerHTML = html;
-        }
-
-        function renderSelectedInvoiceSummary() {
-            const summaryEl = document.getElementById('invoice-selected-summary');
-            if (!summaryEl) return;
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>';
-                return;
-            }
-
-            let html = '';
-            keys.forEach(idx => {
-                let item = selectedInvoiceItems[idx];
-                html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem;">
-                        <span style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> (${item.size})</span>
-                        <button type="button" onclick="removeInvoiceItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
-                    </div>
-                `;
-            });
-            summaryEl.innerHTML = html;
         }
 
         function generateInvoice() {
