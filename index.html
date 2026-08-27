@@ -137,7 +137,7 @@
                                 <th style="text-align: left;">月繳/原價</th>
                                 <th style="text-align: left;">季繳</th>
                                 <th style="text-align: left;">半年繳</th>
-                                <th style="text-align: left;">年繳優惠</th>
+                                <th id="th-annual-label" style="text-align: left;">年繳</th>
                             </tr>
                         </thead>
                         <tbody id="storage-table-body">
@@ -172,7 +172,6 @@
                     const branch = document.getElementById('upload-branch-name').value.trim() || '土城店';
                     const discountVal = document.getElementById('branch-annual-discount').value;
                     
-                    // 記錄該分店的年繳折扣設定
                     branchDiscounts[branch] = discountVal;
                     localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
 
@@ -234,12 +233,26 @@
         function renderStorageTable() {
             updateBranchFilter();
             let filter = document.getElementById('storage-branch-filter').value;
+            let thLabel = document.getElementById('th-annual-label');
+            
+            // 💡 動態控制表頭：如果單選某個分店，顯示對應折扣；如果是全部據點，只顯示「年繳」
+            if (filter && filter !== 'all') {
+                let dVal = branchDiscounts[filter];
+                if (!dVal) {
+                    let found = storageData.find(i => i.branch === filter);
+                    dVal = found ? found.discountType : '0.85';
+                }
+                thLabel.innerText = dVal === '0.80' ? '年繳 (8折)' : '年繳 (85折)';
+            } else {
+                thLabel.innerText = '年繳';
+            }
+
             let list = filter === 'all' ? storageData : storageData.filter(i => i.branch === filter);
             let tbody = document.getElementById('storage-table-body');
             if (!tbody) return;
             if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
+            
             tbody.innerHTML = list.map(item => {
-                let dLabel = (item.discountType === '0.80' || item.price12 === Math.round(item.price1 * 0.8)) ? '年繳(8折)' : '年繳(85折)';
                 return `
                     <tr>
                         <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
@@ -249,7 +262,7 @@
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
                         <td>NT$ ${item.price3.toLocaleString()}</td>
                         <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12.toLocaleString()} <span style="font-size:0.75rem; color:#64748b;">(${dLabel})</span></td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
@@ -260,13 +273,15 @@
             if (b === 'all') { alert('請先選擇特定分店！'); return; }
             if (confirm(`確定刪除 ${b} 的所有資料？`)) {
                 storageData = storageData.filter(i => i.branch !== b);
+                delete branchDiscounts[b];
                 localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
                 renderStorageTable();
             }
         }
 
         function clearStorageData() {
-            if (confirm('確定清空全部資料？')) { storageData = []; localStorage.removeItem('storeasy_storage_data'); localStorage.removeItem('storeasy_branch_discounts'); renderStorageTable(); }
+            if (confirm('確定清空全部資料？')) { storageData = []; branchDiscounts = {}; localStorage.removeItem('storeasy_storage_data'); localStorage.removeItem('storeasy_branch_discounts'); renderStorageTable(); }
         }
 
         renderStorageTable();
