@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <!-- SheetJS 用於解析與匯出 Excel 檔案 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -1079,7 +1079,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 🏆 使用 Excel 2003 XML 格式進行匯出：保證完美呈現格線、灰底表頭、左右分欄與區塊間隔！
+        // 🏆 精準控制：帶有格線、底色、區塊間隔、匯款帳號與金額緊湊的專業 Excel XML 輸出
         function exportQuoteExcel() {
             const previewEl = document.getElementById('quote-preview');
             if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
@@ -1087,8 +1087,19 @@
                 return;
             }
 
-            const clone = previewEl.cloneNode(true);
-            clone.querySelectorAll('.no-print').forEach(el => el.remove());
+            const qDate = document.getElementById('v-q-date').innerText;
+            const qClient = document.getElementById('v-q-client').innerText;
+            const qManager = document.getElementById('v-q-manager').innerText;
+            const qClientPhone = document.getElementById('v-q-client-phone').innerText;
+            const qBranch = document.getElementById('v-q-branch').innerText;
+            const qCompany = document.getElementById('v-q-company').innerText;
+            const qTel = document.getElementById('v-q-tel').innerText;
+            const qTaxid = document.getElementById('v-q-taxid').innerText;
+            const qAddress = document.getElementById('v-q-address').innerText;
+            const qRent = document.getElementById('v-q-rent').innerText;
+            const qDeposit = document.getElementById('v-q-deposit').innerText;
+            const qFee = document.getElementById('v-q-fee').innerText;
+            const qTotal = document.getElementById('v-q-total').innerText;
 
             let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
             <?mso-application progid="Excel.Sheet"?>
@@ -1161,9 +1172,9 @@
              </Styles>
              <Worksheet ss:Name="報價單">
               <Table>
-               <Column ss:Width="140"/><Column ss:Width="180"/><Column ss:Width="20"/><Column ss:Width="120"/><Column ss:Width="180"/><Column ss:Width="120"/>
+               <Column ss:Width="110"/><Column ss:Width="160"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/>
                
-               <!-- 頂部標題列：左側大字迷你倉庫，右側報價單平行 -->
+               <!-- 頂部標題列 -->
                <Row ss:Height="30">
                 <Cell ss:StyleID="TitleMain"><Data ss:Type="String">收多易迷你倉庫</Data></Cell>
                 <Cell/><Cell/><Cell/>
@@ -1175,16 +1186,16 @@
                </Row>
                <Row><Cell/></Row> <!-- 區塊間隔 -->
 
-               <!-- 據點與客戶資訊左右分欄 -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-branch').innerText}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-client').innerText}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">店長：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-manager').innerText}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-client-phone').innerText}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">聯繫電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-tel').innerText}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">公司抬頭：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-company').innerText}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-address').innerText}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-taxid').innerText}</Data></Cell><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-q-date').innerText}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <!-- 左右分欄資訊區 -->
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qBranch}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qClient}</Data></Cell><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">店長：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qManager}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qClientPhone}</Data></Cell><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">聯繫電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qTel}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">公司抬頭：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qCompany}</Data></Cell><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qAddress}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qTaxid}</Data></Cell><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qDate}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
                
                <Row><Cell/></Row> <!-- 區塊間隔 -->
 
-               <!-- 價格方案表格表頭 -->
+               <!-- 價格表表頭 -->
                <Row ss:Height="25">
                 <Cell ss:StyleID="Header"><Data ss:Type="String">單位(材)</Data></Cell>
                 <Cell ss:StyleID="Header"><Data ss:Type="String">倉位尺寸(寬*深*高 m)</Data></Cell>
@@ -1212,18 +1223,20 @@
 
                <Row><Cell/></Row> <!-- 區塊間隔 -->
 
-               <!-- 費用試算表 -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">費用試算表</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">租金總計 (NT$)：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${document.getElementById('v-q-rent').innerText}</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">保證金總計 (NT$)：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${document.getElementById('v-q-deposit').innerText}</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">保險文書處理費總計 (NT$)：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${document.getElementById('v-q-fee').innerText}</Data></Cell></Row>
-               <Row><Cell><Data ss:Type="String">合計 (NT$)：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold;">NT$ ${document.getElementById('v-q-total').innerText}</Data></Cell></Row>
+               <!-- 費用試算表（項目與金額緊鄰，不隔太遠） -->
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">費用試算表 (不含額外優惠)</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">租金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qRent}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">保證金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qDeposit}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">保險文書處理費總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qFee}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String" style="font-weight:bold;">合計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold; color:#B45309;">NT$ ${qTotal}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
 
                <Row><Cell/></Row> <!-- 區塊間隔 -->
 
-               <!-- 匯款資訊 -->
+               <!-- 匯款資訊（包含帳號） -->
                <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">匯款資訊：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">銀行：國泰世華 新莊分行 (代碼 013)</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
 
                <Row><Cell/></Row> <!-- 區塊間隔 -->
 
@@ -1234,6 +1247,9 @@
                <Row><Cell><Data ss:Type="String">3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
                <Row><Cell><Data ss:Type="String">4. 付款方式: 轉帳、即期支票。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
                <Row><Cell><Data ss:Type="String">5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+
+               <Row><Cell/></Row>
+               <Row><Cell ss:StyleID="CellCenter"><Data ss:Type="String">THANK YOU FOR YOUR BUSINESS!</Data></Cell></Row>
 
               </Table>
              </Worksheet>
@@ -1248,11 +1264,24 @@
         }
 
         function exportInvoiceExcel() {
-            const previewEl = document.getElementById('invoice-preview');
-            if (!previewEl || document.getElementById('v-i-items').innerText.includes('請先於')) {
-                alert('目前尚無生成的請款單內容可供匯出！');
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) {
+                alert('目前尚無請款單內容可匯出！');
                 return;
             }
+
+            const iDate = document.getElementById('v-i-date').innerText;
+            const iClient = document.getElementById('v-i-client').innerText;
+            const iManager = document.getElementById('v-i-manager').innerText;
+            const iClientPhone = document.getElementById('v-i-client-phone').innerText;
+            const iBranch = document.getElementById('v-i-branch').innerText;
+            const iCompany = document.getElementById('v-i-company').innerText;
+            const iTel = document.getElementById('v-i-tel').innerText;
+            const iTaxid = document.getElementById('v-i-taxid').innerText;
+            const iAddress = document.getElementById('v-i-address').innerText;
+            const iSubtotal = document.getElementById('v-i-subtotal').innerText;
+            const iDeposit = document.getElementById('v-i-deposit').innerText;
+            const iTotal = document.getElementById('v-i-total').innerText;
 
             let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
             <?mso-application progid="Excel.Sheet"?>
@@ -1278,15 +1307,6 @@
                </Borders>
                <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#0F172A"/>
                <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-              </Style>
-              <Style ss:ID="Cell">
-               <Alignment ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
               </Style>
               <Style ss:ID="CellCenter">
                <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
@@ -1337,11 +1357,11 @@
                </Row>
                <Row><Cell/></Row>
 
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-branch').innerText}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-client').innerText}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">店長：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-manager').innerText}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-client-phone').innerText}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">聯繫電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-tel').innerText}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">公司抬頭：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-company').innerText}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-address').innerText}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-taxid').innerText}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${document.getElementById('v-i-date').innerText}</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iBranch}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iClient}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">店長：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iManager}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iClientPhone}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">聯繫電話：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iTel}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">公司抬頭：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iCompany}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iAddress}</Data></Cell><Cell/><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iTaxid}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${iDate}</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
                
                <Row><Cell/></Row>
 
@@ -1387,13 +1407,14 @@
 
                <Row><Cell/></Row>
 
-               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">租金合計：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">${document.getElementById('v-i-subtotal').innerText}</Data></Cell></Row>
-               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">保證金合計：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">${document.getElementById('v-i-deposit').innerText}</Data></Cell></Row>
-               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">請款總金額：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold;">${document.getElementById('v-i-total').innerText}</Data></Cell></Row>
+               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">租金合計：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">${iSubtotal}</Data></Cell></Row>
+               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">保證金合計：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String">${iDeposit}</Data></Cell></Row>
+               <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">請款總金額：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold;">${iTotal}</Data></Cell></Row>
 
                <Row><Cell/></Row>
                <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">付款資料：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
                <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
 
               </Table>
              </Worksheet>
