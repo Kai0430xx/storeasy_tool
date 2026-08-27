@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收多易迷你倉庫 - 生成報價單</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
+        .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
+        .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        
+        nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .menu-group { display: flex; flex-direction: column; gap: 4px; }
+        .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
+        
+        nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
+        nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
+        nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+
+        .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
+
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-dark { background-color: #0f172a; color: #fff; }
+        .btn-amber { background-color: #f59e0b; color: #0f172a; }
+        .btn-emerald { background-color: #059669; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+
+        .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
+        .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
+        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
+        .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
+        .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
+        .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            aside, header.no-print, .card.no-print, .no-print { display: none !important; }
+            #quote-preview, #quote-preview * { visibility: visible; }
+            #quote-preview { position: absolute; left: 0; top: 0; width: 100% !important; margin: 0 !important; padding: 10px !important; box-shadow: none !important; border: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="no-print">
+        <div class="sidebar-header">
+            <h1>收多易迷你倉庫</h1>
+            <p>Storeasy Storage</p>
+        </div>
+        <nav>
+            <div class="menu-group">
+                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <div class="menu-items">
+                    <a href="index.html" class="sub-btn">📦 倉位資料</a>
+                    <a href="quote.html" class="sub-btn active">📄 生成報價單</a>
+                    <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
+                </div>
+            </div>
+            <div class="menu-group" style="margin-top: 8px;">
+                <button type="button" class="menu-category"><span>🗄️ 快存櫃 (eLocker)</span><span>▶</span></button>
+                <div class="menu-items">
+                    <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
+                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
+                    <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
+                </div>
+            </div>
+        </nav>
+        <div class="sidebar-footer">資料已永久儲存於本機瀏覽器</div>
+    </aside>
+
+    <main>
+        <header class="no-print">
+            <h2>📄 生成報價單</h2>
+            <div class="version" id="system-version">系統版本：載入中...</div>
+        </header>
+
+        <div class="content-body">
+            <div class="card no-print">
+                <div class="form-grid">
+                    <div class="form-group"><label>分店名稱</label><input type="text" id="q-branch" placeholder="請輸入分店"></div>
+                    <div class="form-group"><label>店長</label><input type="text" id="q-manager" placeholder="請輸入店長姓名"></div>
+                    <div class="form-group"><label>聯繫電話</label><input type="text" id="q-tel" placeholder="請輸入分店電話"></div>
+                    <div class="form-group"><label>報價日期</label><input type="date" id="quote-date"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="q-address" placeholder="請輸入分店地址"></div>
+                    <div class="form-group"><label>客戶名稱</label><input type="text" id="q-client-name" placeholder="輸入客戶姓名"></div>
+                    <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="q-client-tel" placeholder="輸入客電"></div>
+                    <div class="form-group"><label>公司抬頭</label><input type="text" id="q-company" placeholder="抬頭"></div>
+                    <div class="form-group"><label>統一編號</label><input type="text" id="q-taxid" placeholder="統編"></div>
+                </div>
+
+                <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label>選擇分店據點篩選：</label>
+                        <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
+                            <option value="">-- 全部據點 / 不限分店 --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>🔍 快速搜尋：</label>
+                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: QD335 或 75">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                                <th style="width: 40px;">選取</th>
+                                <th>據點名稱</th>
+                                <th>倉位編號</th>
+                                <th>尺寸 (寬*深*高 m)</th>
+                                <th>材積 (材)</th>
+                                <th>月繳/原價</th>
+                                <th>季繳</th>
+                                <th>半年繳</th>
+                                <th>年繳(85折)</th>
+                                <th>年繳(8折)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quote-selectable-body">
+                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目：</h5>
+                    <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
+                        <span style="color: #94a3b8;">尚未勾選任何項目</span>
+                    </div>
+                </div>
+
+                <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 生成報價單</button>
+            </div>
+
+            <!-- 報價單預覽區 -->
+            <div id="quote-preview" class="preview-box">
+                <div class="preview-header">
+                    <div>
+                        <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
+                        <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Solution</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">報 價 單</h2>
+                        <p style="font-size: 0.75rem; color: #dc2626; font-weight: 600; margin-top: 4px;">報價有效期限 7 天</p>
+                    </div>
+                </div>
+
+                <div class="preview-info">
+                    <div><strong>日  期：</strong> <span id="v-q-date">---</span></div>
+                    <div><strong>客 戶 名 稱：</strong> <span id="v-q-client">---</span></div>
+                    <div><strong>店  長：</strong> <span id="v-q-manager">---</span></div>
+                    <div><strong>客 戶 電 話：</strong> <span id="v-q-client-phone">---</span></div>
+                    <div><strong>分店名稱：</strong> <span id="v-q-branch">---</span></div>
+                    <div><strong>公 司 抬 頭：</strong> <span id="v-q-company">---</span></div>
+                    <div><strong>聯 繫 電 話：</strong> <span id="v-q-tel">---</span></div>
+                    <div><strong>統  編：</strong> <span id="v-q-taxid">---</span></div>
+                    <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr style="background-color: #f1f5f9; text-align: center;">
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">單位(材)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位尺寸</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">月繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">季繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">半年繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">年繳/月</th>
+                        </tr>
+                    </thead>
+                    <tbody id="v-q-items" style="text-align: center;">
+                        <tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">尚未產生內容</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="summary-box">
+                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表</div>
+                    <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 6px; color: #b45309;"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
+                </div>
+
+                <div class="notes-box">
+                    <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">匯款資訊：</div>
+                    <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
+                    <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="login.js"></script>
+    <script>
+        (function() {
+            const now = new Date();
+            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+            document.getElementById('quote-date').valueAsDate = new Date();
+        })();
+
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let selectedQuoteItems = {};
+
+        function initQuoteTab() {
+            const branchSelect = document.getElementById('quote-branch-select');
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
+            branches.forEach(b => html += `<option value="${b}">${b}</option>`);
+            branchSelect.innerHTML = html;
+            renderQuoteSelectableItems();
+        }
+
+        function renderQuoteSelectableItems() {
+            const selectedBranch = document.getElementById('quote-branch-select').value;
+            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
+            const tbody = document.getElementById('quote-selectable-body');
+            
+            let list = storageData;
+            if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
+            if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
+
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
+
+            tbody.innerHTML = list.map(item => {
+                let idx = storageData.indexOf(item);
+                let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px;"></td>
+                        <td style="color: #b45309; font-weight: 500;">${item.branch}</td>
+                        <td style="font-weight: bold;">${item.code}</td>
+                        <td>${item.size}</td>
+                        <td style="color: #64748b;">${item.unit}</td>
+                        <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td>NT$ ${item.price3.toLocaleString()}</td>
+                        <td>NT$ ${item.price6.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleQuoteItem(idx) {
+            const chk = document.querySelector(`input.q-item-chk[data-index="${idx}"]`);
+            if (chk && chk.checked) {
+                selectedQuoteItems[idx] = { ...storageData[idx], term: '12', extraNote: '' };
+            } else {
+                delete selectedQuoteItems[idx];
+            }
+            renderSelectedQuoteSummary();
+        }
+
+        function renderSelectedQuoteSummary() {
+            const summaryEl = document.getElementById('selected-items-summary');
+            const keys = Object.keys(selectedQuoteItems);
+            if (keys.length === 0) { summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>'; return; }
+            summaryEl.innerHTML = keys.map(idx => {
+                let item = selectedQuoteItems[idx];
+                return `
+                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>[${item.branch}] <b>${item.code}</b> - ${item.size} (${item.unit}材)</div>
+                        <div style="display: flex; gap: 8px;">
+                            <select onchange="selectedQuoteItems[${idx}].term = this.value" style="padding: 4px; font-weight: bold;">
+                                <option value="1">月繳</option><option value="3">季繳</option><option value="6">半年繳</option><option value="12" selected>年繳(85折)</option><option value="12_80">年繳(8折)</option>
+                            </select>
+                            <button type="button" onclick="delete selectedQuoteItems[${idx}]; renderQuoteSelectableItems(); renderSelectedQuoteSummary();" style="border:none; background:none; color:red; font-weight:bold; cursor:pointer;">×</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function generateQuote() {
+            const keys = Object.keys(selectedQuoteItems);
+            if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
+            document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
+            document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
+            document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
+            document.getElementById('v-q-company').innerText = document.getElementById('q-company').value || '---';
+            document.getElementById('v-q-taxid').innerText = document.getElementById('q-taxid').value || '---';
+            document.getElementById('v-q-branch').innerText = document.getElementById('q-branch').value || '---';
+            document.getElementById('v-q-client-phone').innerText = document.getElementById('q-client-tel').value || '---';
+            document.getElementById('v-q-address').innerText = document.getElementById('q-address').value || '---';
+            document.getElementById('v-q-tel').innerText = document.getElementById('q-tel').value || '---';
+
+            let tbody = document.getElementById('v-q-items'), html = '', rent = 0, fee = 0, deposit = 0;
+            keys.forEach(idx => {
+                let item = selectedQuoteItems[idx];
+                let p = item.term === '3' ? item.price3 : item.term === '6' ? item.price6 : item.term === '12_80' ? item.price12_80 : (item.term === '12' ? item.price12_85 : item.price1);
+                let months = item.term === '3' ? 3 : item.term === '6' ? 6 : (item.term.startsWith('12') ? 12 : 1);
+                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px;">${item.unit}</td><td style="border:1px solid #cbd5e1; padding:10px; font-weight:bold;">[${item.branch}] ${item.code} - ${item.size}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
+                rent += p * months; fee += (p >= 3000 ? 150 : 80) * months; deposit += (months <= 2 ? item.price1 * 2 : item.price1);
+            });
+            tbody.innerHTML = html;
+            document.getElementById('v-q-rent').innerText = rent.toLocaleString();
+            document.getElementById('v-q-deposit').innerText = deposit.toLocaleString();
+            document.getElementById('v-q-fee').innerText = fee.toLocaleString();
+            document.getElementById('v-q-total').innerText = (rent + fee + deposit).toLocaleString();
+            alert('報價單已成功生成！');
+        }
+
+        initQuoteTab();
+    </script>
+</body>
+</html>
