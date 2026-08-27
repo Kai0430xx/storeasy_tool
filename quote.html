@@ -397,7 +397,6 @@
                     unitText = '上層' + item.unit;
                 }
 
-                // 💡 儲存格全部設定為文字垂直置中與水平置中
                 html += '<tr>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">' + unitText + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; word-break: break-all;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
@@ -430,7 +429,7 @@
             let wsData = [
                 ["收多易迷你倉庫 - 報價單明細表"],
                 ["報價日期", dateStr, "分店名稱", branchName],
-                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel'].value || '---'],
+                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel').value || '---'],
                 ["公司抬頭", document.getElementById('q-company').value || '---', "統一編號", document.getElementById('q-taxid').value || '---'],
                 [],
                 ["【報價項目明細】"],
