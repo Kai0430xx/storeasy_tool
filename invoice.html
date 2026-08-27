@@ -119,7 +119,7 @@
                     </div>
                     <div class="form-group">
                         <label>🔍 快速搜尋：</label>
-                        <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" placeholder="例如: 0.9 或 75">
+                        <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" placeholder="例如: QD335 或 75">
                     </div>
                 </div>
 
@@ -393,9 +393,9 @@
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
                             <div style="grid-column: span 2;">
-                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 4px;">📅 租期區間 (連動)</label>
+                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 4px;">📅 租期區間</label>
                                 <div style="display: flex; align-items: center;">
-                                    <input type="date" value="${item.startDate || ''}" data-date-field="startDate" onchange="selectedInvoiceItems[${idx}].startDate = this.value; updateAllDates('startDate', this.value);" style="padding: 6px 8px; font-size: 0.85net; border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; width: 50%;">
+                                    <input type="date" value="${item.startDate || ''}" data-date-field="startDate" onchange="selectedInvoiceItems[${idx}].startDate = this.value; updateAllDates('startDate', this.value);" style="padding: 6px 8px; font-size: 0.85rem; border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; width: 50%;">
                                     <span style="background: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; padding: 7px 8px; font-size: 0.8rem; color: #64748b;">至</span>
                                     <input type="date" value="${item.endDate || ''}" data-date-field="endDate" onchange="selectedInvoiceItems[${idx}].endDate = this.value; updateAllDates('endDate', this.value);" style="padding: 6px 8px; font-size: 0.85rem; border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: none; width: 50%;">
                                 </div>
