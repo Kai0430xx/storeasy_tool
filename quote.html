@@ -54,11 +54,24 @@
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
+        /* 💡 專屬列印 / PDF 輸出縮放與彈性排版最佳化樣式 */
         @media print {
             body * { visibility: hidden; }
             aside, header.no-print, .card.no-print, .no-print { display: none !important; }
             #quote-preview, #quote-preview * { visibility: visible; }
-            #quote-preview { position: absolute; left: 0; top: 0; width: 100% !important; margin: 0 !important; padding: 10px !important; box-shadow: none !important; border: none !important; }
+            #quote-preview { 
+                position: absolute; left: 0; top: 0; width: 100% !important; 
+                margin: 0 !important; padding: 15px !important; 
+                box-shadow: none !important; border: none !important; 
+                font-size: 8.5pt !important;
+            }
+            #quote-preview h1 { font-size: 1.3rem !important; }
+            #quote-preview h2 { font-size: 1rem !important; }
+            #quote-preview .preview-info { padding: 10px !important; margin-bottom: 15px !important; font-size: 8.5pt !important; }
+            #quote-preview table { font-size: 8pt !important; margin-top: 6px !important; margin-bottom: 15px !important; word-break: break-all; }
+            #quote-preview th, #quote-preview td { padding: 6px 6px !important; }
+            #quote-preview .summary-box { padding: 10px !important; font-size: 9pt !important; margin-top: 15px !important; margin-bottom: 15px !important; }
+            #quote-preview .notes-box { padding: 8px !important; font-size: 7.5pt !important; margin-bottom: 0 !important; }
         }
     </style>
 </head>
@@ -183,12 +196,12 @@
                 <table>
                     <thead>
                         <tr style="background-color: #f1f5f9; text-align: center;">
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">單位<br>(材)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位尺寸<br>(寬*深*高 m)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">月繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">季繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">半年繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">年繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 12%;">單位<br>(材)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 36%;">倉位尺寸<br>(寬*深*高 m)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">月繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">季繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">半年繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">年繳/月</th>
                         </tr>
                     </thead>
                     <tbody id="v-q-items" style="text-align: center;">
@@ -240,28 +253,13 @@
             }
         });
 
-        function getStorageData() {
-            try {
-                return JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-            } catch(e) {
-                return [];
-            }
-        }
-
-        function getBranchDiscounts() {
-            try {
-                return JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
-            } catch(e) {
-                return {};
-            }
-        }
-
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
         let selectedQuoteItems = {};
 
         function initQuoteTab() {
             const branchSelect = document.getElementById('quote-branch-select');
             if (!branchSelect) return;
-            let storageData = getStorageData();
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
             branches.forEach(function(b) {
@@ -277,7 +275,6 @@
             const tbody = document.getElementById('quote-selectable-body');
             if (!tbody) return;
 
-            let storageData = getStorageData();
             const selectedBranch = branchSelect ? branchSelect.value : '';
             const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
             
@@ -320,8 +317,6 @@
 
         function toggleQuoteItem(idx) {
             const chk = document.querySelector('input.q-item-chk[data-index="' + idx + '"]');
-            let storageData = getStorageData();
-            let branchDiscounts = getBranchDiscounts();
             if (chk && chk.checked) {
                 let item = storageData[idx];
                 if (!item) return;
@@ -369,25 +364,6 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
-            let branchDiscounts = getBranchDiscounts();
-            let mismatchDetected = false;
-            keys.forEach(function(idx) {
-                let item = selectedQuoteItems[idx];
-                let term = item.term;
-                if (term === '12_85' || term === '12_80') {
-                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
-                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
-                    if (chosenDiscount !== originalDiscount) {
-                        mismatchDetected = true;
-                    }
-                }
-            });
-
-            if (mismatchDetected) {
-                let confirmCalc = confirm("⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折扣去試算費用？\n(若點擊【確定】，費用試算將會以您新選的折扣計算；同時正式報價單的價格表，仍會依照原本分店設定的預設折扣金額來呈現)");
-                if (!confirmCalc) return;
-            }
-
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
             document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
@@ -415,7 +391,7 @@
                 else if (term === '12_85') { calcPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
                 else if (term === '12_80') { calcPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
 
-                let extraNote = item.extraNote ? ' <span style="color: #dc2626; font-size:0.75rem;">(' + item.extraNote + ')</span>' : '';
+                let extraNote = item.extraNote ? '<br><span style="color: #dc2626; font-size:0.75rem;">(' + item.extraNote + ')</span>' : '';
 
                 let unitText = item.unit;
                 if (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') {
@@ -424,7 +400,7 @@
 
                 html += '<tr>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">' + unitText + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:left; font-weight:bold;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price1.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price3.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price6.toLocaleString() + '</td>' +
@@ -447,17 +423,17 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
             
-            let branchDiscounts = getBranchDiscounts();
             let clientName = document.getElementById('q-client-name').value || '客戶';
             let branchName = document.getElementById('q-branch').value || '分店';
             let dateStr = document.getElementById('quote-date').value;
 
             let wsData = [
-                ["收多易迷你倉庫 - 報價單"],
+                ["收多易迷你倉庫 - 報價單明細表"],
                 ["報價日期", dateStr, "分店名稱", branchName],
                 ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel').value || '---'],
                 ["公司抬頭", document.getElementById('q-company').value || '---', "統一編號", document.getElementById('q-taxid').value || '---'],
                 [],
+                ["【報價項目明細】"],
                 ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "季繳/月 (NT$)", "半年繳/月 (NT$)", "年繳/月 (NT$)"]
             ];
 
@@ -468,21 +444,22 @@
                 let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
                 let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
                 let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
-                let sizeText = "[" + item.branch + "] " + item.size;
+                let sizeText = "[" + item.branch + "] " + item.size + (item.extraNote ? " (" + item.extraNote + ")" : "");
                 wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
             });
 
             wsData.push(
                 [],
-                ["費用試算彙總"],
+                ["【費用試算彙總表】"],
                 ["租金總計 (NT$)", document.getElementById('v-q-rent').innerText],
                 ["保證金總計 (NT$)", document.getElementById('v-q-deposit').innerText],
                 ["保險文書處理費總計 (NT$)", document.getElementById('v-q-fee').innerText],
-                ["合計總金額 (NT$)", document.getElementById('v-q-total').innerText]
+                ["合計總金額 (NT$)", document.getElementById('v-q-total'].innerText]
             );
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = [{wch: 15}, {wch: 35}, {wch: 16}, {wch: 16}, {wch: 16}, {wch: 16}];
             XLSX.utils.book_append_sheet(wb, ws, "報價單試算");
             XLSX.writeFile(wb, "報價單_" + clientName + ".xlsx");
         }
