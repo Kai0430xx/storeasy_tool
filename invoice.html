@@ -246,11 +246,22 @@
 
     <script src="login.js"></script>
     <script>
-        (function() {
-            const now = new Date();
-            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
-            document.getElementById('inv-date').valueAsDate = new Date();
-        })();
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                const now = new Date();
+                const verEl = document.getElementById('system-version');
+                if (verEl) {
+                    verEl.innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+                }
+                const dateEl = document.getElementById('inv-date');
+                if (dateEl) {
+                    dateEl.valueAsDate = new Date();
+                }
+                initInvoiceTab();
+            } catch(e) {
+                console.error("Initialization error:", e);
+            }
+        });
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
@@ -258,6 +269,7 @@
 
         function initInvoiceTab() {
             const branchSelect = document.getElementById('invoice-branch-select');
+            if (!branchSelect) return;
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
             branches.forEach(b => html += `<option value="${b}">${b}</option>`);
@@ -266,21 +278,28 @@
         }
 
         function renderInvoiceSelectableItems() {
-            const selectedBranch = document.getElementById('invoice-branch-select').value;
-            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
+            const branchSelect = document.getElementById('invoice-branch-select');
+            const searchInput = document.getElementById('invoice-search-input');
             const tbody = document.getElementById('invoice-selectable-body');
+            if (!tbody) return;
+
+            const selectedBranch = branchSelect ? branchSelect.value : '';
+            const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
             
             let list = storageData;
             if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
-            if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
+            if (searchKw) list = list.filter(item => (item.code && item.code.toLowerCase().includes(searchKw)) || (item.size && item.size.toLowerCase().includes(searchKw)) || (item.unit && String(item.unit).toLowerCase().includes(searchKw)));
 
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的請款項目</td></tr>`; return; }
+            if (list.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的請款項目（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>`; 
+                return; 
+            }
 
             tbody.innerHTML = list.map(item => {
                 let idx = storageData.indexOf(item);
                 let isChecked = selectedInvoiceItems[idx] ? 'checked' : '';
-                let p12_85 = Math.round((item.price1 * 0.85) / 10) * 10;
-                let p12_80 = Math.round((item.price1 * 0.8) / 10) * 10;
+                let p12_85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                let p12_80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
                 return `
                     <tr>
                         <td><input type="checkbox" class="i-item-chk" ${isChecked} onchange="toggleInvoiceItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
@@ -306,6 +325,17 @@
                 let bDisc = branchDiscounts[item.branch];
                 if (bDisc === '0.80') defaultTerm = '12_80';
                 let today = new Date().toISOString().split('T')[0];
+                
+                // 如果已經有其他已勾選的項目，自動抓取第一個已勾選項目的日期來連動
+                let existingKeys = Object.keys(selectedInvoiceItems);
+                let targetStart = today;
+                let targetEnd = today;
+                if (existingKeys.length > 0) {
+                    let firstItem = selectedInvoiceItems[existingKeys[0]];
+                    if (firstItem.startDate) targetStart = firstItem.startDate;
+                    if (firstItem.endDate) targetEnd = firstItem.endDate;
+                }
+
                 selectedInvoiceItems[idx] = { 
                     ...item, 
                     term: defaultTerm, 
@@ -314,8 +344,8 @@
                     packingFee: 0,
                     movingFee: 0,
                     otherFee: 0,
-                    startDate: today, 
-                    endDate: today 
+                    startDate: targetStart, 
+                    endDate: targetEnd 
                 };
             } else {
                 delete selectedInvoiceItems[idx];
@@ -323,8 +353,21 @@
             renderPerItemFeesInputs();
         }
 
+        // 💡 租期「格子連格子」同步更新函數
+        function updateAllDates(field, value) {
+            Object.keys(selectedInvoiceItems).forEach(idx => {
+                selectedInvoiceItems[idx][field] = value;
+            });
+            // 同步更新畫面上所有同名字段的值，避免畫面沒刷新
+            const inputs = document.querySelectorAll(`input[data-date-field="${field}"]`);
+            inputs.forEach(input => {
+                if (input.value !== value) input.value = value;
+            });
+        }
+
         function renderPerItemFeesInputs() {
             const container = document.getElementById('per-item-fees-container');
+            if (!container) return;
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) { container.innerHTML = `<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>`; return; }
             
@@ -353,12 +396,12 @@
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
                             <div>
-                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期起日</label>
-                                <input type="date" value="${item.startDate || ''}" onchange="selectedInvoiceItems[${idx}].startDate = this.value" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期起日 (連動)</label>
+                                <input type="date" value="${item.startDate || ''}" data-date-field="startDate" onchange="selectedInvoiceItems[${idx}].startDate = this.value; updateAllDates('startDate', this.value);" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
-                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期訖日</label>
-                                <input type="date" value="${item.endDate || ''}" onchange="selectedInvoiceItems[${idx}].endDate = this.value" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期訖日 (連動)</label>
+                                <input type="date" value="${item.endDate || ''}" data-date-field="endDate" onchange="selectedInvoiceItems[${idx}].endDate = this.value; updateAllDates('endDate', this.value);" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b;">滯納金 (含稅)</label>
@@ -408,8 +451,8 @@
                 let monthlyRate = item.price1;
                 if (term === '3') monthlyRate = item.price3;
                 else if (term === '6') monthlyRate = item.price6;
-                else if (term === '12_85') monthlyRate = Math.round((item.price1 * 0.85) / 10) * 10;
-                else if (term === '12_80') monthlyRate = Math.round((item.price1 * 0.8) / 10) * 10;
+                else if (term === '12_85') monthlyRate = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                else if (term === '12_80') monthlyRate = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
 
                 let termMonths = 1;
                 if (item.startDate && item.endDate) {
@@ -506,8 +549,8 @@
                 let monthlyRate = item.price1;
                 if (term === '3') monthlyRate = item.price3;
                 else if (term === '6') monthlyRate = item.price6;
-                else if (term === '12_85') monthlyRate = Math.round((item.price1 * 0.85) / 10) * 10;
-                else if (term === '12_80') monthlyRate = Math.round((item.price1 * 0.8) / 10) * 10;
+                else if (term === '12_85') monthlyRate = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                else if (term === '12_80') monthlyRate = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
 
                 let termMonths = 1;
                 if (item.startDate && item.endDate) {
@@ -552,8 +595,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "請款單明細");
             XLSX.writeFile(wb, `請款單_${clientName}.xlsx`);
         }
-
-        initInvoiceTab();
     </script>
 </body>
 </html>
