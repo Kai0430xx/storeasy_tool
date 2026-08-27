@@ -105,7 +105,7 @@
     <aside class="no-print">
         <div class="sidebar-header">
             <h1>收多易迷你倉庫</h1>
-            <p>Storeasy Storage 單據生成工具</p>
+            <p>Storeasy Storage</p>
         </div>
         <nav>
             <button type="button" onclick="switchTab('storage')" id="btn-storage" class="active">📦 倉位資料</button>
@@ -130,7 +130,7 @@
             <div id="panel-storage" class="tab-content active">
                 <div class="card">
                     <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                    <p>系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
+                    <p>系統會自動辨識編號、尺寸、材積、原價與各方案金額</p>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>分店名稱 (可下拉選擇或自行手打)</label>
@@ -141,7 +141,7 @@
                             <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
                         </div>
                     </div>
-                    <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">一鍵智慧匯入資料</button>
+                    <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">匯入資料</button>
                 </div>
 
                 <div class="card">
@@ -183,7 +183,6 @@
             <!-- 2. 生成報價單頁籤 -->
             <div id="panel-quote" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 報價單設定與完整方案勾選</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="q-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="q-manager" placeholder="請輸入店長姓名"></div>
@@ -236,7 +235,7 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 一鍵生成公司標準格式報價單</button>
+                    <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 生成報價單</button>
                 </div>
 
                 <!-- 報價單預覽區 -->
@@ -311,7 +310,6 @@
             <!-- 3. 生成請款單頁籤 -->
             <div id="panel-invoice" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 會計版請款單設定與多倉位獨立方案、保證金及雜費設定</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="i-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
                         <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
@@ -345,7 +343,6 @@
                                     <th>據點</th>
                                     <th>編號 / 尺寸(寬*深*高 m) / 材積</th>
                                     <th>月繳原價</th>
-                                    <th>年繳優惠價</th>
                                 </tr>
                             </thead>
                             <tbody id="invoice-selectable-body">
@@ -362,7 +359,7 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="generateInvoice()" class="btn btn-dark">💰 一鍵套用會計版正式請款單</button>
+                    <button type="button" onclick="generateInvoice()" class="btn btn-dark">💰 生成請款單</button>
                 </div>
 
                 <!-- 請款單預覽區 -->
