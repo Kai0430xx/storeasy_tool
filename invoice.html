@@ -414,10 +414,12 @@
                 totalFeeInc += insuranceFee;
                 totalDeposit += deposit;
 
+                // 💡 確保未稅與稅金正確拆算 (含稅 / 1.05 = 未稅)
                 let unTax = Math.round(rentSubtotal / 1.05);
                 let tax = rentSubtotal - unTax;
                 let dateRangeStr = (item.startDate && item.endDate) ? `${item.startDate.replace(/-/g,'/')} － ${item.endDate.replace(/-/g,'/')}` : '未填租期';
 
+                // 💡 嚴格對齊表頭：倉位編號 | 材積 | 原價租金 | 優惠租金 | 承租月份 | 未稅小計 | 稅金 | 含稅小計 | 保證金 | 租期 | 小計
                 itemsHtml += `
                     <tr>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold;">${item.code}</td>
