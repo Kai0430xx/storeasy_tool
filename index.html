@@ -210,6 +210,11 @@
                     }
                     storageData = storageData.concat(newItems);
                     localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                    
+                    // 💡 匯入成功後，將下拉選單強制設回 'all' 並重新渲染
+                    const selectEl = document.getElementById('storage-branch-filter');
+                    if (selectEl) selectEl.value = 'all';
+
                     renderStorageTable();
                     alert('成功匯入 ' + newItems.length + ' 筆資料！');
                 } catch(err) { alert('解析錯誤：' + err.message); }
@@ -217,26 +222,27 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function updateBranchFilter() {
+        function updateBranchFilter(selectedVal = 'all') {
             let counts = {};
             storageData.forEach(i => counts[i.branch] = (counts[i.branch]||0)+1);
             let html = `<option value="all">全部據點 (${storageData.length})</option>`;
             Object.keys(counts).forEach(b => html += `<option value="${b}">${b} (${counts[b]})</option>`);
             const selectEl = document.getElementById('storage-branch-filter');
             if (selectEl) {
-                let currentVal = selectEl.value;
                 selectEl.innerHTML = html;
-                selectEl.value = currentVal;
+                selectEl.value = selectedVal;
             }
         }
 
         function renderStorageTable() {
-            updateBranchFilter();
-            let filter = document.getElementById('storage-branch-filter').value;
+            let selectEl = document.getElementById('storage-branch-filter');
+            let filter = selectEl ? selectEl.value : 'all';
+            
+            updateBranchFilter(filter);
+
             let th85 = document.getElementById('th-annual-85');
             let th80 = document.getElementById('th-annual-80');
             
-            // 💡 動態判斷標題：若單選某分店，對應其預設設定加上紅字 (已設定)
             let activeBranchDisc = null;
             if (filter && filter !== 'all') {
                 activeBranchDisc = branchDiscounts[filter] || '0.85';
@@ -249,7 +255,6 @@
                 th85.innerHTML = '年繳 (85折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
                 th80.innerHTML = '年繳 (8折)';
             } else {
-                // 顯示全部據點時不加紅字標籤
                 th85.innerHTML = '年繳 (85折)';
                 th80.innerHTML = '年繳 (8折)';
             }
