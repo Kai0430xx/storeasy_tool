@@ -1029,14 +1029,14 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                             <div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：${item.code} ([${item.branch}] ${item.size} / ${item.unit}材)</div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <select class="inv-term-select" data-index="${idx}" onchange="updateInvoiceItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
+                                <select class="inv-term-select" data-index="${idx}" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
                                     <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
                                     <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                     <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
                                     <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
                                     <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
                                 </select>
-                                <select class="inv-dep-select" data-index="${idx}" onchange="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
+                                <select class="inv-dep-select" data-index="${idx}" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
                                     <option value="yes" ${currentDep==='yes'?'selected':''}>🔒 含保證金</option>
                                     <option value="no" ${currentDep==='no'?'selected':''}>🔓 無保證金 (續約)</option>
                                 </select>
@@ -1045,27 +1045,27 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期起日 (西元)</label>
-                                <input type="date" value="${item.startDate || ''}" onchange="updatePerItemDate(${idx}, 'startDate', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <input type="date" class="inv-start-date" data-index="${idx}" value="${item.startDate || ''}" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期訖日 (西元)</label>
-                                <input type="date" value="${item.endDate || ''}" onchange="updatePerItemDate(${idx}, 'endDate', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <input type="date" class="inv-end-date" data-index="${idx}" value="${item.endDate || ''}" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b;">滯納金 (含稅)</label>
-                                <input type="number" value="${item.lateFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'lateFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <input type="number" class="inv-late-fee" data-index="${idx}" value="${item.lateFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b;">包材費 (含稅)</label>
-                                <input type="number" value="${item.packingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'packingFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <input type="number" class="inv-packing-fee" data-index="${idx}" value="${item.packingFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b;">搬運費 (含稅)</label>
-                                <input type="number" value="${item.movingFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'movingFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <input type="number" class="inv-moving-fee" data-index="${idx}" value="${item.movingFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: #64748b;">其它費 (含稅)</label>
-                                <input type="number" value="${item.otherFee || 0}" min="0" oninput="updatePerItemFee(${idx}, 'otherFee', this.value)" style="padding: 6px 8px; font-size: 0.85rem;">
+                                <input type="number" class="inv-other-fee" data-index="${idx}" value="${item.otherFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
                             </div>
                         </div>
                     </div>
@@ -1075,15 +1075,28 @@
         }
 
         function generateInvoice() {
-            // 生成前自動同步 DOM 中使用者點選的最新 term 與 depositOption
+            // 即時從 DOM 讀取各倉位當前設定的方案、保證金、日曆與雜費
             const containerDivs = document.querySelectorAll('#per-item-fees-container > div');
             containerDivs.forEach(div => {
                 const idx = div.getAttribute('data-index');
                 if (idx && selectedInvoiceItems[idx]) {
                     const termSel = div.querySelector('.inv-term-select');
                     const depSel = div.querySelector('.inv-dep-select');
+                    const startInput = div.querySelector('.inv-start-date');
+                    const endInput = div.querySelector('.inv-end-date');
+                    const lateInput = div.querySelector('.inv-late-fee');
+                    const packInput = div.querySelector('.inv-packing-fee');
+                    const moveInput = div.querySelector('.inv-moving-fee');
+                    const otherInput = div.querySelector('.inv-other-fee');
+
                     if (termSel) selectedInvoiceItems[idx].term = termSel.value;
                     if (depSel) selectedInvoiceItems[idx].depositOption = depSel.value;
+                    if (startInput) selectedInvoiceItems[idx].startDate = startInput.value;
+                    if (endInput) selectedInvoiceItems[idx].endDate = endInput.value;
+                    if (lateInput) selectedInvoiceItems[idx].lateFee = Number(lateInput.value) || 0;
+                    if (packInput) selectedInvoiceItems[idx].packingFee = Number(packInput.value) || 0;
+                    if (moveInput) selectedInvoiceItems[idx].movingFee = Number(moveInput.value) || 0;
+                    if (otherInput) selectedInvoiceItems[idx].otherFee = Number(otherInput.value) || 0;
                 }
             });
 
@@ -1130,7 +1143,18 @@
 
                 let p1 = item.price1;
                 let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
-                let termMonths = term === '3' ? 3 : term === '6' ? 6 : 12;
+
+                // 核心修正：承租月份根據店長選擇的「租期起日」與「租期訖日」日曆自動計算月數
+                let termMonths = 1;
+                if (item.startDate && item.endDate) {
+                    let d1 = new Date(item.startDate);
+                    let d2 = new Date(item.endDate);
+                    let diffTime = Math.abs(d2 - d1);
+                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    termMonths = Math.max(1, Math.round(diffDays / 30));
+                } else {
+                    termMonths = term === '3' ? 3 : term === '6' ? 6 : (term === '12' || term === '12_80' ? 12 : 1);
+                }
 
                 let rentSubtotal = monthlyRate * termMonths;
                 let feePerMonth = monthlyRate >= 3000 ? 150 : 80;
