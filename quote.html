@@ -360,23 +360,6 @@
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
             let branchDiscounts = getBranchDiscounts();
-            let mismatchDetected = false;
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                let term = item.term;
-                if (term === '12_85' || term === '12_80') {
-                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
-                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
-                    if (chosenDiscount !== originalDiscount) {
-                        mismatchDetected = true;
-                    }
-                }
-            });
-
-            if (mismatchDetected) {
-                let confirmCalc = confirm("⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。是否要照您後面選擇的折扣去試算費用？");
-                if (!confirmCalc) return;
-            }
 
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
