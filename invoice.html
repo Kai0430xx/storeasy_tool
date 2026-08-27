@@ -485,13 +485,21 @@
         function exportInvoiceExcel() {
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) { alert('請先生成並確認請款單內容！'); return; }
+
+            let clientName = document.getElementById('i-client').value || '客戶';
+            let branchName = document.getElementById('i-branch').value || '分店';
+            let dateStr = document.getElementById('inv-date').value;
+
             let wsData = [
-                ["收多易迷你倉庫 - 請款單"],
-                ["日期", document.getElementById('inv-date').value, "客戶名稱", document.getElementById('i-client').value],
-                ["分店", document.getElementById('i-branch').value, "聯絡電話", document.getElementById('i-client-phone').value],
+                ["收多易迷你倉庫 - 會計版請款單"],
+                ["請款日期", dateStr, "分店名稱", branchName],
+                ["客戶名稱", clientName, "客戶電話", document.getElementById('i-client-phone').value || '---'],
+                ["公司抬頭", document.getElementById('i-company').value || '---', "統一編號", document.getElementById('i-taxid').value || '---'],
                 [],
-                ["倉位編號", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "租期", "小計"]
+                ["【倉位租金及保證金明細】"],
+                ["倉位編號", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "租期範圍", "小計 (NT$)"]
             ];
+
             keys.forEach(idx => {
                 let item = selectedInvoiceItems[idx];
                 let term = item.term || '12_85';
@@ -500,23 +508,49 @@
                 else if (term === '6') monthlyRate = item.price6;
                 else if (term === '12_85') monthlyRate = Math.round((item.price1 * 0.85) / 10) * 10;
                 else if (term === '12_80') monthlyRate = Math.round((item.price1 * 0.8) / 10) * 10;
+
                 let termMonths = 1;
                 if (item.startDate && item.endDate) {
                     let d1 = new Date(item.startDate), d2 = new Date(item.endDate);
                     let diffDays = Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
                     termMonths = Math.max(1, Math.round(diffDays / 30));
                 }
+
                 let rentSub = monthlyRate * termMonths;
                 let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (item.price1 * 2) : item.price1) : 0;
-                let unTax = Math.round(rentSub / 1.05), tax = rentSub - unTax;
-                let dateStr = (item.startDate && item.endDate) ? `${item.startDate}至${item.endDate}` : '';
-                wsData.push([item.code, `${item.unit}材`, item.price1, monthlyRate, termMonths, unTax, tax, rentSub, dep, dateStr, rentSub + dep]);
+                let unTax = Math.round(rentSub / 1.05);
+                let tax = rentSub - unTax;
+                let dateStr = (item.startDate && item.endDate) ? `${item.startDate}至${item.endDate}` : '未填租期';
+
+                wsData.push([
+                    item.code, 
+                    `${item.unit}材`, 
+                    item.price1, 
+                    monthlyRate, 
+                    termMonths, 
+                    unTax, 
+                    tax, 
+                    rentSub, 
+                    dep, 
+                    dateStr, 
+                    rentSub + dep
+                ]);
             });
-            wsData.push([], ["租金合計", document.getElementById('v-i-subtotal').innerText], ["保證金合計", document.getElementById('v-i-deposit').innerText], ["保險文書處理費合計", document.getElementById('v-i-fee-total').innerText], ["其他雜費合計", document.getElementById('v-i-extra-total').innerText], ["請款總金額", document.getElementById('v-i-total').innerText]);
+
+            wsData.push(
+                [],
+                ["【費用試算總表彙總】"],
+                ["租金合計 (NT$)", document.getElementById('v-i-subtotal').innerText],
+                ["保證金合計 (NT$)", document.getElementById('v-i-deposit').innerText],
+                ["保險文書處理費合計 (NT$)", document.getElementById('v-i-fee-total').innerText],
+                ["其他雜費合計 (NT$)", document.getElementById('v-i-extra-total').innerText],
+                ["請款總金額 (TWD)", document.getElementById('v-i-total').innerText]
+            );
+
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, "請款單");
-            XLSX.writeFile(wb, `請款單_${document.getElementById('i-client').value || '客戶'}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "請款單明細");
+            XLSX.writeFile(wb, `請款單_${clientName}.xlsx`);
         }
 
         initInvoiceTab();
