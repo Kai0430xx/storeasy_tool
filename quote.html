@@ -142,7 +142,6 @@
                     </table>
                 </div>
 
-                <!-- 已選取項目與額外折扣備註設定區 -->
                 <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                     <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目（方案與額外優惠備註）：</h5>
                     <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
@@ -153,7 +152,7 @@
                 <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 生成報價單</button>
             </div>
 
-            <!-- 報價單預覽區 (完全不需要倉位編號) -->
+            <!-- 報價單預覽區 (無倉位編號) -->
             <div id="quote-preview" class="preview-box">
                 <div class="preview-header">
                     <div>
@@ -332,7 +331,7 @@
                 let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
 
-                // 💡 報價單表格內：絕對沒有倉位編號，只有單位(材)與倉位尺寸
+                // 💡 報價單表格內：絕對沒有倉位編號 (item.code)
                 html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${item.unit}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
                 rent += p * months; fee += (p >= 3000 ? 150 : 80) * months; deposit += (months <= 2 ? item.price1 * 2 : item.price1);
             });
