@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 生成請款單</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
@@ -40,6 +41,7 @@
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
         .btn-dark { background-color: #0f172a; color: #fff; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
+        .btn-emerald { background-color: #059669; color: #fff; }
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
@@ -235,6 +237,7 @@
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
+                    <button type="button" onclick="exportInvoiceExcel()" class="btn btn-emerald">📥 匯出 Excel (試算表)</button>
                     <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
                 </div>
             </div>
@@ -383,25 +386,6 @@
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
-            // 💡 檢查是否有覆蓋原本分店年繳設定的防呆通知
-            let mismatchDetected = false;
-            keys.forEach(idx => {
-                let item = selectedInvoiceItems[idx];
-                let term = item.term;
-                if (term === '12_85' || term === '12_80') {
-                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
-                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
-                    if (chosenDiscount !== originalDiscount) {
-                        mismatchDetected = true;
-                    }
-                }
-            });
-
-            if (mismatchDetected) {
-                let confirmed = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n按【確定】代表您同意以此筆單據後面選擇的折扣進行計算（不會修改後台倉位資料），按【取消】可返回修改。`);
-                if (!confirmed) return;
-            }
-
             document.getElementById('v-i-date').innerText = document.getElementById('inv-date').value;
             document.getElementById('v-i-client').innerText = document.getElementById('i-client').value || '未填寫';
             document.getElementById('v-i-manager').innerText = document.getElementById('i-manager').value || '---';
@@ -496,6 +480,43 @@
             document.getElementById('v-i-total').innerText = grandTotal.toLocaleString();
 
             alert('會計版請款單已成功生成！');
+        }
+
+        function exportInvoiceExcel() {
+            const keys = Object.keys(selectedInvoiceItems);
+            if (keys.length === 0) { alert('請先生成並確認請款單內容！'); return; }
+            let wsData = [
+                ["收多易迷你倉庫 - 請款單"],
+                ["日期", document.getElementById('inv-date').value, "客戶名稱", document.getElementById('i-client').value],
+                ["分店", document.getElementById('i-branch').value, "聯絡電話", document.getElementById('i-client-phone').value],
+                [],
+                ["倉位編號", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "租期", "小計"]
+            ];
+            keys.forEach(idx => {
+                let item = selectedInvoiceItems[idx];
+                let term = item.term || '12_85';
+                let monthlyRate = item.price1;
+                if (term === '3') monthlyRate = item.price3;
+                else if (term === '6') monthlyRate = item.price6;
+                else if (term === '12_85') monthlyRate = Math.round((item.price1 * 0.85) / 10) * 10;
+                else if (term === '12_80') monthlyRate = Math.round((item.price1 * 0.8) / 10) * 10;
+                let termMonths = 1;
+                if (item.startDate && item.endDate) {
+                    let d1 = new Date(item.startDate), d2 = new Date(item.endDate);
+                    let diffDays = Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+                    termMonths = Math.max(1, Math.round(diffDays / 30));
+                }
+                let rentSub = monthlyRate * termMonths;
+                let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (item.price1 * 2) : item.price1) : 0;
+                let unTax = Math.round(rentSub / 1.05), tax = rentSub - unTax;
+                let dateStr = (item.startDate && item.endDate) ? `${item.startDate}至${item.endDate}` : '';
+                wsData.push([item.code, `${item.unit}材`, item.price1, monthlyRate, termMonths, unTax, tax, rentSub, dep, dateStr, rentSub + dep]);
+            });
+            wsData.push([], ["租金合計", document.getElementById('v-i-subtotal').innerText], ["保證金合計", document.getElementById('v-i-deposit').innerText], ["保險文書處理費合計", document.getElementById('v-i-fee-total').innerText], ["其他雜費合計", document.getElementById('v-i-extra-total').innerText], ["請款總金額", document.getElementById('v-i-total').innerText]);
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "請款單");
+            XLSX.writeFile(wb, `請款單_${document.getElementById('i-client').value || '客戶'}.xlsx`);
         }
 
         initInvoiceTab();
