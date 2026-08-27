@@ -2,10 +2,7 @@
     // 1. 初始化您的專屬帳號與登入狀態
     const MY_ACCOUNT = { user: "kai", pass: "0430", role: "admin" };
     
-    // 檢查本機是否有儲存的使用者帳號，若無則寫入您的帳號
     let localUsers = JSON.parse(localStorage.getItem('storeasy_users')) || [MY_ACCOUNT];
-    
-    // 確保一定包含您的帳號
     if (!localUsers.some(u => u.user === "kai")) {
         localUsers.push(MY_ACCOUNT);
     }
@@ -13,7 +10,7 @@
 
     let currentUser = JSON.parse(sessionStorage.getItem('storeasy_current_user'));
 
-    // 2. 建立全域遮罩與登入樣式
+    // 2. 建立全域遮罩與登入樣式（包含修復右上角登出按鈕排版）
     const style = document.createElement('style');
     style.innerHTML = `
         #login-overlay {
@@ -35,8 +32,29 @@
         .login-btn { padding: 12px; background-color: #f59e0b; color: #0f172a; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
         .login-btn:hover { background-color: #d97706; }
         .login-error { color: #dc2626; font-size: 0.85rem; text-align: center; display: none; }
-        .logout-btn-container { position: absolute; top: 16px; right: 32px; z-index: 40; }
-        .logout-btn { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+        
+        /* 修正右上角登出區塊排版：使用 Flex 置於右側並與版本號分開 */
+        header.no-print {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+        .logout-btn-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logout-btn { 
+            background: #fee2e2; 
+            color: #dc2626; 
+            border: 1px solid #fecaca; 
+            padding: 6px 14px; 
+            border-radius: 6px; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
         .logout-btn:hover { background: #fecaca; }
     `;
     document.head.appendChild(style);
@@ -61,14 +79,13 @@
         </div>
     `;
 
-    // 如果未登入，顯示登入遮罩；若已登入，則解鎖畫面並加入登出按鈕
     if (!currentUser) {
         document.body.appendChild(overlay);
     } else {
         injectLogoutButton();
     }
 
-    // 4. 綁定登入按鈕事件
+    // 4. 綁定按鈕事件
     document.addEventListener('click', function(e) {
         if (e.target && e.target.id === 'submit-login') {
             performLogin();
@@ -78,7 +95,6 @@
         }
     });
 
-    // 支援按下 Enter 鍵登入
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && document.getElementById('login-overlay')) {
             performLogin();
@@ -113,9 +129,14 @@
         const headerEl = document.querySelector('header');
         if (headerEl && !document.getElementById('system-logout')) {
             const userObj = JSON.parse(sessionStorage.getItem('storeasy_current_user'));
+            
+            // 讓 header 內原本的 version 靠左，並在右側插入登出容器
             const div = document.createElement('div');
             div.className = 'logout-btn-container no-print';
-            div.innerHTML = `<span style="font-size: 0.85rem; font-weight: 600; color: #475569; margin-right: 8px;">👤 ${userObj ? userObj.user : ''}</span><button type="button" id="system-logout" class="logout-btn">登出</button>`;
+            div.innerHTML = `
+                <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">👤 歡迎，${userObj ? userObj.user : ''}</span>
+                <button type="button" id="system-logout" class="logout-btn">登出</button>
+            `;
             headerEl.appendChild(div);
         }
     }
