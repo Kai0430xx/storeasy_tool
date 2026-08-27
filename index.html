@@ -155,6 +155,7 @@
         function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
             if (!fileInput.files || fileInput.files.length === 0) { alert('請先選擇一個 Excel 檔案！'); return; }
+            const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
