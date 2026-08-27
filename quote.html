@@ -68,7 +68,7 @@
             #quote-preview h2 { font-size: 1rem !important; }
             #quote-preview .preview-info { padding: 10px !important; margin-bottom: 15px !important; font-size: 8.5pt !important; }
             #quote-preview table { font-size: 8pt !important; margin-top: 6px !important; margin-bottom: 15px !important; word-break: break-all; }
-            #quote-preview th, #quote-preview td { padding: 6px 6px !important; }
+            #quote-preview th, #quote-preview td { padding: 6px 6px !important; text-align: center !important; vertical-align: middle !important; }
             #quote-preview .summary-box { padding: 10px !important; font-size: 9pt !important; margin-top: 15px !important; margin-bottom: 15px !important; }
             #quote-preview .notes-box { padding: 8px !important; font-size: 7.5pt !important; margin-bottom: 0 !important; }
         }
@@ -195,12 +195,12 @@
                 <table>
                     <thead>
                         <tr style="background-color: #f1f5f9; text-align: center;">
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 12%;">單位<br>(材)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 36%;">倉位尺寸<br>(寬*深*高 m)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">月繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">季繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">半年繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; width: 13%;">年繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 12%; text-align: center;">單位<br>(材)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 36%; text-align: center;">倉位尺寸<br>(寬*深*高 m)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">月繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">季繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">半年繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">年繳/月</th>
                         </tr>
                     </thead>
                     <tbody id="v-q-items" style="text-align: center;">
@@ -397,13 +397,14 @@
                     unitText = '上層' + item.unit;
                 }
 
+                // 💡 儲存格全部設定為文字垂直置中與水平置中
                 html += '<tr>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">' + unitText + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:left; font-weight:bold; word-break: break-all;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price1.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price3.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price6.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ' + tableAnnualPrice.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">' + unitText + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; word-break: break-all;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price1.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309;">NT$ ' + tableAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
                 
                 rent += calcPrice * months; 
@@ -429,7 +430,7 @@
             let wsData = [
                 ["收多易迷你倉庫 - 報價單明細表"],
                 ["報價日期", dateStr, "分店名稱", branchName],
-                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel').value || '---'],
+                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel'].value || '---'],
                 ["公司抬頭", document.getElementById('q-company').value || '---', "統一編號", document.getElementById('q-taxid').value || '---'],
                 [],
                 ["【報價項目明細】"],
