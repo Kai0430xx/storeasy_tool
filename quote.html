@@ -121,7 +121,6 @@
                     </div>
                 </div>
 
-                <!-- 💡 選擇倉位表格：這裡保留了「倉位編號」供勾選識別 -->
                 <div class="table-container">
                     <table>
                         <thead>
@@ -134,12 +133,11 @@
                                 <th>月繳/原價</th>
                                 <th>季繳</th>
                                 <th>半年繳</th>
-                                <th>年繳(85折)</th>
-                                <th>年繳(8折)</th>
+                                <th>年繳優惠金額</th>
                             </tr>
                         </thead>
                         <tbody id="quote-selectable-body">
-                            <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -154,7 +152,7 @@
                 <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 生成報價單</button>
             </div>
 
-            <!-- 報價單預覽區 (💡 絕對沒有倉位編號) -->
+            <!-- 報價單預覽區 -->
             <div id="quote-preview" class="preview-box">
                 <div class="preview-header">
                     <div>
@@ -248,11 +246,12 @@
             if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
             if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
 
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
 
             tbody.innerHTML = list.map(item => {
                 let idx = storageData.indexOf(item);
                 let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
+                let dLabel = (item.discountType === '0.80' || item.price12 === Math.round(item.price1 * 0.8)) ? '年繳(8折)' : '年繳(85折)';
                 return `
                     <tr>
                         <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
@@ -263,8 +262,7 @@
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
                         <td>NT$ ${item.price3.toLocaleString()}</td>
                         <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12.toLocaleString()} <span style="font-size:0.75rem; color:#64748b;">(${dLabel})</span></td>
                     </tr>
                 `;
             }).join('');
@@ -298,8 +296,7 @@
                                     <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
                                     <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                     <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
-                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
-                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
+                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳優惠</option>
                                     <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
                                 </select>
                                 <input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="${currentNote}" oninput="selectedQuoteItems[${idx}].extraNote = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">
@@ -330,13 +327,20 @@
                 let term = item.term || '12';
                 if (term === 'none') return;
 
-                let p = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : (term === '12' ? item.price12_85 : item.price1);
-                let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
+                let p = term === '3' ? item.price3 : term === '6' ? item.price6 : (term === '12' ? item.price12 : item.price1);
+                let months = term === '3' ? 3 : term === '6' ? 6 : (term === '12' ? 12 : 1);
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
 
-                // 💡 生成的報價單預覽：只有單位與尺寸，沒有編號
-                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${item.unit}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
-                rent += p * months; fee += (p >= 3000 ? 150 : 80) * months; deposit += (months <= 2 ? item.price1 * 2 : item.price1);
+                let unitText = item.unit;
+                if (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') {
+                    unitText = '上層' + item.unit;
+                }
+
+                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
+                
+                rent += p * months; 
+                fee += (p >= 3000 ? 150 : 80) * months; 
+                deposit += (months <= 2 ? item.price1 * 2 : item.price1);
             });
             tbody.innerHTML = html;
             document.getElementById('v-q-rent').innerText = rent.toLocaleString();
