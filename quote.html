@@ -379,16 +379,25 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                let bDisc = branchDiscounts[item.branch];
-                let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
-                let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                // 💡 關鍵：依據店長選擇的方案動態決定報價單表格中的「年繳/月」顯示價格
+                let displayAnnualPrice = 0;
+                if (term === '12_80') {
+                    displayAnnualPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
+                } else if (term === '12_85') {
+                    displayAnnualPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                } else {
+                    // 若選月繳、季繳、半年繳，表格年繳欄位預設顯示分店原本預設的年繳金額
+                    let bDisc = branchDiscounts[item.branch];
+                    let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
+                    displayAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                }
 
                 let calcPrice = item.price1;
                 let months = 1;
                 if (term === '3') { calcPrice = item.price3; months = 3; }
                 else if (term === '6') { calcPrice = item.price6; months = 6; }
-                else if (term === '12_85') { calcPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
-                else if (term === '12_80') { calcPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
+                else if (term === '12_85') { calcPrice = displayAnnualPrice; months = 12; }
+                else if (term === '12_80') { calcPrice = displayAnnualPrice; months = 12; }
 
                 let extraNote = item.extraNote ? '<br><span style="color: #dc2626; font-size:0.75rem; word-break: break-all;">(' + item.extraNote + ')</span>' : '';
 
@@ -403,7 +412,7 @@
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price1.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price3.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price6.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309;">NT$ ' + tableAnnualPrice.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
                 
                 rent += calcPrice * months; 
@@ -439,9 +448,18 @@
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
                 if (item.term === 'none') return;
-                let bDisc = branchDiscounts[item.branch];
-                let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
-                let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                let term = item.term || '12_85';
+                let tableAnnualPrice = 0;
+                if (term === '12_80') {
+                    tableAnnualPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
+                } else if (term === '12_85') {
+                    tableAnnualPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                } else {
+                    let bDisc = branchDiscounts[item.branch];
+                    let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
+                    tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                }
+
                 let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
                 let sizeText = "[" + item.branch + "] " + item.size + (item.extraNote ? " (" + item.extraNote + ")" : "");
                 wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
