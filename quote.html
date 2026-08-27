@@ -240,13 +240,28 @@
             }
         });
 
-        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
+        function getStorageData() {
+            try {
+                return JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function getBranchDiscounts() {
+            try {
+                return JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
+            } catch(e) {
+                return {};
+            }
+        }
+
         let selectedQuoteItems = {};
 
         function initQuoteTab() {
             const branchSelect = document.getElementById('quote-branch-select');
             if (!branchSelect) return;
+            let storageData = getStorageData();
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
             branches.forEach(function(b) {
@@ -262,6 +277,7 @@
             const tbody = document.getElementById('quote-selectable-body');
             if (!tbody) return;
 
+            let storageData = getStorageData();
             const selectedBranch = branchSelect ? branchSelect.value : '';
             const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
             
@@ -304,6 +320,8 @@
 
         function toggleQuoteItem(idx) {
             const chk = document.querySelector('input.q-item-chk[data-index="' + idx + '"]');
+            let storageData = getStorageData();
+            let branchDiscounts = getBranchDiscounts();
             if (chk && chk.checked) {
                 let item = storageData[idx];
                 if (!item) return;
@@ -350,6 +368,25 @@
         function generateQuote() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
+
+            let branchDiscounts = getBranchDiscounts();
+            let mismatchDetected = false;
+            keys.forEach(function(idx) {
+                let item = selectedQuoteItems[idx];
+                let term = item.term;
+                if (term === '12_85' || term === '12_80') {
+                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
+                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
+                    if (chosenDiscount !== originalDiscount) {
+                        mismatchDetected = true;
+                    }
+                }
+            });
+
+            if (mismatchDetected) {
+                let confirmCalc = confirm("⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折扣去試算費用？\n(若點擊【確定】，費用試算將會以您新選的折扣計算；同時正式報價單的價格表，仍會依照原本分店設定的預設折扣金額來呈現)");
+                if (!confirmCalc) return;
+            }
 
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
@@ -410,6 +447,7 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
             
+            let branchDiscounts = getBranchDiscounts();
             let clientName = document.getElementById('q-client-name').value || '客戶';
             let branchName = document.getElementById('q-branch').value || '分店';
             let dateStr = document.getElementById('quote-date').value;
