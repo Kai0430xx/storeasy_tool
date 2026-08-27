@@ -38,7 +38,7 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        .form-group input, .form-group select, .form-group datalist { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
         .form-group input:focus, .form-group select:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1); }
 
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
@@ -76,6 +76,16 @@
 </head>
 <body>
 
+    <!-- 共用據點下拉選項 (Datalist 支援下拉選取或直接手打) -->
+    <datalist id="branch-list">
+        <option value="土城店">
+        <option value="南東店">
+        <option value="民生松江店">
+        <option value="永和店">
+        <option value="延吉店">
+        <option value="逸仙店">
+    </datalist>
+
     <!-- 側邊導覽列 -->
     <aside class="no-print">
         <div class="sidebar-header">
@@ -105,11 +115,11 @@
             <div id="panel-storage" class="tab-content active">
                 <div class="card">
                     <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                    <p>系統會自動辨識編號、尺寸、材積、原價與各方案金額，個位數維持0。</p>
+                    <p>系統會自動辨識編號, 尺寸, 材積, 原價與各方案金額，個位數維持0。</p>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>分店名稱</label>
-                            <input type="text" id="upload-branch-name" value="土城店" placeholder="例如: 土城店">
+                            <label>分店名稱 (可下拉選擇或自行手打)</label>
+                            <input type="text" id="upload-branch-name" list="branch-list" value="土城店" placeholder="請選擇或輸入分店">
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
                             <label>選擇 Excel 檔案</label>
@@ -158,13 +168,13 @@
             <!-- 2. 生成報價單頁籤 -->
             <div id="panel-quote" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 報價單設定與完整方案勾選（不顯示編號）</h3>
+                    <h3>⚙️ 報價單設定與完整方案勾選（資料請自行填寫）</h3>
                     <div class="form-grid">
-                        <div class="form-group"><label>分店顯示名稱</label><input type="text" id="q-branch" value="土城店"></div>
-                        <div class="form-group"><label>店長</label><input type="text" id="q-manager" value="經辦人員"></div>
-                        <div class="form-group"><label>聯繫電話</label><input type="text" id="q-tel" value="0800-388075"></div>
-                        <div class="form-group"><label>報價日期</label><input type="date" id="quote-date"></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="q-address" value="新北市土城區..."></div>
+                        <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="q-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
+                        <div class="form-group"><label>店長</label><input type="text" id="q-manager" placeholder="請輸入店長姓名"></div>
+                        <div class="form-group"><label>聯繫電話</label><input type="text" id="q-tel" placeholder="請輸入分店電話"></div>
+                        <div class="form-group"><label>報價日期 (預設當天)</label><input type="date" id="quote-date"></div>
+                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="q-address" placeholder="請輸入分店地址"></div>
                         <div class="form-group"><label>客戶名稱</label><input type="text" id="q-client-name" placeholder="輸入客戶姓名"></div>
                         <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="q-client-tel" placeholder="輸入客電"></div>
                         <div class="form-group"><label>公司抬頭</label><input type="text" id="q-company" placeholder="抬頭"></div>
@@ -173,7 +183,7 @@
 
                     <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
                         <div class="form-group">
-                            <label>選擇分店據點：</label>
+                            <label>選擇分店據點篩選：</label>
                             <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
                                 <option value="">-- 全部據點 / 不限分店 --</option>
                             </select>
@@ -286,13 +296,13 @@
             <!-- 3. 生成請款單頁籤 -->
             <div id="panel-invoice" class="tab-content">
                 <div class="card no-print">
-                    <h3>⚙️ 會計版請款單設定與彈性搜尋勾選（可選保證金有無）</h3>
+                    <h3>⚙️ 會計版請款單設定與彈性搜尋勾選（資料請自行填寫）</h3>
                     <div class="form-grid">
-                        <div class="form-group"><label>分店顯示名稱</label><input type="text" id="i-branch" value="土城店"></div>
-                        <div class="form-group"><label>店長</label><input type="text" id="i-manager" value="經辦人員"></div>
-                        <div class="form-group"><label>聯繫電話</label><input type="text" id="i-tel" value="0800-388075"></div>
-                        <div class="form-group"><label>請款日期</label><input type="date" id="inv-date"></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="i-address" value="新北市土城區..."></div>
+                        <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="i-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
+                        <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
+                        <div class="form-group"><label>聯繫電話</label><input type="text" id="i-tel" placeholder="請輸入分店電話"></div>
+                        <div class="form-group"><label>請款日期 (預設當天)</label><input type="date" id="inv-date"></div>
+                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="i-address" placeholder="請輸入分店地址"></div>
                         <div class="form-group"><label>客戶名稱</label><input type="text" id="i-client" placeholder="姓名"></div>
                         <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
                         <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
@@ -301,7 +311,7 @@
 
                     <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
                         <div class="form-group">
-                            <label>選擇分店據點：</label>
+                            <label>選擇分店據點篩選：</label>
                             <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
                                 <option value="">-- 全部據點 / 不限分店 --</option>
                             </select>
@@ -411,7 +421,7 @@
     <!-- 載入 SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
-        // 自動設定右上角版本號
+        // 自動設定右上角版本號與預設日期
         (function() {
             const now = new Date();
             const yyyy = now.getFullYear();
@@ -654,7 +664,7 @@
             }
         }
 
-        // 報價單邏輯（完整方案顯示與勾選）
+        // 報價單邏輯
         function initQuoteTab() {
             const qDate = document.getElementById('quote-date');
             if (qDate && !qDate.value) qDate.valueAsDate = new Date();
@@ -782,10 +792,10 @@
         }
 
         function generateQuote() {
-            const branch = document.getElementById('q-branch').value;
-            const manager = document.getElementById('q-manager').value;
-            const address = document.getElementById('q-address').value;
-            const tel = document.getElementById('q-tel').value;
+            const branch = document.getElementById('q-branch').value || '未填寫分店';
+            const manager = document.getElementById('q-manager').value || '---';
+            const address = document.getElementById('q-address').value || '---';
+            const tel = document.getElementById('q-tel').value || '---';
             const client = document.getElementById('q-client-name').value || '未填寫';
             const clientPhone = document.getElementById('q-client-tel').value || '---';
             const company = document.getElementById('q-company').value || '---';
@@ -992,10 +1002,10 @@
         }
 
         function generateInvoice() {
-            const branch = document.getElementById('i-branch').value;
-            const manager = document.getElementById('i-manager').value;
-            const address = document.getElementById('i-address').value;
-            const tel = document.getElementById('i-tel').value;
+            const branch = document.getElementById('i-branch').value || '未填寫分店';
+            const manager = document.getElementById('i-manager').value || '---';
+            const address = document.getElementById('i-address').value || '---';
+            const tel = document.getElementById('i-tel').value || '---';
             const client = document.getElementById('i-client').value || '未填寫';
             const clientPhone = document.getElementById('i-client-phone').value || '---';
             const company = document.getElementById('i-company').value || '---';
@@ -1079,7 +1089,7 @@
             alert('會計版請款單已成功套用！');
         }
 
-        // 🏆 精準控制：帶有格線、底色、區塊間隔、匯款帳號與金額緊湊的專業 Excel XML 輸出
+        // 🏆 精準 Excel 2003 XML 格式匯出引擎 (確保格線、底色、區塊間隔、緊湊試算與帳號完整)
         function exportQuoteExcel() {
             const previewEl = document.getElementById('quote-preview');
             if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
@@ -1126,15 +1136,6 @@
                <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#0F172A"/>
                <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
               </Style>
-              <Style ss:ID="Cell">
-               <Alignment ss:Vertical="Center"/>
-               <Borders>
-                <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-                <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-               </Borders>
-              </Style>
               <Style ss:ID="CellCenter">
                <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
                <Borders>
@@ -1172,7 +1173,7 @@
              </Styles>
              <Worksheet ss:Name="報價單">
               <Table>
-               <Column ss:Width="110"/><Column ss:Width="160"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/>
+               <Column ss:Width="130"/><Column ss:Width="200"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/>
                
                <!-- 頂部標題列 -->
                <Row ss:Height="30">
@@ -1184,7 +1185,7 @@
                <Row ss:Height="20">
                 <Cell><Data ss:Type="String">Storeasy Storage Solution</Data></Cell>
                </Row>
-               <Row><Cell/></Row> <!-- 區塊間隔 -->
+               <Row><Cell/></Row>
 
                <!-- 左右分欄資訊區 -->
                <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qBranch}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">客戶名稱：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qClient}</Data></Cell><Cell/></Row>
@@ -1193,7 +1194,7 @@
                <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">分店地址：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qAddress}</Data></Cell><Cell/><Cell ss:StyleID="InfoBox"><Data ss:Type="String">統一編號：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qTaxid}</Data></Cell><Cell/></Row>
                <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">日期：</Data></Cell><Cell ss:StyleID="InfoBox"><Data ss:Type="String">${qDate}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
                
-               <Row><Cell/></Row> <!-- 區塊間隔 -->
+               <Row><Cell/></Row>
 
                <!-- 價格表表頭 -->
                <Row ss:Height="25">
@@ -1221,32 +1222,32 @@
                    </Row>`;
                }).join('')}
 
-               <Row><Cell/></Row> <!-- 區塊間隔 -->
+               <Row><Cell/></Row>
 
                <!-- 費用試算表（項目與金額緊鄰，不隔太遠） -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">費用試算表 (不含額外優惠)</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">租金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qRent}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">保證金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qDeposit}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">保險文書處理費總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qFee}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String" style="font-weight:bold;">合計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold; color:#B45309;">NT$ ${qTotal}</Data></Cell><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">費用試算表 (不含額外優惠)</Data></Cell><Cell/></Row>
+               <Row><Cell><Data ss:Type="String">租金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qRent}</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">保證金總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qDeposit}</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">保險文書處理費總計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String">NT$ ${qFee}</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String" style="font-weight:bold;">合計 (NT$)：</Data></Cell><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold; color:#B45309;">NT$ ${qTotal}</Data></Cell></Row>
 
-               <Row><Cell/></Row> <!-- 區塊間隔 -->
+               <Row><Cell/></Row>
 
                <!-- 匯款資訊（包含帳號） -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">匯款資訊：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">銀行：國泰世華 新莊分行 (代碼 013)</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">匯款資訊：</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">銀行：國泰世華 新莊分行 (代碼 013)</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell></Row>
 
-               <Row><Cell/></Row> <!-- 區塊間隔 -->
+               <Row><Cell/></Row>
 
                <!-- 備註 -->
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">備註：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">4. 付款方式: 轉帳、即期支票。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">備註：</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">4. 付款方式: 轉帳、即期支票。</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</Data></Cell></Row>
 
                <Row><Cell/></Row>
                <Row><Cell ss:StyleID="CellCenter"><Data ss:Type="String">THANK YOU FOR YOUR BUSINESS!</Data></Cell></Row>
@@ -1348,7 +1349,7 @@
                <Column ss:Width="160"/><Column ss:Width="80"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="70"/><Column ss:Width="90"/><Column ss:Width="70"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="110"/>
                
                <Row ss:Height="30">
-                <Cell ss:StyleID="TitleMain"><Data ss:Type="String">收多易股份有限公司</Data></Cell>
+                <Cell ss:StyleID="TitleMain"><Data ss:Type="String">收多易迷你倉庫</Data></Cell>
                 <Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/>
                 <Cell ss:StyleID="TitleSub"><Data ss:Type="String">請 款 單</Data></Cell>
                </Row>
@@ -1412,9 +1413,9 @@
                <Row><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell><Data ss:Type="String">請款總金額：</Data></Cell><Cell/><Cell ss:StyleID="CellRight"><Data ss:Type="String" style="font-weight:bold;">${iTotal}</Data></Cell></Row>
 
                <Row><Cell/></Row>
-               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">付款資料：</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
-               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/></Row>
+               <Row><Cell ss:StyleID="InfoBox"><Data ss:Type="String">付款資料：</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行</Data></Cell></Row>
+               <Row><Cell><Data ss:Type="String">帳號：________________________</Data></Cell></Row>
 
               </Table>
              </Worksheet>
