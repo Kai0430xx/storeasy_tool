@@ -321,6 +321,36 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
+            // 💡 步驟 1：偵測是否有任何一個項目選擇了與分店預設不同的年繳折扣
+            let mismatchDetected = false;
+            keys.forEach(idx => {
+                let item = selectedQuoteItems[idx];
+                let term = item.term;
+                if (term === '12_85' || term === '12_80') {
+                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
+                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
+                    if (chosenDiscount !== originalDiscount) {
+                        mismatchDetected = true;
+                    }
+                }
+            });
+
+            let overrideTableDiscount = null; // 用來記錄報價單表格年繳要以幾折呈現
+
+            if (mismatchDetected) {
+                // 詢問 1：是否照後面選擇的折數去試算費用？
+                let confirmCalc = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折數去試算費用？\n(按【確定】繼續，按【取消】返回修改)`);
+                if (!confirmCalc) return;
+
+                // 詢問 2：報價單內的價格表中年繳的部分要以幾折的金額呈現？
+                let tableChoice = prompt(`請問報價單內的價格表（年繳欄位），要以幾折的金額呈現？\n請輸入【85】(85折) 或【80】(8折)：`, "85");
+                if (tableChoice === '80' || tableChoice === '8折') {
+                    overrideTableDiscount = 0.8;
+                } else {
+                    overrideTableDiscount = 0.85;
+                }
+            }
+
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
             document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
@@ -337,12 +367,11 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                // 💡 報價單表格顯示價格：直接根據該倉位原生支援的價格顯示（月繳、季繳、半年繳、年繳依分店預設呈現）
-                let tableAnnualPrice = Math.round((item.price1 * 0.85) / 10) * 10;
-                let bDisc = branchDiscounts[item.branch];
-                if (bDisc === '0.80') tableAnnualPrice = Math.round((item.price1 * 0.8) / 10) * 10;
+                // 💡 報價單表格內年繳金額呈現邏輯
+                let tableDiscountRate = overrideTableDiscount !== null ? overrideTableDiscount : (branchDiscounts[item.branch] === '0.80' ? 0.8 : 0.85);
+                let tableAnnualPrice = Math.round((item.price1 * tableDiscountRate) / 10) * 10;
 
-                // 💡 費用試算金額：精確根據上方每個項目各自選擇的方案（月繳或8折或85折）計算
+                // 💡 費用試算金額：完全依據上方每個項目各自選擇的方案（月繳/季繳/半年繳/8折/85折）計算
                 let calcPrice = item.price1;
                 let months = 1;
                 if (term === '3') { calcPrice = item.price3; months = 3; }
@@ -357,7 +386,6 @@
                     unitText = '上層' + item.unit;
                 }
 
-                // 💡 表格內固定顯示各方案原生價格，不因選擇月繳就變成月繳
                 html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${tableAnnualPrice.toLocaleString()}</td></tr>`;
                 
                 rent += calcPrice * months; 
