@@ -223,11 +223,22 @@
 
     <script src="login.js"></script>
     <script>
-        (function() {
-            const now = new Date();
-            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
-            document.getElementById('quote-date').valueAsDate = new Date();
-        })();
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                const now = new Date();
+                const verEl = document.getElementById('system-version');
+                if (verEl) {
+                    verEl.innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+                }
+                const dateEl = document.getElementById('quote-date');
+                if (dateEl) {
+                    dateEl.valueAsDate = new Date();
+                }
+                initQuoteTab();
+            } catch(e) {
+                console.error("Initialization error:", e);
+            }
+        });
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
@@ -235,6 +246,7 @@
 
         function initQuoteTab() {
             const branchSelect = document.getElementById('quote-branch-select');
+            if (!branchSelect) return;
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
             branches.forEach(b => html += `<option value="${b}">${b}</option>`);
@@ -243,21 +255,28 @@
         }
 
         function renderQuoteSelectableItems() {
-            const selectedBranch = document.getElementById('quote-branch-select').value;
-            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
+            const branchSelect = document.getElementById('quote-branch-select');
+            const searchInput = document.getElementById('quote-search-input');
             const tbody = document.getElementById('quote-selectable-body');
+            if (!tbody) return;
+
+            const selectedBranch = branchSelect ? branchSelect.value : '';
+            const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
             
             let list = storageData;
             if (selectedBranch) list = list.filter(item => item.branch === selectedBranch);
-            if (searchKw) list = list.filter(item => item.code.toLowerCase().includes(searchKw) || item.size.toLowerCase().includes(searchKw) || String(item.unit).toLowerCase().includes(searchKw));
+            if (searchKw) list = list.filter(item => (item.code && item.code.toLowerCase().includes(searchKw)) || (item.size && item.size.toLowerCase().includes(searchKw)) || (item.unit && String(item.unit).toLowerCase().includes(searchKw)));
 
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料</td></tr>`; return; }
+            if (list.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>`; 
+                return; 
+            }
 
             tbody.innerHTML = list.map(item => {
                 let idx = storageData.indexOf(item);
                 let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
-                let p12_85 = Math.round((item.price1 * 0.85) / 10) * 10;
-                let p12_80 = Math.round((item.price1 * 0.8) / 10) * 10;
+                let p12_85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                let p12_80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
                 return `
                     <tr>
                         <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
@@ -291,6 +310,7 @@
 
         function renderSelectedQuoteSummary() {
             const summaryEl = document.getElementById('selected-items-summary');
+            if (!summaryEl) return;
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>'; return; }
             
@@ -366,8 +386,8 @@
                 let months = 1;
                 if (term === '3') { calcPrice = item.price3; months = 3; }
                 else if (term === '6') { calcPrice = item.price6; months = 6; }
-                else if (term === '12_85') { calcPrice = Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
-                else if (term === '12_80') { calcPrice = Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
+                else if (term === '12_85') { calcPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
+                else if (term === '12_80') { calcPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
 
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
 
@@ -432,8 +452,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "報價單試算");
             XLSX.writeFile(wb, `報價單_${clientName}.xlsx`);
         }
-
-        initQuoteTab();
     </script>
 </body>
 </html>
