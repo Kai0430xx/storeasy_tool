@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 生成報價單</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
@@ -40,6 +41,7 @@
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
         .btn-dark { background-color: #0f172a; color: #fff; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
+        .btn-emerald { background-color: #059669; color: #fff; }
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
@@ -212,6 +214,7 @@
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
+                    <button type="button" onclick="exportQuoteExcel()" class="btn btn-emerald">📥 匯出 Excel (試算表)</button>
                     <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
                 </div>
             </div>
@@ -321,7 +324,6 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
-            // 💡 檢查是否有項目選擇了與分店預設不同的年繳折扣
             let mismatchDetected = false;
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
@@ -336,7 +338,6 @@
             });
 
             if (mismatchDetected) {
-                // 💡 優化後的提示通知文字
                 let confirmCalc = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折扣去試算費用？\n(若點擊【確定】，費用試算將會以您新選的折扣計算；同時正式報價單的價格表，仍會依照原本分店設定的預設折扣金額來呈現)`);
                 if (!confirmCalc) return;
             }
@@ -357,12 +358,10 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                // 💡 報價單價格表：年繳欄位永遠依照原本分店預設的折扣金額呈現
                 let bDisc = branchDiscounts[item.branch];
                 let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
                 let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
 
-                // 💡 費用試算金額：完全依照您在下方選單各自選擇的方案（月繳/季繳/半年繳/8折/85折）計算
                 let calcPrice = item.price1;
                 let months = 1;
                 if (term === '3') { calcPrice = item.price3; months = 3; }
@@ -377,7 +376,6 @@
                     unitText = '上層' + item.unit;
                 }
 
-                // 💡 正式生成的報價單價格表：年繳金額固定依分店原預設呈現
                 html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${tableAnnualPrice.toLocaleString()}</td></tr>`;
                 
                 rent += calcPrice * months; 
@@ -390,6 +388,32 @@
             document.getElementById('v-q-fee').innerText = fee.toLocaleString();
             document.getElementById('v-q-total').innerText = (rent + fee + deposit).toLocaleString();
             alert('報價單已成功生成！');
+        }
+
+        function exportQuoteExcel() {
+            const keys = Object.keys(selectedQuoteItems);
+            if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
+            let wsData = [
+                ["收多易迷你倉庫 - 報價單"],
+                ["日期", document.getElementById('quote-date').value, "客戶名稱", document.getElementById('q-client-name').value],
+                ["分店", document.getElementById('q-branch').value, "聯絡電話", document.getElementById('q-client-tel'].value],
+                [],
+                ["單位(材)", "倉位尺寸", "月繳/月", "季繳/月", "半年繳/月", "年繳/月"]
+            ];
+            keys.forEach(idx => {
+                let item = selectedQuoteItems[idx];
+                if (item.term === 'none') return;
+                let bDisc = branchDiscounts[item.branch];
+                let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
+                let tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
+                wsData.push([unitText, `[${item.branch}] ${item.size}`, item.price1, item.price3, item.price6, tableAnnualPrice]);
+            });
+            wsData.push([], ["租金總計", document.getElementById('v-q-rent').innerText], ["保證金總計", document.getElementById('v-q-deposit').innerText], ["保險文書處理費", document.getElementById('v-q-fee').innerText], ["合計", document.getElementById('v-q-total').innerText]);
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "報價單");
+            XLSX.writeFile(wb, `報價單_${document.getElementById('q-client-name').value || '客戶'}.xlsx`);
         }
 
         initQuoteTab();
