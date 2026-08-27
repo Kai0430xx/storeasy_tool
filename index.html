@@ -63,7 +63,7 @@
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
-        /* 🏆 完美單頁壓縮列印控制 (自動縮小字體並塞進一頁) */
+        /* 🏆 完美單頁壓縮列印控制 */
         @media print {
             @page { size: A4 portrait; margin: 8mm; }
             body * { visibility: hidden; }
@@ -389,7 +389,6 @@
                         <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
                     </div>
 
-                    <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅) &amp; 保證金明細 / 月</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
@@ -411,7 +410,6 @@
                         </tbody>
                     </table>
 
-                    <div style="margin-top: 24px; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">雜費明細 (各倉位獨立 - 皆為含稅)</div>
                     <table>
                         <thead>
                             <tr style="background-color: #f8fafc; text-align: center;">
@@ -442,7 +440,7 @@
 
                     <div class="notes-box">
                         <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">付款資料：</div>
-                        <div>帳戶名稱：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 南門分行 ｜ 帳號：5965-071-110230-3</div>
+                        <div>帳戶名稱：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 南門分行 ｜ 帳號：________________________</div>
                         <div>支票付款抬頭請開：收多易股份有限公司</div>
                         <div style="color: #dc2626; font-weight: 600; margin-top: 4px;">請於請款日起7個工作日內完成入款</div>
                     </div>
@@ -995,18 +993,6 @@
             renderPerItemFeesInputs();
         }
 
-        function updateInvoiceItemTerm(globalIndex, termVal) {
-            if (selectedInvoiceItems[globalIndex]) {
-                selectedInvoiceItems[globalIndex].term = termVal;
-            }
-        }
-
-        function updateInvoiceItemDeposit(globalIndex, depVal) {
-            if (selectedInvoiceItems[globalIndex]) {
-                selectedInvoiceItems[globalIndex].depositOption = depVal;
-            }
-        }
-
         function updatePerItemFee(globalIndex, feeType, val) {
             if (selectedInvoiceItems[globalIndex]) {
                 selectedInvoiceItems[globalIndex][feeType] = Number(val) || 0;
@@ -1159,7 +1145,7 @@
                 let p1 = item.price1;
                 let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : item.price12_85;
 
-                // 核心修復：承租月份嚴格根據店長透過日曆選擇的「租期起日」與「租期訖日」計算月數
+                // 🏆 承租月份完全根據日曆起訖日精確計算月數
                 let termMonths = 1;
                 if (item.startDate && item.endDate) {
                     let d1 = new Date(item.startDate);
@@ -1176,7 +1162,7 @@
                 let insuranceFee = feePerMonth * termMonths;
                 
                 let deposit = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                let lineTotal = rentSubtotal + insuranceFee + deposit;
+                let lineTotal = rentSubtotal + deposit;
 
                 totalRentInc += rentSubtotal;
                 totalFeeInc += insuranceFee;
