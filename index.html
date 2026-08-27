@@ -138,7 +138,9 @@
                     <span id="arrow-elocker-menu">▶</span>
                 </button>
                 <div id="elocker-menu" class="menu-items collapsed" style="max-height: 0px;">
-                    <button type="button" onclick="switchTab('elocker')" id="btn-elocker" class="sub-btn">📋 快存櫃管理</button>
+                    <button type="button" onclick="switchTab('elocker-branches')" id="btn-elocker-branches" class="sub-btn">🏢 各據點資訊</button>
+                    <button type="button" onclick="switchTab('elocker-tutorial')" id="btn-elocker-tutorial" class="sub-btn">📖 操作教學</button>
+                    <button type="button" onclick="switchTab('elocker-data')" id="btn-elocker-data" class="sub-btn">⚙️ 管理資料</button>
                 </div>
             </div>
         </nav>
@@ -491,11 +493,27 @@
                 </div>
             </div>
 
-            <!-- 4. 快存櫃管理頁籤 (預留範例) -->
-            <div id="panel-elocker" class="tab-content">
+            <!-- 4. 快存櫃頁籤：各據點資訊 -->
+            <div id="panel-elocker-branches" class="tab-content">
                 <div class="card">
-                    <h3>🗄️ 快存櫃 (eLocker) 管理</h3>
-                    <p>此區域為快存櫃專屬管理與單據生成功能。</p>
+                    <h3>🏢 快存櫃 - 各據點資訊</h3>
+                    <p>在此檢視與管理各快存櫃據點的詳細資訊。</p>
+                </div>
+            </div>
+
+            <!-- 5. 快存櫃頁籤：操作教學 -->
+            <div id="panel-elocker-tutorial" class="tab-content">
+                <div class="card">
+                    <h3>📖 快存櫃 - 操作教學</h3>
+                    <p>在此查閱快存櫃系統的標準操作流程與教學指南。</p>
+                </div>
+            </div>
+
+            <!-- 6. 快存櫃頁籤：管理資料 -->
+            <div id="panel-elocker-data" class="tab-content">
+                <div class="card">
+                    <h3>⚙️ 快存櫃 - 管理資料</h3>
+                    <p>在此維護快存櫃的後台基礎數據與相關設定。</p>
                 </div>
             </div>
 
@@ -556,40 +574,47 @@
 
         // 頁籤切換
         function switchTab(tabName) {
-            document.getElementById('panel-storage').classList.remove('active');
-            document.getElementById('panel-quote').classList.remove('active');
-            document.getElementById('panel-invoice').classList.remove('active');
-            const elockerPanel = document.getElementById('panel-elocker');
-            if (elockerPanel) elockerPanel.classList.remove('active');
+            // 隱藏所有面板
+            const panels = ['panel-storage', 'panel-quote', 'panel-invoice', 'panel-elocker-branches', 'panel-elocker-tutorial', 'panel-elocker-data'];
+            panels.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
 
-            document.getElementById('btn-storage').classList.remove('active');
-            document.getElementById('btn-sub-quote').classList.remove('active');
-            document.getElementById('btn-sub-invoice').classList.remove('active');
-            const elockerBtn = document.getElementById('btn-elocker');
-            if (elockerBtn) elockerBtn.classList.remove('active');
+            // 移除所有子按鈕的 active
+            const buttons = ['btn-storage', 'btn-sub-quote', 'btn-sub-invoice', 'btn-elocker-branches', 'btn-elocker-tutorial', 'btn-elocker-data'];
+            buttons.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
 
-            if (tabName === 'elocker') {
-                if (elockerPanel) elockerPanel.classList.add('active');
-                if (elockerBtn) elockerBtn.classList.add('active');
-                document.getElementById('page-title').innerText = '🗄️ 快存櫃 (eLocker) 管理';
-            } else {
-                document.getElementById('panel-' + tabName).classList.add('active');
-                if (tabName === 'storage') document.getElementById('btn-storage').classList.add('active');
-                if (tabName === 'quote') document.getElementById('btn-sub-quote').classList.add('active');
-                if (tabName === 'invoice') document.getElementById('btn-sub-invoice').classList.add('active');
-
-                const titles = {
-                    'storage': '📦 倉位資料',
-                    'quote': '📄 生成報價單',
-                    'invoice': '💰 生成請款單'
-                };
-                document.getElementById('page-title').innerText = titles[tabName];
-
-                if (tabName === 'quote') {
-                    initQuoteTab();
-                } else if (tabName === 'invoice') {
-                    initInvoiceTab();
-                }
+            // 啟動對應面板與按鈕
+            if (tabName === 'storage') {
+                document.getElementById('panel-storage').classList.add('active');
+                document.getElementById('btn-storage').classList.add('active');
+                document.getElementById('page-title').innerText = '📦 倉位資料';
+            } else if (tabName === 'quote') {
+                document.getElementById('panel-quote').classList.add('active');
+                document.getElementById('btn-sub-quote').classList.add('active');
+                document.getElementById('page-title').innerText = '📄 生成報價單';
+                initQuoteTab();
+            } else if (tabName === 'invoice') {
+                document.getElementById('panel-invoice').classList.add('active');
+                document.getElementById('btn-sub-invoice').classList.add('active');
+                document.getElementById('page-title').innerText = '💰 生成請款單';
+                initInvoiceTab();
+            } else if (tabName === 'elocker-branches') {
+                document.getElementById('panel-elocker-branches').classList.add('active');
+                document.getElementById('btn-elocker-branches').classList.add('active');
+                document.getElementById('page-title').innerText = '🏢 各據點資訊';
+            } else if (tabName === 'elocker-tutorial') {
+                document.getElementById('panel-elocker-tutorial').classList.add('active');
+                document.getElementById('btn-elocker-tutorial').classList.add('active');
+                document.getElementById('page-title').innerText = '📖 操作教學';
+            } else if (tabName === 'elocker-data') {
+                document.getElementById('panel-elocker-data').classList.add('active');
+                document.getElementById('btn-elocker-data').classList.add('active');
+                document.getElementById('page-title').innerText = '⚙️ 管理資料';
             }
         }
 
