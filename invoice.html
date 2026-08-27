@@ -54,7 +54,6 @@
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
-        /* 💡 專屬列印 / PDF 輸出縮放與美化樣式 */
         @media print {
             body * { visibility: hidden; }
             aside, header.no-print, .card.no-print, .no-print { display: none !important; }
@@ -546,7 +545,7 @@
             let dateStr = document.getElementById('inv-date').value;
 
             let wsData = [
-                ["收多易迷你倉庫 - 會計版請款單"],
+                ["收多易迷你倉庫 - 會計版請款單明細表"],
                 ["請款日期", dateStr, "分店名稱", branchName],
                 ["客戶名稱", clientName, "客戶電話", document.getElementById('i-client-phone').value || '---'],
                 ["公司抬頭", document.getElementById('i-company').value || '---', "統一編號", document.getElementById('i-taxid').value || '---'],
@@ -599,11 +598,18 @@
                 ["保證金合計 (NT$)", document.getElementById('v-i-deposit').innerText],
                 ["保險文書處理費合計 (NT$)", document.getElementById('v-i-fee-total').innerText],
                 ["其他雜費合計 (NT$)", document.getElementById('v-i-extra-total').innerText],
-                ["請款總金額 (TWD)", document.getElementById('v-i-total').innerText]
+                ["請款總金額 (TWD)", document.getElementById('v-i-total'].innerText]
             );
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+            // 💡 設定精美自動欄寬
+            ws['!cols'] = [
+                {wch: 14}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 10}, 
+                {wch: 12}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 24}, {wch: 14}
+            ];
+
             XLSX.utils.book_append_sheet(wb, ws, "請款單明細");
             XLSX.writeFile(wb, "請款單_" + clientName + ".xlsx");
         }
