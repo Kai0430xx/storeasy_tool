@@ -240,28 +240,13 @@
             }
         });
 
-        function getStorageData() {
-            try {
-                return JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-            } catch(e) {
-                return [];
-            }
-        }
-
-        function getBranchDiscounts() {
-            try {
-                return JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
-            } catch(e) {
-                return {};
-            }
-        }
-
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
         let selectedQuoteItems = {};
 
         function initQuoteTab() {
             const branchSelect = document.getElementById('quote-branch-select');
             if (!branchSelect) return;
-            let storageData = getStorageData();
             const branches = [...new Set(storageData.map(item => item.branch))];
             let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
             branches.forEach(b => html += '<option value="' + b + '">' + b + '</option>');
@@ -275,7 +260,6 @@
             const tbody = document.getElementById('quote-selectable-body');
             if (!tbody) return;
 
-            let storageData = getStorageData();
             const selectedBranch = branchSelect ? branchSelect.value : '';
             const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
             
@@ -310,8 +294,6 @@
 
         function toggleQuoteItem(idx) {
             const chk = document.querySelector('input.q-item-chk[data-index="' + idx + '"]');
-            let storageData = getStorageData();
-            let branchDiscounts = getBranchDiscounts();
             if (chk && chk.checked) {
                 let item = storageData[idx];
                 if (!item) return;
@@ -358,8 +340,6 @@
         function generateQuote() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
-
-            let branchDiscounts = getBranchDiscounts();
 
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
@@ -420,7 +400,6 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
             
-            let branchDiscounts = getBranchDiscounts();
             let clientName = document.getElementById('q-client-name').value || '客戶';
             let branchName = document.getElementById('q-branch').value || '分店';
             let dateStr = document.getElementById('quote-date').value;
