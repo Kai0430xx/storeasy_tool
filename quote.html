@@ -195,7 +195,7 @@
                 </table>
 
                 <div class="summary-box">
-                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (此試算不含額外優惠)</div>
+                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (依上方各項目所選方案計算)</div>
                     <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
@@ -321,36 +321,6 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
-            // 💡 步驟 1：檢查是否有選擇與分店預設不同的年繳折數
-            let mismatchDetected = false;
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                let term = item.term;
-                if (term === '12_85' || term === '12_80') {
-                    let chosenDiscount = term === '12_80' ? '0.80' : '0.85';
-                    let originalDiscount = branchDiscounts[item.branch] || '0.85';
-                    if (chosenDiscount !== originalDiscount) {
-                        mismatchDetected = true;
-                    }
-                }
-            });
-
-            let finalTableDiscount = null; // 記錄報價單內表格要用幾折呈現
-
-            if (mismatchDetected) {
-                // 詢問 1：是否照後面選擇的折數去試算？
-                let confirmCalc = confirm(`⚠️ 提示：您選擇的年繳折扣與該分店原本設定的預設折扣不同。\n\n是否要照您後面選擇的折數去試算費用？\n(按【確定】繼續，按【取消】返回修改)`);
-                if (!confirmCalc) return;
-
-                // 詢問 2：報價單內的價格表中年繳的部分要以幾折的金額呈現？
-                let tableChoice = prompt(`請輸入報價單內價格表「年繳」要以幾折呈現？\n請輸入【85】(85折) 或【80】(8折)：`, "85");
-                if (tableChoice === '80' || tableChoice === '8折') {
-                    finalTableDiscount = '0.80';
-                } else {
-                    finalTableDiscount = '0.85';
-                }
-            }
-
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
             document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
             document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
@@ -367,24 +337,19 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                // 💡 報價單表格內價格呈現：若有透過步驟2指定，則依指定折數；否則依分店預設
-                let tableDiscountRate = 0.85;
-                if (finalTableDiscount) {
-                    tableDiscountRate = Number(finalTableDiscount);
-                } else {
-                    let bDisc = branchDiscounts[item.branch];
-                    if (bDisc === '0.80') tableDiscountRate = 0.8;
-                }
-                let tableAnnualPrice = Math.round((item.price1 * tableDiscountRate) / 10) * 10;
+                // 💡 報價單表格顯示價格：直接根據該倉位原生支援的價格顯示（月繳、季繳、半年繳、年繳依分店預設呈現）
+                let tableAnnualPrice = Math.round((item.price1 * 0.85) / 10) * 10;
+                let bDisc = branchDiscounts[item.branch];
+                if (bDisc === '0.80') tableAnnualPrice = Math.round((item.price1 * 0.8) / 10) * 10;
 
-                // 💡 費用試算金額：完全依據上方選單各自選擇的方案計算
+                // 💡 費用試算金額：精確根據上方每個項目各自選擇的方案（月繳或8折或85折）計算
                 let calcPrice = item.price1;
-                if (term === '3') calcPrice = item.price3;
-                else if (term === '6') calcPrice = item.price6;
-                else if (term === '12_85') calcPrice = Math.round((item.price1 * 0.85) / 10) * 10;
-                else if (term === '12_80') calcPrice = Math.round((item.price1 * 0.8) / 10) * 10;
+                let months = 1;
+                if (term === '3') { calcPrice = item.price3; months = 3; }
+                else if (term === '6') { calcPrice = item.price6; months = 6; }
+                else if (term === '12_85') { calcPrice = Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
+                else if (term === '12_80') { calcPrice = Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
 
-                let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
                 let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
 
                 let unitText = item.unit;
@@ -392,6 +357,7 @@
                     unitText = '上層' + item.unit;
                 }
 
+                // 💡 表格內固定顯示各方案原生價格，不因選擇月繳就變成月繳
                 html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${unitText}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${tableAnnualPrice.toLocaleString()}</td></tr>`;
                 
                 rent += calcPrice * months; 
