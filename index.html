@@ -339,7 +339,7 @@
                         </table>
                     </div>
 
-                    <!-- 各倉位獨立設定區 (方案、保證金、日曆租期、含稅雜費) -->
+                    <!-- 各倉位獨立設定區 (方案折扣、保證金、日曆租期、含稅雜費) -->
                     <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                         <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取倉位之方案折扣、保證金、日曆租期與含稅雜費設定：</h5>
                         <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
@@ -1025,18 +1025,18 @@
                 let currentTerm = item.term || '12';
                 let currentDep = item.depositOption || 'yes';
                 html += `
-                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px;" data-index="${idx}">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                             <div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：${item.code} ([${item.branch}] ${item.size} / ${item.unit}材)</div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <select onchange="updateInvoiceItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
+                                <select class="inv-term-select" data-index="${idx}" onchange="updateInvoiceItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
                                     <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
                                     <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
                                     <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
                                     <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
                                     <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
                                 </select>
-                                <select onchange="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
+                                <select class="inv-dep-select" data-index="${idx}" onchange="updateInvoiceItemDeposit(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
                                     <option value="yes" ${currentDep==='yes'?'selected':''}>🔒 含保證金</option>
                                     <option value="no" ${currentDep==='no'?'selected':''}>🔓 無保證金 (續約)</option>
                                 </select>
@@ -1075,6 +1075,18 @@
         }
 
         function generateInvoice() {
+            // 生成前自動同步 DOM 中使用者點選的最新 term 與 depositOption
+            const containerDivs = document.querySelectorAll('#per-item-fees-container > div');
+            containerDivs.forEach(div => {
+                const idx = div.getAttribute('data-index');
+                if (idx && selectedInvoiceItems[idx]) {
+                    const termSel = div.querySelector('.inv-term-select');
+                    const depSel = div.querySelector('.inv-dep-select');
+                    if (termSel) selectedInvoiceItems[idx].term = termSel.value;
+                    if (depSel) selectedInvoiceItems[idx].depositOption = depSel.value;
+                }
+            });
+
             const branch = document.getElementById('i-branch').value || '未填寫分店';
             const manager = document.getElementById('i-manager').value || '---';
             const address = document.getElementById('i-address').value || '---';
@@ -1131,7 +1143,6 @@
                 totalFeeInc += insuranceFee;
                 totalDeposit += deposit;
 
-                // 格式化西元年月日租期 (YYYY/MM/DD - YYYY/MM/DD)
                 let formatDate = (dStr) => {
                     if (!dStr) return '';
                     let parts = dStr.split('-');
@@ -1142,7 +1153,6 @@
                 let endF = formatDate(item.endDate);
                 let dateRangeStr = (startF && endF) ? `${startF} － ${endF}` : (startF || endF || '未填租期');
 
-                // 租金與保證金明細列 (已移除倉位尺寸欄位)
                 itemsHtml += `
                     <tr>
                         <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">${item.code}</td>
@@ -1159,7 +1169,6 @@
                     </tr>
                 `;
 
-                // 各倉位獨立雜費
                 let lFee = item.lateFee || 0;
                 let pFee = item.packingFee || 0;
                 let mFee = item.movingFee || 0;
