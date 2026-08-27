@@ -195,12 +195,15 @@
                         }
                         if (code && !isNaN(price1) && price1 > 200) {
                             newItems.push({
-                                branch: branch, code: code, size: size !== '-' ? size + ' m' : '標準尺寸',
-                                unit: unit !== '-' ? unit : '50', price1: price1,
+                                branch: branch, 
+                                code: code, 
+                                size: size !== '-' ? size + ' m' : '標準尺寸',
+                                unit: unit !== '-' ? unit : '50', 
+                                price1: price1,
                                 price3: Math.round((price1 * 0.95) / 10) * 10,
                                 price6: Math.round((price1 * 0.90) / 10) * 10,
                                 price12_85: Math.round((price1 * 0.85) / 10) * 10,
-                                price12_80: Math.round((price1 * 0.8) / 10) * 10
+                                price12_80: Math.round((price1 * 0.80) / 10) * 10
                             });
                         }
                     }
@@ -211,7 +214,6 @@
                     storageData = storageData.concat(newItems);
                     localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                     
-                    // 💡 匯入成功後，將下拉選單強制設回 'all' 並重新渲染
                     const selectEl = document.getElementById('storage-branch-filter');
                     if (selectEl) selectEl.value = 'all';
 
@@ -229,8 +231,9 @@
             Object.keys(counts).forEach(b => html += `<option value="${b}">${b} (${counts[b]})</option>`);
             const selectEl = document.getElementById('storage-branch-filter');
             if (selectEl) {
+                let currentVal = selectEl.value;
                 selectEl.innerHTML = html;
-                selectEl.value = selectedVal;
+                selectEl.value = currentVal || selectedVal;
             }
         }
 
@@ -265,6 +268,8 @@
             if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
             
             tbody.innerHTML = list.map(item => {
+                let p85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                let p80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.80) / 10) * 10;
                 return `
                     <tr>
                         <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
@@ -274,8 +279,8 @@
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
                         <td>NT$ ${item.price3.toLocaleString()}</td>
                         <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${p85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${p80.toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
