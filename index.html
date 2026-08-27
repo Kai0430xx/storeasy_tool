@@ -208,7 +208,12 @@
             storageData.forEach(i => counts[i.branch] = (counts[i.branch]||0)+1);
             let html = `<option value="all">全部據點 (${storageData.length})</option>`;
             Object.keys(counts).forEach(b => html += `<option value="${b}">${b} (${counts[b]})</option>`);
-            document.getElementById('storage-branch-filter').innerHTML = html;
+            const selectEl = document.getElementById('storage-branch-filter');
+            if (selectEl) {
+                let currentVal = selectEl.value;
+                selectEl.innerHTML = html;
+                selectEl.value = currentVal;
+            }
         }
 
         function renderStorageTable() {
@@ -216,6 +221,7 @@
             let filter = document.getElementById('storage-branch-filter').value;
             let list = filter === 'all' ? storageData : storageData.filter(i => i.branch === filter);
             let tbody = document.getElementById('storage-table-body');
+            if (!tbody) return;
             if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
             tbody.innerHTML = list.map(item => `
                 <tr>
