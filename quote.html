@@ -54,7 +54,6 @@
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
-        /* 💡 專屬列印 / PDF 輸出縮放與彈性排版最佳化樣式 */
         @media print {
             body * { visibility: hidden; }
             aside, header.no-print, .card.no-print, .no-print { display: none !important; }
@@ -391,7 +390,7 @@
                 else if (term === '12_85') { calcPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; months = 12; }
                 else if (term === '12_80') { calcPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; months = 12; }
 
-                let extraNote = item.extraNote ? '<br><span style="color: #dc2626; font-size:0.75rem;">(' + item.extraNote + ')</span>' : '';
+                let extraNote = item.extraNote ? '<br><span style="color: #dc2626; font-size:0.75rem; word-break: break-all;">(' + item.extraNote + ')</span>' : '';
 
                 let unitText = item.unit;
                 if (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') {
@@ -400,7 +399,7 @@
 
                 html += '<tr>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">' + unitText + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:left; font-weight:bold;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:left; font-weight:bold; word-break: break-all;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price1.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price3.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ' + item.price6.toLocaleString() + '</td>' +
@@ -454,7 +453,7 @@
                 ["租金總計 (NT$)", document.getElementById('v-q-rent').innerText],
                 ["保證金總計 (NT$)", document.getElementById('v-q-deposit').innerText],
                 ["保險文書處理費總計 (NT$)", document.getElementById('v-q-fee').innerText],
-                ["合計總金額 (NT$)", document.getElementById('v-q-total'].innerText]
+                ["合計總金額 (NT$)", document.getElementById('v-q-total').innerText]
             );
 
             const wb = XLSX.utils.book_new();
