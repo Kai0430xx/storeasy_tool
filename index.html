@@ -3,44 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收多易迷你倉庫 - Storeasy Storage 營運管理工具</title>
-    <!-- SheetJS 用於解析 Excel 檔案 -->
+    <title>收多易迷你倉庫 - 倉位資料</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* 側邊導覽列 */
         aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
         .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
         .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
         
         nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-        
-        /* 大分類群組樣式 */
         .menu-group { display: flex; flex-direction: column; gap: 4px; }
-        .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
-        .menu-category:hover { background-color: #334155; }
-        .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; overflow: hidden; transition: max-height 0.3s ease; }
-        .menu-items.collapsed { max-height: 0 !important; padding-top: 0; padding-bottom: 0; }
+        .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
         
-        nav button.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; border: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        nav button.sub-btn:hover { background-color: #1e293b; color: #fff; }
-        nav button.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+        nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
+        nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
+        nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        /* 主內容區 */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
-        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; }
-        .tab-content { display: none; flex-direction: column; gap: 24px; }
-        .tab-content.active { display: flex; }
-
+        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .card h3 { font-size: 1.1rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
         .card p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
@@ -49,1375 +39,211 @@
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
         .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
-        .form-group input:focus, .form-group select:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1); }
-
-        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
         .btn-amber:hover { background-color: #d97706; }
-        .btn-dark { background-color: #0f172a; color: #fff; }
-        .btn-dark:hover { background-color: #1e293b; }
-        .btn-emerald { background-color: #059669; color: #fff; }
-        .btn-emerald:hover { background-color: #047857; }
         .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .btn-red-outline:hover { background-color: #fee2e2; }
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
-
-        .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
-        .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
-        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
-        .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
-        .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
-        .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
-
-        /* 🏆 完美單頁壓縮列印控制 */
-        @media print {
-            @page { size: A4 portrait; margin: 8mm; }
-            body * { visibility: hidden; }
-            aside, header.no-print, .card.no-print, .no-print { display: none !important; }
-            #quote-preview.preview-box, #quote-preview.preview-box *,
-            #invoice-preview.preview-box, #invoice-preview.preview-box * { visibility: visible; }
-            #quote-preview, #invoice-preview {
-                position: absolute; left: 0; top: 0; width: 100% !important; 
-                margin: 0 !important; padding: 10px !important; 
-                box-shadow: none !important; border: none !important; background: white !important;
-                font-size: 8pt !important;
-            }
-            #quote-preview table th, #quote-preview table td,
-            #invoice-preview table th, #invoice-preview table td {
-                padding: 4px 6px !important;
-                font-size: 7.5pt !important;
-            }
-            .preview-info { padding: 8px !important; margin-bottom: 10px !important; gap: 6px !important; font-size: 8pt !important; }
-            .summary-box { padding: 8px !important; margin-bottom: 10px !important; margin-top: 10px !important; font-size: 8pt !important; }
-            .notes-box { padding: 8px !important; margin-bottom: 10px !important; font-size: 7pt !important; }
-            .preview-header { padding-bottom: 8px !important; margin-bottom: 12px !important; }
-            body { background: white !important; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- 共用據點下拉選項 (支援選取與手打) -->
     <datalist id="branch-list">
-        <option value="土城店">
-        <option value="南東店">
-        <option value="民生松江店">
-        <option value="永和店">
-        <option value="延吉店">
-        <option value="逸仙店">
+        <option value="土城店"><option value="南東店"><option value="民生松江店"><option value="永和店"><option value="延吉店"><option value="逸仙店">
     </datalist>
 
-    <!-- 側邊導覽列 -->
     <aside class="no-print">
         <div class="sidebar-header">
             <h1>收多易迷你倉庫</h1>
             <p>Storeasy Storage</p>
         </div>
         <nav>
-            <!-- 大分類 1：迷你倉庫 (可展開/縮回) -->
             <div class="menu-group">
-                <button type="button" class="menu-category" onclick="toggleMenu('mini-storage-menu', this)">
-                    <span>📦 迷你倉庫</span>
-                    <span id="arrow-mini-storage-menu">▼</span>
-                </button>
-                <div id="mini-storage-menu" class="menu-items">
-                    <button type="button" onclick="switchTab('storage')" id="btn-storage" class="sub-btn active">📦 倉位資料</button>
-                    <button type="button" onclick="switchTab('quote')" id="btn-sub-quote" class="sub-btn">📄 生成報價單</button>
-                    <button type="button" onclick="switchTab('invoice')" id="btn-sub-invoice" class="sub-btn">💰 生成請款單</button>
+                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <div class="menu-items">
+                    <a href="index.html" class="sub-btn active">📦 倉位資料</a>
+                    <a href="quote.html" class="sub-btn">📄 生成報價單</a>
+                    <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
                 </div>
             </div>
-
-            <!-- 大分類 2：快存櫃 (可展開/縮回) -->
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category" onclick="toggleMenu('elocker-menu', this)">
-                    <span>🗄️ 快存櫃 (eLocker)</span>
-                    <span id="arrow-elocker-menu">▶</span>
-                </button>
-                <div id="elocker-menu" class="menu-items collapsed" style="max-height: 0px;">
-                    <button type="button" onclick="switchTab('elocker-branches')" id="btn-elocker-branches" class="sub-btn">🏢 各據點資訊</button>
-                    <button type="button" onclick="switchTab('elocker-tutorial')" id="btn-elocker-tutorial" class="sub-btn">📖 操作教學</button>
-                    <button type="button" onclick="switchTab('elocker-data')" id="btn-elocker-data" class="sub-btn">⚙️ 管理資料</button>
+                <button type="button" class="menu-category"><span>🗄️ 快存櫃 (eLocker)</span><span>▶</span></button>
+                <div class="menu-items">
+                    <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
+                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
+                    <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
                 </div>
             </div>
         </nav>
-        <div class="sidebar-footer">
-            資料已永久儲存於本機瀏覽器
-        </div>
+        <div class="sidebar-footer">資料已永久儲存於本機瀏覽器</div>
     </aside>
 
-    <!-- 主內容區 -->
     <main>
         <header class="no-print">
-            <h2 id="page-title">📦 倉位資料</h2>
+            <h2>📦 倉位資料</h2>
             <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
         <div class="content-body">
-
-            <!-- 1. 倉位資料頁籤 -->
-            <div id="panel-storage" class="tab-content active">
-                <div class="card">
-                    <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                    <p>系統會自動辨識編號,尺寸,材積,原價與各方案金額</p>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>分店名稱 (可下拉選擇或自行手打)</label>
-                            <input type="text" id="upload-branch-name" list="branch-list" value="土城店" placeholder="請選擇或輸入分店">
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>選擇 Excel 檔案</label>
-                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
-                        </div>
+            <div class="card">
+                <h3>📥 一鍵上傳各店空倉表 Excel</h3>
+                <p>系統會自動辨識編號,尺寸,材積,原價與各方案金額</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>分店名稱</label>
+                        <input type="text" id="upload-branch-name" list="branch-list" value="土城店">
                     </div>
-                    <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">匯入資料</button>
-                </div>
-
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <h3 style="margin-bottom:0;">📋 已載入的倉位清單</h3>
-                            <select id="storage-branch-filter" onchange="renderStorageTable()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #92400e; background: #fef3c7;">
-                                <option value="all">全部據點</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button type="button" onclick="deleteSelectedBranchData()" class="btn btn-red-outline" style="padding: 6px 12px; font-size: 0.8rem;">🗑️ 刪除目前選取分店</button>
-                            <button type="button" onclick="clearStorageData()" style="background:none; border:none; color: #94a3b8; font-size: 0.8rem; cursor:pointer; text-decoration: underline;">清空全部本機資料</button>
-                        </div>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="text-align: left;">據點名稱</th>
-                                    <th style="text-align: left;">倉位編號</th>
-                                    <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
-                                    <th style="text-align: left;">材積 (材)</th>
-                                    <th style="text-align: left;">月繳/原價</th>
-                                    <th style="text-align: left;">季繳</th>
-                                    <th style="text-align: left;">半年繳</th>
-                                    <th style="text-align: left;">年繳(85折)</th>
-                                    <th style="text-align: left;">年繳(8折)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="storage-table-body">
-                                <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
-                            </tbody>
-                        </table>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>選擇 Excel 檔案</label>
+                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
                     </div>
                 </div>
+                <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">匯入資料</button>
             </div>
 
-            <!-- 2. 生成報價單頁籤 -->
-            <div id="panel-quote" class="tab-content">
-                <div class="card no-print">
-                    <div class="form-grid">
-                        <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="q-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
-                        <div class="form-group"><label>店長</label><input type="text" id="q-manager" placeholder="請輸入店長姓名"></div>
-                        <div class="form-group"><label>聯繫電話</label><input type="text" id="q-tel" placeholder="請輸入分店電話"></div>
-                        <div class="form-group"><label>報價日期 (預設當天)</label><input type="date" id="quote-date"></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="q-address" placeholder="請輸入分店地址"></div>
-                        <div class="form-group"><label>客戶名稱</label><input type="text" id="q-client-name" placeholder="輸入客戶姓名"></div>
-                        <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="q-client-tel" placeholder="輸入客電"></div>
-                        <div class="form-group"><label>公司抬頭</label><input type="text" id="q-company" placeholder="抬頭"></div>
-                        <div class="form-group"><label>統一編號</label><input type="text" id="q-taxid" placeholder="統編"></div>
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <h3 style="margin-bottom:0;">📋 已載入的倉位清單</h3>
+                        <select id="storage-branch-filter" onchange="renderStorageTable()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #92400e; background: #fef3c7;">
+                            <option value="all">全部據點</option>
+                        </select>
                     </div>
-
-                    <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>選擇分店據點篩選：</label>
-                            <select id="quote-branch-select" onchange="renderQuoteSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
-                                <option value="">-- 全部據點 / 不限分店 --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>🔍 快速搜尋 (尺寸或材積)：</label>
-                            <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: 0.9 或 75">
-                        </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="deleteSelectedBranchData()" class="btn btn-red-outline" style="padding: 6px 12px; font-size: 0.8rem;">🗑️ 刪除目前選取分店</button>
+                        <button type="button" onclick="clearStorageData()" style="background:none; border:none; color: #94a3b8; font-size: 0.8rem; cursor:pointer; text-decoration: underline;">清空全部本機資料</button>
                     </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                                    <th style="width: 40px; text-align: left;">選取</th>
-                                    <th style="text-align: left;">據點名稱</th>
-                                    <th style="text-align: left;">倉位編號</th>
-                                    <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
-                                    <th style="text-align: left;">材積 (材)</th>
-                                    <th style="text-align: left;">月繳/原價</th>
-                                    <th style="text-align: left;">季繳</th>
-                                    <th style="text-align: left;">半年繳</th>
-                                    <th style="text-align: left;">年繳(85折)</th>
-                                    <th style="text-align: left;">年繳(8折)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="quote-selectable-body">
-                                <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目（方案與額外優惠）：</h5>
-                        <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
-                            <span style="color: #94a3b8;">尚未勾選任何項目</span>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="generateQuote()" class="btn btn-dark">📄 生成報價單</button>
                 </div>
-
-                <!-- 報價單預覽區 -->
-                <div id="quote-preview" class="preview-box">
-                    <div class="preview-header">
-                        <div>
-                            <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
-                            <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Solution</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">報 價 單</h2>
-                            <p style="font-size: 0.75rem; color: #dc2626; font-weight: 600; margin-top: 4px;">報價有效期限 7 天</p>
-                        </div>
-                    </div>
-
-                    <div class="preview-info">
-                        <div><strong>日  期：</strong> <span id="v-q-date">---</span></div>
-                        <div><strong>客 戶 名 稱：</strong> <span id="v-q-client">---</span></div>
-                        <div><strong>店  長：</strong> <span id="v-q-manager">---</span></div>
-                        <div><strong>客 戶 電 話：</strong> <span id="v-q-client-phone">---</span></div>
-                        <div><strong>分店名稱：</strong> <span id="v-q-branch">---</span></div>
-                        <div><strong>公 司 抬 頭：</strong> <span id="v-q-company">---</span></div>
-                        <div><strong>聯 繫 電 話：</strong> <span id="v-q-tel">---</span></div>
-                        <div><strong>統  編：</strong> <span id="v-q-taxid">---</span></div>
-                        <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
-                    </div>
-
+                <div style="overflow-x: auto;">
                     <table>
                         <thead>
-                            <tr style="background-color: #f1f5f9; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">單位<br>(材)</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">倉位尺寸<br>(寬*深*高 m)</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">月繳/月</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">季繳/月</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">半年繳/月</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: right;">年繳/月</th>
+                            <tr>
+                                <th style="text-align: left;">據點名稱</th>
+                                <th style="text-align: left;">倉位編號</th>
+                                <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
+                                <th style="text-align: left;">材積 (材)</th>
+                                <th style="text-align: left;">月繳/原價</th>
+                                <th style="text-align: left;">季繳</th>
+                                <th style="text-align: left;">半年繳</th>
+                                <th style="text-align: left;">年繳(85折)</th>
+                                <th style="text-align: left;">年繳(8折)</th>
                             </tr>
                         </thead>
-                        <tbody id="v-q-items" style="text-align: center;">
-                            <tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">尚未產生內容</td></tr>
+                        <tbody id="storage-table-body">
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
                         </tbody>
                     </table>
-
-                    <div class="summary-box">
-                        <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (此試算不含額外優惠)</div>
-                        <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 6px; color: #b45309;"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
-                    </div>
-
-                    <div class="notes-box">
-                        <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">匯款資訊：</div>
-                        <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</div>
-                        <div style="font-weight: bold; color: #1e293b; margin-top: 8px; margin-bottom: 4px;">備註：</div>
-                        <div>1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</div>
-                        <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
-                        <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
-                        <div>4. 付款方式: 轉帳、即期支票。</div>
-                        <div>5. 個人用戶簽約請帶: 雙證件及悠遊卡乙張；公司用戶請帶: 設立登記表影本、公司大小章、負責人雙證件、悠遊卡兩張。</div>
-                    </div>
-
-                    <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
-                        <button type="button" onclick="exportQuoteExcel()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
-                        <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
-                    </div>
                 </div>
             </div>
-
-            <!-- 3. 生成請款單頁籤 -->
-            <div id="panel-invoice" class="tab-content">
-                <div class="card no-print">
-                    <div class="form-grid">
-                        <div class="form-group"><label>分店名稱 (可下拉選取或手打)</label><input type="text" id="i-branch" list="branch-list" placeholder="請選擇或輸入分店"></div>
-                        <div class="form-group"><label>店長</label><input type="text" id="i-manager" placeholder="請輸入店長姓名"></div>
-                        <div class="form-group"><label>聯繫電話</label><input type="text" id="i-tel" placeholder="請輸入分店電話"></div>
-                        <div class="form-group"><label>請款日期 (預設當天)</label><input type="date" id="inv-date"></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="i-address" placeholder="請輸入分店地址"></div>
-                        <div class="form-group"><label>客戶名稱</label><input type="text" id="i-client" placeholder="姓名"></div>
-                        <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
-                        <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
-                        <div class="form-group"><label>統一編號</label><input type="text" id="i-taxid" placeholder="統編"></div>
-                    </div>
-
-                    <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>選擇分店據點篩選：</label>
-                            <select id="invoice-branch-select" onchange="renderInvoiceSelectableItems()" style="background: #fef3c7; font-weight: bold; color: #92400e;">
-                                <option value="">-- 全部據點 / 不限分店 --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>🔍 快速搜尋 (編號或材積)：</label>
-                            <input type="text" id="invoice-search-input" oninput="renderInvoiceSelectableItems()" placeholder="例如: QD335 或 75">
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                                    <th style="width: 40px; text-align: left;">選取</th>
-                                    <th style="text-align: left;">據點名稱</th>
-                                    <th style="text-align: left;">倉位編號</th>
-                                    <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
-                                    <th style="text-align: left;">材積 (材)</th>
-                                    <th style="text-align: left;">月繳/原價</th>
-                                    <th style="text-align: left;">季繳</th>
-                                    <th style="text-align: left;">半年繳</th>
-                                    <th style="text-align: left;">年繳(85折)</th>
-                                    <th style="text-align: left;">年繳(8折)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoice-selectable-body">
-                                <tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">請先選擇據點或搜尋</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- 各倉位獨立設定區 (方案折扣、保證金、日曆租期、含稅雜費) -->
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取倉位之方案折扣、保證金、日曆租期與含稅雜費設定：</h5>
-                        <div id="per-item-fees-container" style="display: flex; flex-direction: column; gap: 12px;">
-                            <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="generateInvoice()" class="btn btn-dark">💰 生成請款單</button>
-                </div>
-
-                <!-- 請款單預覽區 -->
-                <div id="invoice-preview" class="preview-box">
-                    <div class="preview-header">
-                        <div>
-                            <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
-                            <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Invoice Statement</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">請 款 單</h2>
-                        </div>
-                    </div>
-
-                    <div class="preview-info">
-                        <div><strong>日  期：</strong> <span id="v-i-date">---</span></div>
-                        <div><strong>客 戶 名 稱：</strong> <span id="v-i-client">---</span></div>
-                        <div><strong>店  長：</strong> <span id="v-i-manager">---</span></div>
-                        <div><strong>客 戶 電 話：</strong> <span id="v-i-client-phone">---</span></div>
-                        <div><strong>分店名稱：</strong> <span id="v-i-branch">---</span></div>
-                        <div><strong>公 司 抬 頭：</strong> <span id="v-i-company">---</span></div>
-                        <div><strong>聯 繫 電 話：</strong> <span id="v-i-tel">---</span></div>
-                        <div><strong>統  編：</strong> <span id="v-i-taxid">---</span></div>
-                        <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
-                    </div>
-
-                    <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅) &amp; 保證金明細</div>
-                    <table>
-                        <thead>
-                            <tr style="background-color: #f8fafc; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">倉位編號</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">材積</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">原價租金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">優惠租金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">承租月份</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">未稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">稅金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">含稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">保證金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">租期</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">小計</th>
-                            </tr>
-                        </thead>
-                        <tbody id="v-i-items" style="text-align: center;">
-                            <tr><td colspan="11" style="text-align: center; color: #94a3b8; padding: 24px;">請先於請款單頁面勾選項目與繳費方式</td></tr>
-                        </tbody>
-                    </table>
-
-                    <div style="margin-top: 32px; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155; text-align: left;">雜費明細</div>
-                    <table style="margin-bottom: 32px;">
-                        <thead>
-                            <tr style="background-color: #f8fafc; text-align: center;">
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">倉位編號</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">滯納金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">保險文書處理費</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">包材</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">搬運</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">其它</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">未稅小計</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">稅金</th>
-                                <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a; text-align: center;">含稅小計</th>
-                            </tr>
-                        </thead>
-                        <tbody id="v-i-fees" style="text-align: center;">
-                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 16px;">無額外雜費</td></tr>
-                        </tbody>
-                    </table>
-
-                    <div class="summary-box">
-                        <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算總表</div>
-                        <div style="display: flex; justify-content: space-between;"><span>租金合計：</span> <span id="v-i-subtotal" style="font-weight: bold;">0</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>保證金合計：</span> <span id="v-i-deposit">0</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>保險文書處理費合計：</span> <span id="v-i-fee-total">0</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>其他雜費合計 (滯納金/包材/搬運/其它)：</span> <span id="v-i-extra-total">0</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 8px; color: #b45309;"><span>請款總金額 (TWD)：</span> <span id="v-i-total">0</span></div>
-                    </div>
-
-                    <div class="notes-box">
-                        <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">付款資料：</div>
-                        <div>帳戶名稱：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 南門分行 ｜ 帳號：________________________</div>
-                        <div>支票付款抬頭請開：收多易股份有限公司</div>
-                        <div style="color: #dc2626; font-weight: 600; margin-top: 4px;">請於請款日起7個工作日內完成入款</div>
-                    </div>
-
-                    <div style="text-align: center; font-weight: bold; letter-spacing: 2px; color: #94a3b8; font-size: 0.75rem; margin-bottom: 24px;">THANK YOU FOR YOUR BUSINESS!</div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
-                        <button type="button" onclick="exportInvoiceExcel()" class="btn btn-emerald">📥 匯出為 Excel 檔</button>
-                        <button type="button" onclick="window.print()" class="btn btn-amber">🖨️ 列印 / 另存為 PDF</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. 快存櫃頁籤：各據點資訊 -->
-            <div id="panel-elocker-branches" class="tab-content">
-                <div class="card">
-                    <h3>🏢 快存櫃 - 各據點資訊</h3>
-                    <p>在此檢視與管理各快存櫃據點的詳細資訊。</p>
-                </div>
-            </div>
-
-            <!-- 5. 快存櫃頁籤：操作教學 -->
-            <div id="panel-elocker-tutorial" class="tab-content">
-                <div class="card">
-                    <h3>📖 快存櫃 - 操作教學</h3>
-                    <p>在此查閱快存櫃系統的標準操作流程與教學指南。</p>
-                </div>
-            </div>
-
-            <!-- 6. 快存櫃頁籤：管理資料 -->
-            <div id="panel-elocker-data" class="tab-content">
-                <div class="card">
-                    <h3>⚙️ 快存櫃 - 管理資料</h3>
-                    <p>在此維護快存櫃的後台基礎數據與相關設定。</p>
-                </div>
-            </div>
-
         </div>
     </main>
 
-    <!-- 載入 SheetJS -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
-    <!-- 載入登入驗證模組 -->
     <script src="login.js"></script>
-
     <script>
-        // 自動設定右上角版本號與預設日期
         (function() {
             const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const versionStr = `${yyyy}${mm}${dd}_1`;
-            const verEl = document.getElementById('system-version');
-            if (verEl) verEl.innerText = `系統版本：${versionStr}`;
+            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
         })();
 
-        let storageData = [];
-        try {
-            let saved = localStorage.getItem('storeasy_storage_data');
-            if (saved) storageData = JSON.parse(saved) || [];
-        } catch(e) {
-            storageData = [];
-        }
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
 
-        let selectedQuoteItems = {}; 
-        let selectedInvoiceItems = {}; 
-
-        // 大分類展開/縮回切換邏輯
-        function toggleMenu(menuId, headerEl) {
-            const menu = document.getElementById(menuId);
-            const arrow = headerEl.querySelector('span:last-child');
-            if (menu.classList.contains('collapsed')) {
-                menu.classList.remove('collapsed');
-                menu.style.maxHeight = menu.scrollHeight + 'px';
-                arrow.innerText = '▼';
-            } else {
-                menu.style.maxHeight = '0px';
-                menu.classList.add('collapsed');
-                arrow.innerText = '▶';
-            }
-        }
-
-        // 初始化展開快取高度
-        window.addEventListener('DOMContentLoaded', () => {
-            const activeMenu = document.getElementById('mini-storage-menu');
-            if (activeMenu) {
-                activeMenu.style.maxHeight = activeMenu.scrollHeight + 'px';
-            }
-        });
-
-        // 頁籤切換
-        function switchTab(tabName) {
-            // 隱藏所有面板
-            const panels = ['panel-storage', 'panel-quote', 'panel-invoice', 'panel-elocker-branches', 'panel-elocker-tutorial', 'panel-elocker-data'];
-            panels.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('active');
-            });
-
-            // 移除所有子按鈕的 active
-            const buttons = ['btn-storage', 'btn-sub-quote', 'btn-sub-invoice', 'btn-elocker-branches', 'btn-elocker-tutorial', 'btn-elocker-data'];
-            buttons.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('active');
-            });
-
-            // 啟動對應面板與按鈕
-            if (tabName === 'storage') {
-                document.getElementById('panel-storage').classList.add('active');
-                document.getElementById('btn-storage').classList.add('active');
-                document.getElementById('page-title').innerText = '📦 倉位資料';
-            } else if (tabName === 'quote') {
-                document.getElementById('panel-quote').classList.add('active');
-                document.getElementById('btn-sub-quote').classList.add('active');
-                document.getElementById('page-title').innerText = '📄 生成報價單';
-                initQuoteTab();
-            } else if (tabName === 'invoice') {
-                document.getElementById('panel-invoice').classList.add('active');
-                document.getElementById('btn-sub-invoice').classList.add('active');
-                document.getElementById('page-title').innerText = '💰 生成請款單';
-                initInvoiceTab();
-            } else if (tabName === 'elocker-branches') {
-                document.getElementById('panel-elocker-branches').classList.add('active');
-                document.getElementById('btn-elocker-branches').classList.add('active');
-                document.getElementById('page-title').innerText = '🏢 各據點資訊';
-            } else if (tabName === 'elocker-tutorial') {
-                document.getElementById('panel-elocker-tutorial').classList.add('active');
-                document.getElementById('btn-elocker-tutorial').classList.add('active');
-                document.getElementById('page-title').innerText = '📖 操作教學';
-            } else if (tabName === 'elocker-data') {
-                document.getElementById('panel-elocker-data').classList.add('active');
-                document.getElementById('btn-elocker-data').classList.add('active');
-                document.getElementById('page-title').innerText = '⚙️ 管理資料';
-            }
-        }
-
-        // 上傳 Excel
         function handleSmartExcelUpload() {
             const fileInput = document.getElementById('excelFile');
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('請先選擇一個 Excel 檔案！');
-                return;
-            }
-
-            const file = fileInput.files[0];
+            if (!fileInput.files || fileInput.files.length === 0) { alert('請先選擇一個 Excel 檔案！'); return; }
             const reader = new FileReader();
-
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonSheet = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-
-                    if (jsonSheet.length < 2) {
-                        alert('Excel 內容不足！');
-                        return;
-                    }
-
+                    const jsonSheet = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
                     const branch = document.getElementById('upload-branch-name').value.trim() || '土城店';
                     let newItems = [];
-
                     for (let i = 0; i < jsonSheet.length; i++) {
                         let row = jsonSheet[i];
                         if (!row || row.length === 0) continue;
-
-                        let code = '';
-                        let size = '-';
-                        let unit = '-';
-                        let price1 = NaN;
-
+                        let code = '', size = '-', unit = '-', price1 = NaN;
                         for (let c = 0; c < row.length; c++) {
                             let val = row[c];
                             if (val == null) continue;
                             let sVal = String(val).trim();
-
                             if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
-                                code = sVal;
-                                if (!isNaN(row[c+1])) code += row[c+1];
+                                code = sVal; if (!isNaN(row[c+1])) code += row[c+1];
                             } else if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
                                 size = sVal;
                             } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
                                 price1 = Number(sVal);
                             }
                         }
-
-                        if (!code) {
-                            for (let c = 0; c < row.length; c++) {
-                                let s = String(row[c] || '').trim();
-                                if (/^[A-Za-z0-9\-_]{2,10}$/.test(s) && /[A-Za-z]/.test(s) && /\d/.test(s)) {
-                                    code = s;
-                                    break;
-                                }
-                            }
-                        }
-                        if (isNaN(price1)) {
-                            for (let c = 0; c < row.length; c++) {
-                                let n = Number(row[c]);
-                                if (!isNaN(n) && n >= 500 && n < 100000) {
-                                    price1 = n;
-                                    break;
-                                }
-                            }
-                        }
-                        if (unit === '-') {
-                            for (let c = 0; c < row.length; c++) {
-                                let n = Number(row[c]);
-                                if (!isNaN(n) && n >= 10 && n <= 500) {
-                                    unit = String(n);
-                                    break;
-                                }
-                            }
-                        }
-
                         if (code && !isNaN(price1) && price1 > 200) {
-                            let price3 = Math.round((price1 * 0.95) / 10) * 10;
-                            let price6 = Math.round((price1 * 0.90) / 10) * 10;
-                            let price12_85 = Math.round((price1 * 0.85) / 10) * 10;
-                            let price12_80 = Math.round((price1 * 0.80) / 10) * 10;
-
                             newItems.push({
-                                branch: branch,
-                                code: code,
-                                size: size !== '-' ? size + ' m' : '標準尺寸',
-                                unit: unit !== '-' ? unit : '50',
-                                price1: price1,
-                                price3: price3,
-                                price6: price6,
-                                price12_85: price12_85,
-                                price12_80: price12_80
+                                branch: branch, code: code, size: size !== '-' ? size + ' m' : '標準尺寸',
+                                unit: unit !== '-' ? unit : '50', price1: price1,
+                                price3: Math.round((price1 * 0.95) / 10) * 10,
+                                price6: Math.round((price1 * 0.90) / 10) * 10,
+                                price12_85: Math.round((price1 * 0.85) / 10) * 10,
+                                price12_80: Math.round((price1 * 0.80) / 10) * 10
                             });
                         }
                     }
-
-                    if (newItems.length === 0) {
-                        alert('未能自動抓取到有效資料！');
-                        return;
+                    if (newItems.length === 0) { alert('未能自動抓取到有效資料！'); return; }
+                    if (storageData.some(i => i.branch === branch) && confirm(`「${branch}」資料已存在，是否覆蓋？`)) {
+                        storageData = storageData.filter(i => i.branch !== branch);
                     }
-
-                    let existingBranchIndex = storageData.findIndex(item => item.branch === branch);
-                    if (existingBranchIndex !== -1) {
-                        let choice = confirm(`系統偵測到「${branch}」的資料已存在！\n\n【確定】覆蓋舊資料。\n【取消】保留舊資料並合併。`);
-                        if (choice) {
-                            storageData = storageData.filter(item => item.branch !== branch);
-                        }
-                    }
-
                     storageData = storageData.concat(newItems);
                     localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                     renderStorageTable();
-                    alert('成功一鍵智慧匯入 ' + newItems.length + ' 筆倉位資料！');
-                } catch(err) {
-                    alert('解析 Excel 檔案發生錯誤：' + err.message);
-                }
+                    alert('成功匯入 ' + newItems.length + ' 筆資料！');
+                } catch(err) { alert('解析錯誤：' + err.message); }
             };
             reader.readAsArrayBuffer(file);
         }
 
         function updateBranchFilter() {
-            const branchCounts = {};
-            storageData.forEach(item => {
-                branchCounts[item.branch] = (branchCounts[item.branch] || 0) + 1;
-            });
-
+            let counts = {};
+            storageData.forEach(i => counts[i.branch] = (counts[i.branch]||0)+1);
             let html = `<option value="all">全部據點 (${storageData.length})</option>`;
-            Object.keys(branchCounts).forEach(branch => {
-                html += `<option value="${branch}">${branch} (${branchCounts[branch]})</option>`;
-            });
-
-            const selectEl = document.getElementById('storage-branch-filter');
-            if (selectEl) {
-                let currentVal = selectEl.value;
-                selectEl.innerHTML = html;
-                selectEl.value = currentVal;
-            }
+            Object.keys(counts).forEach(b => html += `<option value="${b}">${b} (${counts[b]})</option>`);
+            document.getElementById('storage-branch-filter').innerHTML = html;
         }
 
         function renderStorageTable() {
             updateBranchFilter();
-            const filterEl = document.getElementById('storage-branch-filter');
-            const filterVal = filterEl ? filterEl.value : 'all';
-            const tbody = document.getElementById('storage-table-body');
-            if (!tbody) return;
-            
-            let filtered = storageData;
-            if (filterVal && filterVal !== 'all') {
-                filtered = storageData.filter(item => item.branch === filterVal);
-            }
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = filtered.map(item => `
+            let filter = document.getElementById('storage-branch-filter').value;
+            let list = filter === 'all' ? storageData : storageData.filter(i => i.branch === filter);
+            let tbody = document.getElementById('storage-table-body');
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
+            tbody.innerHTML = list.map(item => `
                 <tr>
-                    <td style="font-weight: 500; color: #b45309; text-align: left;">${item.branch}</td>
-                    <td style="font-weight: bold; text-align: left;">${item.code}</td>
-                    <td style="text-align: left;">${item.size}</td>
-                    <td style="color: #64748b; text-align: left;">${item.unit}</td>
-                    <td style="font-weight: 600; color: #d97706; text-align: left;">NT$ ${item.price1.toLocaleString()}</td>
-                    <td style="text-align: left;">NT$ ${item.price3.toLocaleString()}</td>
-                    <td style="text-align: left;">NT$ ${item.price6.toLocaleString()}</td>
-                    <td style="color: #059669; font-weight: 600; text-align: left;">NT$ ${item.price12_85.toLocaleString()}</td>
-                    <td style="color: #047857; font-weight: 600; text-align: left;">NT$ ${item.price12_80.toLocaleString()}</td>
+                    <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
+                    <td style="font-weight: bold;">${item.code}</td>
+                    <td>${item.size}</td>
+                    <td style="color: #64748b;">${item.unit}</td>
+                    <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
+                    <td>NT$ ${item.price3.toLocaleString()}</td>
+                    <td>NT$ ${item.price6.toLocaleString()}</td>
+                    <td style="color: #059669; font-weight: 600;">NT$ ${item.price12_85.toLocaleString()}</td>
+                    <td style="color: #047857; font-weight: 600;">NT$ ${item.price12_80.toLocaleString()}</td>
                 </tr>
             `).join('');
         }
 
         function deleteSelectedBranchData() {
-            const filterVal = document.getElementById('storage-branch-filter').value;
-            if (!filterVal || filterVal === 'all') {
-                alert('請先在上方選擇您想要刪除的分店！');
-                return;
-            }
-            if (confirm(`確定要刪除分店「${filterVal}」的所有倉位資料嗎？`)) {
-                storageData = storageData.filter(item => item.branch !== filterVal);
+            let b = document.getElementById('storage-branch-filter').value;
+            if (b === 'all') { alert('請先選擇特定分店！'); return; }
+            if (confirm(`確定刪除 ${b} 的所有資料？`)) {
+                storageData = storageData.filter(i => i.branch !== b);
                 localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                 renderStorageTable();
-                alert(`已成功刪除 ${filterVal} 的資料！`);
             }
         }
 
         function clearStorageData() {
-            if (confirm('確定要清空全部本機的所有倉位資料嗎？')) {
-                storageData = [];
-                localStorage.removeItem('storeasy_storage_data');
-                renderStorageTable();
-            }
-        }
-
-        // 報價單邏輯
-        function initQuoteTab() {
-            const qDate = document.getElementById('quote-date');
-            if (qDate && !qDate.value) qDate.valueAsDate = new Date();
-            
-            const branchSelect = document.getElementById('quote-branch-select');
-            if (!branchSelect) return;
-            const branches = [...new Set(storageData.map(item => item.branch))];
-            
-            let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
-            branches.forEach(b => {
-                html += `<option value="${b}">${b}</option>`;
-            });
-            branchSelect.innerHTML = html;
-            renderQuoteSelectableItems();
-        }
-
-        function renderQuoteSelectableItems() {
-            const selectedBranch = document.getElementById('quote-branch-select').value;
-            const searchKw = document.getElementById('quote-search-input').value.trim().toLowerCase();
-            const tbody = document.getElementById('quote-selectable-body');
-            if (!tbody) return;
-
-            if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
-                return;
-            }
-
-            let branchItems = storageData;
-            if (selectedBranch) {
-                branchItems = branchItems.filter(item => item.branch === selectedBranch);
-            }
-            if (searchKw) {
-                branchItems = branchItems.filter(item => 
-                    item.code.toLowerCase().includes(searchKw) || 
-                    item.size.toLowerCase().includes(searchKw) || 
-                    String(item.unit).toLowerCase().includes(searchKw)
-                );
-            }
-
-            if (branchItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的倉位資料</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = branchItems.map((item) => {
-                let globalIndex = storageData.indexOf(item);
-                let isChecked = selectedQuoteItems[globalIndex] ? 'checked' : '';
-                return `
-                    <tr>
-                        <td style="text-align: left;"><input type="checkbox" class="q-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleQuoteItem(${globalIndex})" data-index="${globalIndex}"></td>
-                        <td style="font-weight: 500; color: #b45309; text-align: left;">${item.branch}</td>
-                        <td style="font-weight: bold; text-align: left;">${item.code}</td>
-                        <td style="text-align: left;">${item.size}</td>
-                        <td style="color: #64748b; text-align: left;">${item.unit}</td>
-                        <td style="font-weight: 600; color: #d97706; text-align: left;">NT$ ${item.price1.toLocaleString()}</td>
-                        <td style="text-align: left;">NT$ ${item.price3.toLocaleString()}</td>
-                        <td style="text-align: left;">NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600; text-align: left;">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600; text-align: left;">NT$ ${item.price12_80.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function toggleQuoteItem(globalIndex) {
-            const chk = document.querySelector(`input.q-item-chk[data-index="${globalIndex}"]`);
-            if (chk && chk.checked) {
-                selectedQuoteItems[globalIndex] = { ...storageData[globalIndex], term: '12', extraNote: '' };
-            } else {
-                delete selectedQuoteItems[globalIndex];
-            }
-            renderSelectedQuoteSummary();
-        }
-
-        function updateItemTerm(globalIndex, termVal) {
-            if (selectedQuoteItems[globalIndex]) {
-                selectedQuoteItems[globalIndex].term = termVal;
-            }
-        }
-
-        function updateItemExtraNote(globalIndex, noteVal) {
-            if (selectedQuoteItems[globalIndex]) {
-                selectedQuoteItems[globalIndex].extraNote = noteVal;
-            }
-        }
-
-        function removeQuoteItem(globalIndex) {
-            delete selectedQuoteItems[globalIndex];
-            renderQuoteSelectableItems();
-            renderSelectedQuoteSummary();
-        }
-
-        function renderSelectedQuoteSummary() {
-            const summaryEl = document.getElementById('selected-items-summary');
-            if (!summaryEl) return;
-            const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) {
-                summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>';
-                return;
-            }
-
-            let html = '';
-            keys.forEach(idx => {
-                let item = selectedQuoteItems[idx];
-                let currentTerm = item.term || '12';
-                let currentNote = item.extraNote || '';
-                html += `
-                    <div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> - ${item.size} (${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}</div>
-                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                <select onchange="updateItemTerm(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
-                                    <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
-                                    <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
-                                    <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
-                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
-                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
-                                    <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
-                                </select>
-                                <input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="${currentNote}" oninput="updateItemExtraNote(${idx}, this.value)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">
-                            </div>
-                            <button type="button" onclick="removeQuoteItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
-                        </div>
-                    </div>
-                `;
-            });
-            summaryEl.innerHTML = html;
-        }
-
-        function generateQuote() {
-            const branch = document.getElementById('q-branch').value || '未填寫分店';
-            const manager = document.getElementById('q-manager').value || '---';
-            const address = document.getElementById('q-address').value || '---';
-            const tel = document.getElementById('q-tel').value || '---';
-            const client = document.getElementById('q-client-name').value || '未填寫';
-            const clientPhone = document.getElementById('q-client-tel').value || '---';
-            const company = document.getElementById('q-company').value || '---';
-            const taxid = document.getElementById('q-taxid').value || '---';
-            const date = document.getElementById('quote-date').value;
-            
-            const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) {
-                alert('請至少勾選一個報價倉位項目！');
-                return;
-            }
-
-            document.getElementById('v-q-date').innerText = date;
-            document.getElementById('v-q-client').innerText = client;
-            document.getElementById('v-q-manager').innerText = manager;
-            document.getElementById('v-q-company').innerText = company;
-            document.getElementById('v-q-taxid').innerText = taxid;
-            document.getElementById('v-q-branch').innerText = branch;
-            document.getElementById('v-q-client-phone').innerText = clientPhone;
-            document.getElementById('v-q-address').innerText = address;
-            document.getElementById('v-q-tel').innerText = tel;
-
-            const tbody = document.getElementById('v-q-items');
-            let html = '';
-            let targetRent = 0;
-            let targetFee = 0;
-            let targetDeposit = 0;
-
-            keys.forEach((idx) => {
-                let item = selectedQuoteItems[idx];
-                let p1 = item.price1;
-                let p3 = item.price3;
-                let p6 = item.price6;
-                let p12_85 = item.price12_85;
-                let p12_80 = item.price12_80;
-                let term = item.term || '12';
-                let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
-
-                let selectedMonthlyRate = p1;
-                if (term === '3') selectedMonthlyRate = p3;
-                else if (term === '6') selectedMonthlyRate = p6;
-                else if (term === '12') selectedMonthlyRate = p12_85;
-                else if (term === '12_80') selectedMonthlyRate = p12_80;
-
-                html += `
-                    <tr>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${item.unit}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; font-weight: bold;">[${item.branch}] ${item.code} - ${item.size}${extraNote}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p1.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p3.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">NT$ ${p6.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: right; font-weight: bold; color: #b45309;">NT$ ${selectedMonthlyRate.toLocaleString()}</td>
-                    </tr>
-                `;
-
-                if (term !== 'none') {
-                    let termMonths = 1;
-                    if (term === '3') termMonths = 3;
-                    else if (term === '6') termMonths = 6;
-                    else if (term === '12' || term === '12_80') termMonths = 12;
-
-                    targetRent += (selectedMonthlyRate * termMonths);
-                    let feePerMonth = selectedMonthlyRate >= 3000 ? 150 : 80;
-                    targetFee += (feePerMonth * termMonths);
-                    targetDeposit += (termMonths <= 2 ? (p1 * 2) : p1);
-                }
-            });
-
-            tbody.innerHTML = html;
-            document.getElementById('v-q-rent').innerText = targetRent.toLocaleString();
-            document.getElementById('v-q-deposit').innerText = targetDeposit.toLocaleString();
-            document.getElementById('v-q-fee').innerText = targetFee.toLocaleString();
-            document.getElementById('v-q-total').innerText = (targetRent + targetFee + targetDeposit).toLocaleString();
-
-            alert('正式報價單已成功生成！');
-        }
-
-        // 請款單邏輯
-        function initInvoiceTab() {
-            const iDate = document.getElementById('inv-date');
-            if (iDate && !iDate.value) iDate.valueAsDate = new Date();
-            
-            const branchSelect = document.getElementById('invoice-branch-select');
-            if (!branchSelect) return;
-            const branches = [...new Set(storageData.map(item => item.branch))];
-            
-            let html = '<option value="">-- 全部據點 / 不限分店 --</option>';
-            branches.forEach(b => {
-                html += `<option value="${b}">${b}</option>`;
-            });
-            branchSelect.innerHTML = html;
-            renderInvoiceSelectableItems();
-        }
-
-        function renderInvoiceSelectableItems() {
-            const selectedBranch = document.getElementById('invoice-branch-select').value;
-            const searchKw = document.getElementById('invoice-search-input').value.trim().toLowerCase();
-            const tbody = document.getElementById('invoice-selectable-body');
-            if (!tbody) return;
-
-            if (storageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">尚未上傳或載入倉位資料</td></tr>`;
-                return;
-            }
-
-            let branchItems = storageData;
-            if (selectedBranch) {
-                branchItems = branchItems.filter(item => item.branch === selectedBranch);
-            }
-            if (searchKw) {
-                branchItems = branchItems.filter(item => 
-                    item.code.toLowerCase().includes(searchKw) || 
-                    item.size.toLowerCase().includes(searchKw) || 
-                    String(item.unit).toLowerCase().includes(searchKw)
-                );
-            }
-
-            if (branchItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">找不到符合的請款項目</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = branchItems.map((item) => {
-                let globalIndex = storageData.indexOf(item);
-                let isChecked = selectedInvoiceItems[globalIndex] ? 'checked' : '';
-                return `
-                    <tr>
-                        <td style="text-align: left;"><input type="checkbox" class="i-item-chk" style="width: 18px; height: 18px; accent-color: #f59e0b;" ${isChecked} onchange="toggleInvoiceItem(${globalIndex})" data-index="${globalIndex}"></td>
-                        <td style="font-weight: 500; color: #b45309; text-align: left;">${item.branch}</td>
-                        <td style="font-weight: bold; text-align: left;">${item.code}</td>
-                        <td style="text-align: left;">${item.size}</td>
-                        <td style="color: #64748b; text-align: left;">${item.unit}</td>
-                        <td style="font-weight: 600; color: #d97706; text-align: left;">NT$ ${item.price1.toLocaleString()}</td>
-                        <td style="text-align: left;">NT$ ${item.price3.toLocaleString()}</td>
-                        <td style="text-align: left;">NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600; text-align: left;">NT$ ${item.price12_85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600; text-align: left;">NT$ ${item.price12_80.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function toggleInvoiceItem(globalIndex) {
-            const chk = document.querySelector(`input.i-item-chk[data-index="${globalIndex}"]`);
-            if (chk && chk.checked) {
-                const todayStr = new Date().toISOString().split('T')[0];
-                selectedInvoiceItems[globalIndex] = { 
-                    ...storageData[globalIndex], 
-                    term: '1', 
-                    depositOption: 'yes',
-                    lateFee: 0,
-                    packingFee: 0,
-                    movingFee: 0,
-                    otherFee: 0,
-                    startDate: todayStr,
-                    endDate: todayStr
-                };
-            } else {
-                delete selectedInvoiceItems[globalIndex];
-            }
-            renderPerItemFeesInputs();
-        }
-
-        function updatePerItemFee(globalIndex, feeType, val) {
-            if (selectedInvoiceItems[globalIndex]) {
-                selectedInvoiceItems[globalIndex][feeType] = Number(val) || 0;
-            }
-        }
-
-        function updatePerItemDate(globalIndex, dateType, val) {
-            if (selectedInvoiceItems[globalIndex]) {
-                selectedInvoiceItems[globalIndex][dateType] = val;
-            }
-        }
-
-        function removeInvoiceItem(globalIndex) {
-            delete selectedInvoiceItems[globalIndex];
-            renderInvoiceSelectableItems();
-            renderPerItemFeesInputs();
-        }
-
-        function renderPerItemFeesInputs() {
-            const container = document.getElementById('per-item-fees-container');
-            if (!container) return;
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                container.innerHTML = `<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選請款倉位項目</span>`;
-                return;
-            }
-
-            let html = '';
-            keys.forEach(idx => {
-                let item = selectedInvoiceItems[idx];
-                let currentTerm = item.term || '1';
-                let currentDep = item.depositOption || 'yes';
-                html += `
-                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px;" data-index="${idx}">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                            <div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：${item.code} ([${item.branch}] ${item.size} / ${item.unit}材)</div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <select class="inv-term-select" data-index="${idx}" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
-                                    <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
-                                    <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
-                                    <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
-                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
-                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
-                                </select>
-                                <select class="inv-dep-select" data-index="${idx}" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #eff6ff; font-weight: bold;">
-                                    <option value="yes" ${currentDep==='yes'?'selected':''}>🔒 含保證金</option>
-                                    <option value="no" ${currentDep==='no'?'selected':''}>🔓 無保證金 (續約)</option>
-                                </select>
-                                <button type="button" onclick="removeInvoiceItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
-                            <div>
-                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期起日 (西元)</label>
-                                <input type="date" class="inv-start-date" data-index="${idx}" value="${item.startDate || ''}" style="padding: 6px 8px; font-size: 0.85rem;">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.75rem; color: #64748b; font-weight: bold;">📅 租期訖日 (西元)</label>
-                                <input type="date" class="inv-end-date" data-index="${idx}" value="${item.endDate || ''}" style="padding: 6px 8px; font-size: 0.85rem;">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">滯納金 (含稅)</label>
-                                <input type="number" class="inv-late-fee" data-index="${idx}" value="${item.lateFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">包材費 (含稅)</label>
-                                <input type="number" class="inv-packing-fee" data-index="${idx}" value="${item.packingFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">搬運費 (含稅)</label>
-                                <input type="number" class="inv-moving-fee" data-index="${idx}" value="${item.movingFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.75rem; color: #64748b;">其它費 (含稅)</label>
-                                <input type="number" class="inv-other-fee" data-index="${idx}" value="${item.otherFee || 0}" min="0" style="padding: 6px 8px; font-size: 0.85rem;">
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function generateInvoice() {
-            // 即時從 DOM 讀取各倉位當前設定的方案、保證金、日曆與雜費
-            const containerDivs = document.querySelectorAll('#per-item-fees-container > div');
-            containerDivs.forEach(div => {
-                const idx = div.getAttribute('data-index');
-                if (idx && selectedInvoiceItems[idx]) {
-                    const termSel = div.querySelector('.inv-term-select');
-                    const depSel = div.querySelector('.inv-dep-select');
-                    const startInput = div.querySelector('.inv-start-date');
-                    const endInput = div.querySelector('.inv-end-date');
-                    const lateInput = div.querySelector('.inv-late-fee');
-                    const packInput = div.querySelector('.inv-packing-fee');
-                    const moveInput = div.querySelector('.inv-moving-fee');
-                    const otherInput = div.querySelector('.inv-other-fee');
-
-                    if (termSel) selectedInvoiceItems[idx].term = termSel.value;
-                    if (depSel) selectedInvoiceItems[idx].depositOption = depSel.value;
-                    if (startInput) selectedInvoiceItems[idx].startDate = startInput.value;
-                    if (endInput) selectedInvoiceItems[idx].endDate = endInput.value;
-                    if (lateInput) selectedInvoiceItems[idx].lateFee = Number(lateInput.value) || 0;
-                    if (packInput) selectedInvoiceItems[idx].packingFee = Number(packInput.value) || 0;
-                    if (moveInput) selectedInvoiceItems[idx].movingFee = Number(moveInput.value) || 0;
-                    if (otherInput) selectedInvoiceItems[idx].otherFee = Number(otherInput.value) || 0;
-                }
-            });
-
-            const branch = document.getElementById('i-branch').value || '未填寫分店';
-            const manager = document.getElementById('i-manager').value || '---';
-            const address = document.getElementById('i-address').value || '---';
-            const tel = document.getElementById('i-tel').value || '---';
-            const client = document.getElementById('i-client').value || '未填寫';
-            const clientPhone = document.getElementById('i-client-phone').value || '---';
-            const company = document.getElementById('i-company').value || '---';
-            const taxid = document.getElementById('i-taxid').value || '---';
-            const date = document.getElementById('inv-date').value;
-            
-            const keys = Object.keys(selectedInvoiceItems);
-            if (keys.length === 0) {
-                alert('請至少勾選一個請款項目！');
-                return;
-            }
-
-            document.getElementById('v-i-date').innerText = date;
-            document.getElementById('v-i-client').innerText = client;
-            document.getElementById('v-i-manager').innerText = manager;
-            document.getElementById('v-i-client-phone').innerText = clientPhone;
-            document.getElementById('v-i-branch').innerText = branch;
-            document.getElementById('v-i-company').innerText = company;
-            document.getElementById('v-i-taxid').innerText = taxid;
-            document.getElementById('v-i-tel').innerText = tel;
-            document.getElementById('v-i-address').innerText = address;
-
-            const tbodyItems = document.getElementById('v-i-items');
-            const tbodyFees = document.getElementById('v-i-fees');
-            let itemsHtml = '';
-            let feesHtml = '';
-            
-            let totalRentInc = 0;
-            let totalFeeInc = 0;
-            let totalDeposit = 0;
-            let grandExtraTotal = 0;
-
-            keys.forEach((idx) => {
-                let item = selectedInvoiceItems[idx];
-                let term = item.term || '1';
-                if (term === 'none') return;
-
-                let p1 = item.price1;
-                let monthlyRate = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : (term === '12' ? item.price12_85 : p1);
-
-                let termMonths = 1;
-                if (item.startDate && item.endDate) {
-                    let d1 = new Date(item.startDate);
-                    let d2 = new Date(item.endDate);
-                    let diffTime = Math.abs(d2 - d1);
-                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    termMonths = Math.max(1, Math.round(diffDays / 30));
-                } else {
-                    termMonths = term === '3' ? 3 : term === '6' ? 6 : (term === '12' || term === '12_80' ? 12 : 1);
-                }
-
-                let rentSubtotal = monthlyRate * termMonths;
-                let feePerMonth = monthlyRate >= 3000 ? 150 : 80;
-                let insuranceFee = feePerMonth * termMonths;
-                
-                let deposit = item.depositOption === 'yes' ? (termMonths <= 2 ? (p1 * 2) : p1) : 0;
-                let lineTotal = rentSubtotal + deposit;
-
-                totalRentInc += rentSubtotal;
-                totalFeeInc += insuranceFee;
-                totalDeposit += deposit;
-
-                let formatDate = (dStr) => {
-                    if (!dStr) return '';
-                    let parts = dStr.split('-');
-                    if (parts.length === 3) return `${parts[0]}/${parts[1]}/${parts[2]}`;
-                    return dStr;
-                };
-                let startF = formatDate(item.startDate);
-                let endF = formatDate(item.endDate);
-                let dateRangeStr = (startF && endF) ? `${startF} － ${endF}` : (startF || endF || '未填租期');
-
-                itemsHtml += `
-                    <tr>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">${item.code}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${item.unit}材</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${p1.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${monthlyRate.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${termMonths}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${Math.round(rentSubtotal/1.05).toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${(rentSubtotal - Math.round(rentSubtotal/1.05)).toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${rentSubtotal.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${deposit.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; font-size: 0.8rem;">${dateRangeStr}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; font-weight: bold; color: #b45309;">${lineTotal.toLocaleString()}</td>
-                    </tr>
-                `;
-
-                let lFee = item.lateFee || 0;
-                let pFee = item.packingFee || 0;
-                let mFee = item.movingFee || 0;
-                let oFee = item.otherFee || 0;
-                let itemExtraSum = lFee + insuranceFee + pFee + mFee + oFee;
-                grandExtraTotal += (lFee + pFee + mFee + oFee);
-
-                let exFee = Math.round(itemExtraSum / 1.05);
-                let taxFee = itemExtraSum - exFee;
-
-                feesHtml += `
-                    <tr>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; text-align: center;">${item.code}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${lFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${insuranceFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${pFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${mFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${oFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${exFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center;">${taxFee.toLocaleString()}</td>
-                        <td style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; font-weight: bold;">${itemExtraSum.toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-
-            tbodyItems.innerHTML = itemsHtml;
-            tbodyFees.innerHTML = feesHtml;
-
-            document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentInc.toLocaleString();
-            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeInc.toLocaleString();
-            document.getElementById('v-i-deposit').innerText = 'NT$ ' + totalDeposit.toLocaleString();
-            document.getElementById('v-i-extra-total').innerText = 'NT$ ' + grandExtraTotal.toLocaleString();
-            
-            let grandTotal = totalRentInc + totalFeeInc + totalDeposit + grandExtraTotal;
-            document.getElementById('v-i-total').innerText = grandTotal.toLocaleString();
-
-            alert('會計版請款單已成功套用！');
-        }
-
-        // 匯出報價單與請款單 Excel
-        function exportQuoteExcel() {
-            const previewEl = document.getElementById('quote-preview');
-            if (!previewEl || document.getElementById('v-q-items').innerText.includes('尚未產生')) {
-                alert('目前尚無生成的報價單內容可供匯出！');
-                return;
-            }
-            const clone = previewEl.cloneNode(true);
-            clone.querySelectorAll('.no-print').forEach(el => el.remove());
-
-            let htmlContent = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="utf-8"><style>
-                    body { font-family: sans-serif; background-color: #ffffff; padding: 30px; color: #1e293b; }
-                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 30px; }
-                    .preview-info { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 30px !important; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 30px; font-size: 10pt; }
-                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 30px; margin-bottom: 30px; font-size: 10pt; }
-                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.6; margin-top: 30px; margin-bottom: 20px; }
-                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 20px; margin-bottom: 20px; }
-                    th, td { border: 1px solid #000000 !important; padding: 12px; vertical-align: middle; }
-                    th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
-                    td:nth-child(1), td:nth-child(2) { text-align: center !important; }
-                </style></head>
-                <body>${clone.innerHTML}</body>
-                </html>
-            `;
-            let blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Storeasy_報價單.xls';
-            a.click();
-        }
-
-        function exportInvoiceExcel() {
-            const previewEl = document.getElementById('invoice-preview');
-            if (!previewEl || document.getElementById('v-i-items').innerText.includes('請先於')) {
-                alert('目前尚無生成的請款單內容可供匯出！');
-                return;
-            }
-            const clone = previewEl.cloneNode(true);
-            clone.querySelectorAll('.no-print').forEach(el => el.remove());
-
-            const h1 = clone.querySelector('h1');
-            if (h1) h1.innerText = "收多易迷你倉庫";
-
-            let htmlContent = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="utf-8"><style>
-                    body { font-family: sans-serif; background-color: #ffffff; padding: 30px; color: #1e293b; }
-                    .preview-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 30px; }
-                    .preview-info { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 30px !important; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-bottom: 30px; font-size: 10pt; }
-                    .summary-box { background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; margin-top: 30px; margin-bottom: 30px; font-size: 10pt; }
-                    .notes-box { font-size: 9pt; background-color: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; line-height: 1.6; margin-top: 30px; margin-bottom: 20px; }
-                    table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 20px; margin-bottom: 20px; }
-                    th, td { border: 1px solid #000000 !important; padding: 12px; vertical-align: middle; }
-                    th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; color: #0f172a; }
-                    td { text-align: center !important; }
-                </style></head>
-                <body>${clone.innerHTML}</body>
-                </html>
-            `;
-            let blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Storeasy_請款單.xls';
-            a.click();
+            if (confirm('確定清空全部資料？')) { storageData = []; localStorage.removeItem('storeasy_storage_data'); renderStorageTable(); }
         }
 
         renderStorageTable();
