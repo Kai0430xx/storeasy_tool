@@ -1043,6 +1043,7 @@
                                     <option value="yes" ${currentDep==='yes'?'selected':''}>🔒 含保證金</option>
                                     <option value="no" ${currentDep==='no'?'selected':''}>🔓 無保證金 (續約)</option>
                                 </select>
+                                <button type="button" onclick="removeInvoiceItem(${idx})" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
