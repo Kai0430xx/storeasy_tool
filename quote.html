@@ -40,7 +40,6 @@
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
         .btn-dark { background-color: #0f172a; color: #fff; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
-        .btn-emerald { background-color: #059669; color: #fff; }
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
@@ -144,8 +143,9 @@
                     </table>
                 </div>
 
+                <!-- 💡 已選取項目與額外折扣備註設定區 -->
                 <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目：</h5>
+                    <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目（方案與額外優惠備註）：</h5>
                     <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
                         <span style="color: #94a3b8;">尚未勾選任何項目</span>
                     </div>
@@ -182,8 +182,8 @@
                 <table>
                     <thead>
                         <tr style="background-color: #f1f5f9; text-align: center;">
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">單位(材)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位尺寸</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">單位<br>(材)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位尺寸<br>(寬*深*高 m)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">月繳/月</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">季繳/月</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: right;">半年繳/月</th>
@@ -196,7 +196,7 @@
                 </table>
 
                 <div class="summary-box">
-                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表</div>
+                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (此試算不含額外優惠)</div>
                     <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
@@ -206,6 +206,10 @@
                 <div class="notes-box">
                     <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">匯款資訊：</div>
                     <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</div>
+                    <div style="font-weight: bold; color: #1e293b; margin-top: 8px; margin-bottom: 4px;">備註：</div>
+                    <div>1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</div>
+                    <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
+                    <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
@@ -251,7 +255,7 @@
                 let isChecked = selectedQuoteItems[idx] ? 'checked' : '';
                 return `
                     <tr>
-                        <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px;"></td>
+                        <td><input type="checkbox" class="q-item-chk" ${isChecked} onchange="toggleQuoteItem(${idx})" data-index="${idx}" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>
                         <td style="color: #b45309; font-weight: 500;">${item.branch}</td>
                         <td style="font-weight: bold;">${item.code}</td>
                         <td>${item.size}</td>
@@ -280,16 +284,27 @@
             const summaryEl = document.getElementById('selected-items-summary');
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>'; return; }
+            
             summaryEl.innerHTML = keys.map(idx => {
                 let item = selectedQuoteItems[idx];
+                let currentTerm = item.term || '12';
+                let currentNote = item.extraNote || '';
                 return `
-                    <div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>[${item.branch}] <b>${item.code}</b> - ${item.size} (${item.unit}材)</div>
-                        <div style="display: flex; gap: 8px;">
-                            <select onchange="selectedQuoteItems[${idx}].term = this.value" style="padding: 4px; font-weight: bold;">
-                                <option value="1">月繳</option><option value="3">季繳</option><option value="6">半年繳</option><option value="12" selected>年繳(85折)</option><option value="12_80">年繳(8折)</option>
-                            </select>
-                            <button type="button" onclick="delete selectedQuoteItems[${idx}]; renderQuoteSelectableItems(); renderSelectedQuoteSummary();" style="border:none; background:none; color:red; font-weight:bold; cursor:pointer;">×</button>
+                    <div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">
+                        <div style="font-weight: 600; color: #92400e;">[${item.branch}] <b>${item.code}</b> - ${item.size} (${item.unit}材) - 原價: NT$ ${item.price1.toLocaleString()}</div>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <select onchange="selectedQuoteItems[${idx}].term = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">
+                                    <option value="1" ${currentTerm==='1'?'selected':''}>月繳 (1個月)</option>
+                                    <option value="3" ${currentTerm==='3'?'selected':''}>季繳 (95折)</option>
+                                    <option value="6" ${currentTerm==='6'?'selected':''}>半年繳 (9折)</option>
+                                    <option value="12" ${currentTerm==='12'?'selected':''}>年繳 (85折)</option>
+                                    <option value="12_80" ${currentTerm==='12_80'?'selected':''}>年繳 (8折優惠)</option>
+                                    <option value="none" ${currentTerm==='none'?'selected':''}>❌ 不列入試算</option>
+                                </select>
+                                <input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="${currentNote}" oninput="selectedQuoteItems[${idx}].extraNote = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">
+                            </div>
+                            <button type="button" onclick="delete selectedQuoteItems[${idx}]; renderQuoteSelectableItems(); renderSelectedQuoteSummary();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>
                         </div>
                     </div>
                 `;
@@ -312,9 +327,14 @@
             let tbody = document.getElementById('v-q-items'), html = '', rent = 0, fee = 0, deposit = 0;
             keys.forEach(idx => {
                 let item = selectedQuoteItems[idx];
-                let p = item.term === '3' ? item.price3 : item.term === '6' ? item.price6 : item.term === '12_80' ? item.price12_80 : (item.term === '12' ? item.price12_85 : item.price1);
-                let months = item.term === '3' ? 3 : item.term === '6' ? 6 : (item.term.startsWith('12') ? 12 : 1);
-                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px;">${item.unit}</td><td style="border:1px solid #cbd5e1; padding:10px; font-weight:bold;">[${item.branch}] ${item.code} - ${item.size}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
+                let term = item.term || '12';
+                if (term === 'none') return;
+
+                let p = term === '3' ? item.price3 : term === '6' ? item.price6 : term === '12_80' ? item.price12_80 : (term === '12' ? item.price12_85 : item.price1);
+                let months = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
+                let extraNote = item.extraNote ? ` <span style="color: #dc2626; font-size:0.75rem;">(${item.extraNote})</span>` : '';
+
+                html += `<tr><td style="border:1px solid #cbd5e1; padding:10px; text-align:center;">${item.unit}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;">[${item.branch}] ${item.code} - ${item.size}${extraNote}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price1.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price3.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right;">NT$ ${item.price6.toLocaleString()}</td><td style="border:1px solid #cbd5e1; padding:10px; text-align:right; font-weight:bold; color:#b45309;">NT$ ${p.toLocaleString()}</td></tr>`;
                 rent += p * months; fee += (p >= 3000 ? 150 : 80) * months; deposit += (months <= 2 ? item.price1 * 2 : item.price1);
             });
             tbody.innerHTML = html;
