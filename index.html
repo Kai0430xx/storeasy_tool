@@ -61,7 +61,7 @@
         .btn-amber:hover { background-color: #d97706; }
         .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; word-break: break-all; white-space: normal; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
@@ -98,7 +98,7 @@
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn active">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
-                    <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
+                    <a href="invoice.html" class="sub-btn">💰 請款單</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
@@ -163,15 +163,15 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 100px;">據點名稱</th>
-                                <th style="width: 90px;">倉位編號</th>
-                                <th style="width: 240px;">尺寸 (寬*深*高 m)</th>
-                                <th style="width: 75px;">材積 (材)</th>
-                                <th style="width: 100px;">月繳/原價</th>
-                                <th style="width: 90px;">季繳</th>
-                                <th style="width: 90px;">半年繳</th>
-                                <th id="th-annual-85" style="width: 105px;">年繳 (85折)</th>
-                                <th id="th-annual-80" style="width: 105px;">年繳 (8折)</th>
+                                <th style="text-align: left;">據點名稱</th>
+                                <th style="text-align: left;">倉位編號</th>
+                                <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
+                                <th style="text-align: left;">材積 (材)</th>
+                                <th style="text-align: left;">月繳/原價</th>
+                                <th style="text-align: left;">季繳</th>
+                                <th style="text-align: left;">半年繳</th>
+                                <th id="th-annual-85" style="text-align: left;">年繳 (85折)</th>
+                                <th id="th-annual-80" style="text-align: left;">年繳 (8折)</th>
                             </tr>
                         </thead>
                         <tbody id="storage-table-body">
@@ -369,5 +369,3 @@
 </body>
 </html>
 ```eof
-
-Your updated `index.html` file has been successfully generated! Let me know if you need any further tweaks.
