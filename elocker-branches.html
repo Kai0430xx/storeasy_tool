@@ -31,28 +31,39 @@
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: center; }
+        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; align-items: center; }
         .filter-group { display: flex; flex-direction: column; gap: 6px; }
         .filter-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
         .filter-group input, .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
 
         .branches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .branch-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
-        .branch-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .branch-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .branch-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); border-color: #cbd5e1; }
         
         .branch-header { background: #0f172a; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
         .branch-title { font-size: 1.1rem; font-weight: bold; color: #fbbf24; }
         .branch-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; background: #059669; color: #fff; }
 
-        .branch-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+        .branch-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
         .info-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9rem; color: #475569; }
         .info-row strong { color: #1e293b; min-width: 70px; flex-shrink: 0; }
+
+        .code-tag { background: #fef3c7; color: #b45309; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #fde68a; margin-left: 6px; }
 
         .floor-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
         .floor-table th, .floor-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
         .floor-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         .floor-table tr:last-child td { border-bottom: none; }
         
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #fff; width: 100%; max-width: 650px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; animation: modalIn 0.2s ease-out; }
+        @keyframes modalIn { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { background: #0f172a; color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 1.25rem; color: #fbbf24; font-weight: bold; }
+        .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; font-weight: bold; }
+        .modal-close:hover { color: #fff; }
+        .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; max-height: 70vh; overflow-y: auto; }
+
         .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; grid-column: 1 / -1; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
 
         @media (max-width: 768px) {
@@ -73,7 +84,7 @@
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
-                    <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
+                    <a href="invoice.html" class="sub-btn">💰 請款單</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
@@ -98,13 +109,22 @@
             <!-- 篩選與搜尋工具列 -->
             <div class="filter-card">
                 <div class="filter-group">
-                    <label>🔍 關鍵字搜尋（據點名稱 / 地址 / 樓層）：</label>
-                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林 或 土城">
+                    <label>🔍 關鍵字搜尋（據點名稱 / 縣市 / 系統編碼）：</label>
+                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 ARA">
                 </div>
                 <div class="filter-group">
                     <label>🏢 選擇據點篩選：</label>
                     <select id="branch-select" onchange="renderBranches()">
                         <option value="">-- 全部據點 --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>📱 承租方式篩選：</label>
+                    <select id="type-select" onchange="renderBranches()">
+                        <option value="">-- 全部承租方式 --</option>
+                        <option value="machine">僅機台承租</option>
+                        <option value="app">僅 APP 承租</option>
+                        <option value="both">機台 + APP 承租</option>
                     </select>
                 </div>
             </div>
@@ -115,6 +135,19 @@
             </div>
         </div>
     </main>
+
+    <!-- 據點詳細資訊彈出視窗 (Modal) -->
+    <div id="branch-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">據點名稱</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- 動態載入詳細內容 -->
+            </div>
+        </div>
+    </div>
 
     <script src="login.js"></script>
     <script>
@@ -131,24 +164,35 @@
             }
         });
 
-        // 💡 直接使用您提供的完整據點清單作為固定資料來源，確保欄位 100% 正確
         function getElockerData() {
             return [
                 {
                     name: "桂林萬家福場",
-                    address: "台北市萬華區桂林路1號",
-                    hours: "24hr",
+                    code: "ARA",
+                    address: "台北市萬華區桂林路1號[cite: 1]",
+                    city: "台北市",
+                    hours: "24hr[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F-1", desc: "手推車區" },
-                        { floor: "5F-1", desc: "哺乳室旁" },
-                        { floor: "6F-1", desc: "退稅服務中心" },
-                        { floor: "6F-2", desc: "化妝室旁" }
+                        { floor: "2F-1", desc: "手推車區[cite: 1]" },
+                        { floor: "5F-1", desc: "哺乳室旁[cite: 1]" },
+                        { floor: "6F-1", desc: "退稅服務中心[cite: 1]" },
+                        { floor: "6F-2", desc: "化妝室旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "台北小巨蛋場",
+                    code: "AAB",
                     address: "台北市松山區南京東路四段2號[cite: 1]",
+                    city: "台北市",
                     hours: "10:00-21:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "001~124櫃", desc: "冰上樂園2F女廁旁[cite: 1]" },
                         { floor: "125~302櫃", desc: "冰上樂園2F女廁旁[cite: 1]" },
@@ -157,16 +201,28 @@
                 },
                 {
                     name: "民生松江場",
+                    code: "AAC",
                     address: "台北市中山區民生東路二段119號B1[cite: 1]",
+                    city: "台北市",
                     hours: "07:00-22:00[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L、XL尺寸",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "B1", desc: "9號出入口 / 電梯旁 / 西側廁所旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "南港車站場",
+                    code: "AAM",
                     address: "台北市南港區忠孝東路七段371號[cite: 1]",
-                    hours: "綜合 (詳見各樓層)",
+                    city: "台北市",
+                    hours: "綜合 (詳見各樓層)[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "B1F-1", desc: "近南側廣場出口 (24hr)[cite: 1]" },
                         { floor: "B1F-2", desc: "計程車招呼站旁 (11:00-22:00)[cite: 1]" },
@@ -175,8 +231,14 @@
                 },
                 {
                     name: "南港北流場",
+                    code: "ABA",
                     address: "台北市南港區忠孝東路七段99號1F[cite: 1]",
+                    city: "台北市",
                     hours: "10:00-24:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F-A", desc: "市民大道 (10:00-24:00)[cite: 1]" },
                         { floor: "1F-B", desc: "天橋下 (24hr)[cite: 1]" }
@@ -184,32 +246,56 @@
                 },
                 {
                     name: "信義威秀場",
+                    code: "ARC",
                     address: "台北市信義區松壽路20號3F[cite: 1]",
+                    city: "台北市",
                     hours: "09:00-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "3F", desc: "3F-4 區域[cite: 1]" }
                     ]
                 },
                 {
                     name: "天母德行場",
+                    code: "ACA",
                     address: "台北市士林區德行西路47號1F(萬家福天母店內)[cite: 1]",
+                    city: "台北市",
                     hours: "08:00-23:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "1F-1", desc: "萬家福天母店內[cite: 1]" }
                     ]
                 },
                 {
                     name: "天母廣場場",
+                    code: "ADA",
                     address: "台北市士林區天母西路3號2F[cite: 1]",
+                    city: "台北市",
                     hours: "08:00-24:00[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "2F", desc: "天母廣場櫃[cite: 1]" }
                     ]
                 },
                 {
                     name: "台北車站場",
+                    code: "ALO",
                     address: "台北市中正區忠孝西路一段50號(亞洲廣場大樓)[cite: 1]",
+                    city: "台北市",
                     hours: "24hr[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "B1-1", desc: "收多易台北車站店前[cite: 1]" },
                         { floor: "B3-1", desc: "站前地下街Z2出口處[cite: 1]" }
@@ -217,8 +303,14 @@
                 },
                 {
                     name: "中和威力場",
+                    code: "AIA",
                     address: "新北市中和區中山路二段291號[cite: 1]",
-                    hours: "綜合 (詳見各樓層)",
+                    city: "新北市",
+                    hours: "綜合 (詳見各樓層)[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "6F", desc: "605室 (08:00-24:00)[cite: 1]" },
                         { floor: "B1", desc: "紙箱打包區旁 (09:00-23:00)[cite: 1]" }
@@ -226,24 +318,42 @@
                 },
                 {
                     name: "汐止北山場",
+                    code: "AJA",
                     address: "新北市汐止區康寧街141號[cite: 1]",
+                    city: "新北市",
                     hours: "24hr[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "北山智取櫃[cite: 1]" }
                     ]
                 },
                 {
                     name: "三重湯城場",
+                    code: "AMGA",
                     address: "新北市三重區重新路5段609巷10號B1(三重湯城廣場內)[cite: 1]",
+                    city: "新北市",
                     hours: "24hr[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "B1", desc: "三重湯城廣場內[cite: 1]" }
                     ]
                 },
                 {
                     name: "台中青海場",
+                    code: "AHA",
                     address: "台中市西屯區青海路二段207-18號(萬家福青海店內)[cite: 1]",
-                    hours: "綜合 (詳見各樓層)",
+                    city: "台中市",
+                    hours: "綜合 (詳見各樓層)[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "B1", desc: "手扶梯旁 (10:00-22:00)[cite: 1]" },
                         { floor: "B1-1", desc: "收多易青海店內 (10:00-22:00)[cite: 1]" },
@@ -252,24 +362,42 @@
                 },
                 {
                     name: "新店萬家福場",
+                    code: "ALB",
                     address: "新北市新店區中興路三段1號[cite: 1]",
+                    city: "新北市",
                     hours: "08:00-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "2F", desc: "賣場入口旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "桃園中壢場",
+                    code: "ANA",
                     address: "桃園市中壢區中山東路二段510號(萬家福中壢店內)[cite: 1]",
+                    city: "桃園市",
                     hours: "08:00-23:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "1F", desc: "服務中心對面[cite: 1]" }
                     ]
                 },
                 {
                     name: "桃園經國場",
+                    code: "ACIA",
                     address: "桃園市桃園區經國路369號(萬家福經國店內)[cite: 1]",
+                    city: "桃園市",
                     hours: "24hr[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "賣場入口旁[cite: 1]" },
                         { floor: "B1", desc: "賣場入口旁[cite: 1]" }
@@ -277,8 +405,14 @@
                 },
                 {
                     name: "台中豐原場",
+                    code: "ACG",
                     address: "台中市豐原區成功路500號(萬家福豐原店內)[cite: 1]",
+                    city: "台中市",
                     hours: "09:00-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "B1", desc: "電梯旁[cite: 1]" },
                         { floor: "3F", desc: "手扶梯旁[cite: 1]" }
@@ -286,24 +420,42 @@
                 },
                 {
                     name: "台中文心場",
+                    code: "AFD",
                     address: "台中市南屯區文心路一段521號2F(萬家福文心店內)[cite: 1]",
+                    city: "台中市",
                     hours: "09:00-23:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "2F", desc: "賣場入口處[cite: 1]" }
                     ]
                 },
                 {
                     name: "台中德安場",
+                    code: "AZD",
                     address: "台中市東區復興路四段186號B1(萬家福德安店內)[cite: 1]",
+                    city: "台中市",
                     hours: "24hr[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "B1", desc: "美食街旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "重慶萬家福場",
+                    code: "ATA",
                     address: "台北市大同區重慶北路二段171號[cite: 1]",
+                    city: "台北市",
                     hours: "09:00-24:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "B1", desc: "服務台旁[cite: 1]" },
                         { floor: "B2", desc: "男廁旁[cite: 1]" },
@@ -312,8 +464,14 @@
                 },
                 {
                     name: "信義逸仙場",
+                    code: "AUA",
                     address: "台北市信義區逸仙路26巷1號[cite: 1]",
+                    city: "台北市",
                     hours: "24hr[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "1F", desc: "信義逸仙櫃 1F[cite: 1]" },
                         { floor: "B1", desc: "信義逸仙櫃 B1[cite: 1]" }
@@ -321,16 +479,28 @@
                 },
                 {
                     name: "貓空纜車場",
+                    code: "AVA",
                     address: "台北市文山區新光路二段8號[cite: 1]",
+                    city: "台北市",
                     hours: "06:00-24:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F-1", desc: "動物園站[cite: 1]" }
                     ]
                 },
                 {
                     name: "兒童新樂園場",
+                    code: "AVC",
                     address: "臺北市士林區承德路5段55號[cite: 1]",
+                    city: "台北市",
                     hours: "依樂園開放時間為主[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F-A", desc: "服務中心對面[cite: 1]" },
                         { floor: "1F-B", desc: "沙坑[cite: 1]" }
@@ -338,16 +508,28 @@
                 },
                 {
                     name: "北投會館場",
+                    code: "AVE",
                     address: "臺北市北投區大業路527巷88號[cite: 1]",
+                    city: "台北市",
                     hours: "平日 15:00-22:00 / 假日 09:00-22:00[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "B1", desc: "運動教室[cite: 1]" }
                     ]
                 },
                 {
                     name: "南港萬家福場",
+                    code: "AWA",
                     address: "台北市南港區南港路二段146號B1[cite: 1]",
+                    city: "台北市",
                     hours: "08:00-23:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "B1-1", desc: "電梯前[cite: 1]" },
                         { floor: "B1-2", desc: "樓梯旁[cite: 1]" }
@@ -355,8 +537,14 @@
                 },
                 {
                     name: "內湖萬家福場",
+                    code: "AKA",
                     address: "台北市內湖區民善街88號[cite: 1]",
+                    city: "台北市",
                     hours: "09:00-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "樓梯旁[cite: 1]" },
                         { floor: "2F", desc: "樓梯旁[cite: 1]" }
@@ -364,48 +552,84 @@
                 },
                 {
                     name: "台南民生場",
+                    code: "AYB",
                     address: "台南市中西區民生路二段72號[cite: 1]",
+                    city: "台南市",
                     hours: "24小時[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "1F", desc: "台南民生櫃[cite: 1]" }
                     ]
                 },
                 {
                     name: "高雄鼎山場",
+                    code: "AYC",
                     address: "高雄市三民區大順二路849號(萬家福高雄鼎山店內)[cite: 1]",
+                    city: "高雄市",
                     hours: "24小時[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "3F", desc: "高雄鼎山櫃[cite: 1]" }
                     ]
                 },
                 {
                     name: "林口萬家福場",
+                    code: "AZA",
                     address: "新北市林口區文化二路一段559號B1[cite: 1]",
+                    city: "新北市",
                     hours: "08:30-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "B1", desc: "賣場入口旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "基隆南站場",
+                    code: "IGA",
                     address: "基隆市仁愛區港西街5號(基隆火車站南站)[cite: 1]",
+                    city: "基隆市",
                     hours: "6:00-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "7-11旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "基隆北站場",
+                    code: "DLA",
                     address: "基隆市仁愛區港西街55號(基隆火車站北站)[cite: 1]",
+                    city: "基隆市",
                     hours: "05:00-24:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "B1", desc: "北站出口[cite: 1]" }
                     ]
                 },
                 {
                     name: "汐科萬家福場",
+                    code: "INA",
                     address: "新北市汐止區新台五路一段99號B1[cite: 1]",
+                    city: "新北市",
                     hours: "09:30-22:30[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "B1-A", desc: "賣場入口左側[cite: 1]" },
                         { floor: "B1-B", desc: "賣場出口旁[cite: 1]" }
@@ -413,8 +637,14 @@
                 },
                 {
                     name: "蘆洲萬家福場",
+                    code: "BOA",
                     address: "新北市三重區五華街282號[cite: 1]",
-                    hours: "綜合 (詳見各樓層)",
+                    city: "新北市",
+                    hours: "綜合 (詳見各樓層)[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
                         { floor: "2F", desc: "賣場入口 (24小時)[cite: 1]" },
                         { floor: "5F", desc: "07:00-24:00[cite: 1]" },
@@ -423,16 +653,28 @@
                 },
                 {
                     name: "洲子美食街場",
+                    code: "MAA",
                     address: "台北市內湖區瑞光路517號[cite: 1]",
+                    city: "台北市",
                     hours: "07:00-21:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "7-11旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "三民萬家福場",
+                    code: "MILA",
                     address: "台北市松山區三民路160號[cite: 1]",
+                    city: "台北市",
                     hours: "08:00-23:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "1F", desc: "賣場入口旁[cite: 1]" },
                         { floor: "2F", desc: "手扶梯旁[cite: 1]" },
@@ -443,8 +685,14 @@
                 },
                 {
                     name: "淡新萬家福場",
+                    code: "MCA",
                     address: "新北市淡水區中山北路二段383號[cite: 1]",
+                    city: "新北市",
                     hours: "09:00-22:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "賣場出入口[cite: 1]" },
                         { floor: "B2", desc: "手扶梯旁[cite: 1]" }
@@ -452,16 +700,28 @@
                 },
                 {
                     name: "新店安康場",
+                    code: "MED",
                     address: "新北市新店區安康路二段196號B1(樂家康安康店內)[cite: 1]",
+                    city: "新北市",
                     hours: "07:00-01:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", desc: "新店安康櫃[cite: 1]" }
+                        { floor: "B1", desc: "" }
                     ]
                 },
                 {
                     name: "基隆好食城場",
+                    code: "NAA",
                     address: "基隆市中正區中正路3號[cite: 1]",
+                    city: "基隆市",
                     hours: "11:00-22:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
                         { floor: "1F-A", desc: "廁所旁[cite: 1]" },
                         { floor: "1F-B", desc: "側門入口處[cite: 1]" },
@@ -470,216 +730,142 @@
                 },
                 {
                     name: "桃園內壢場",
+                    code: "OA",
                     address: "桃園市中壢區中華路一段450號(萬家福內壢店內)[cite: 1]",
+                    city: "桃園市",
                     hours: "09:00-23:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "打包區旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "文山興隆場",
+                    code: "LAC",
                     address: "台北市文山區興隆路一段15號3F[cite: 1]",
+                    city: "台北市",
                     hours: "24小時[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "3F", desc: "大門旁[cite: 1]" }
                     ]
                 },
                 {
                     name: "南港興華場",
+                    code: "SCA",
                     address: "台北市南港區南港路二段20巷5號B2[cite: 1]",
+                    city: "台北市",
                     hours: "08:00-23:00[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B2", desc: "南港興華櫃[cite: 1]" }
+                        { floor: "B2", desc: "" }
                     ]
                 },
                 {
                     name: "文山萬慶場",
+                    code: "ODA",
                     address: "台北市文山區萬慶街27號B1[cite: 1]",
+                    city: "台北市",
                     hours: "24小時[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", desc: "文山萬慶櫃[cite: 1]" }
+                        { floor: "B1", desc: "" }
                     ]
                 },
                 {
                     name: "新竹中華場",
+                    code: "OCA",
                     address: "新竹市東區中華路二段198號[cite: 1]",
+                    city: "新竹市",
                     hours: "24小時[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "1F", desc: "新竹中華櫃[cite: 1]" }
+                        { floor: "1F", desc: "" }
                     ]
                 },
                 {
                     name: "士林劍潭場",
+                    code: "CLA",
                     address: "臺北市士林區承德路四段179巷7號[cite: 1]",
+                    city: "台北市",
                     hours: "24小時[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "B1", desc: "樓梯下方[cite: 1]" }
                     ]
                 },
                 {
                     name: "板橋第一運動場",
+                    code: "THA",
                     address: "新北市板橋區漢生東路278號[cite: 1]",
+                    city: "新北市",
                     hours: "05:00-22:00[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "哺乳室前[cite: 1]" }
                     ]
                 },
                 {
                     name: "耕莘專校場",
+                    code: "AZT",
                     address: "新北市新店區民族路112號[cite: 1]",
+                    city: "新北市",
                     hours: "24小時[cite: 1]",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F", desc: "聖母樓一樓走廊[cite: 1]" }
                     ]
                 },
                 {
                     name: "新莊民安場",
+                    code: "VAA",
                     address: "新北市新莊區民安路179號B1[cite: 1]",
+                    city: "新北市",
                     hours: "24小時[cite: 1]",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", desc: "新莊民安櫃[cite: 1]" }
+                        { floor: "B1", desc: "" }
                     ]
                 },
                 {
                     name: "峨眉停車場",
+                    code: "YRA",
                     address: "臺北市萬華區峨眉街83號[cite: 1]",
+                    city: "台北市",
                     hours: "24小時[cite: 1]",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F-A", desc: "機車B1入口旁[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "天母圓環場",
-                    address: "臺北市士林區中山北路七段154巷6號2樓[cite: 1]",
-                    hours: "08:00-23:00[cite: 1]",
-                    floors: [
-                        { floor: "2F", desc: "天母圓環櫃[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "松山新矽谷場",
-                    address: "台北市南港區八德路四段768巷9號2F-1[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "2F", desc: "三店門口旁[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "松山文創場",
-                    address: "台北市信義區光復南路133號[cite: 1]",
-                    hours: "綜合 (詳見各樓層)",
-                    floors: [
-                        { floor: "1F-A", desc: "1號與2號倉庫間 (24小時)[cite: 1]" },
-                        { floor: "1F-B", desc: "辦公廳舍哺乳室前 (08:00-21:00)[cite: 1]" },
-                        { floor: "1F-C", desc: "全家旁 (24小時)[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "台中洲際棒球場",
-                    address: "臺中市北屯區崇德路三段835號[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "1F-A", desc: "售票處對面左側[cite: 1]" },
-                        { floor: "1F-B", desc: "售票處對面右側[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "土城萬家福場",
-                    address: "新北市土城區青雲路152號[cite: 1]",
-                    hours: "10:00-22:00[cite: 1]",
-                    floors: [
-                        { floor: "B1", desc: "往1F手扶梯前[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "台中文心洛陽場",
-                    address: "臺中市西屯區文心路三段65-1號[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "台中文心洛陽櫃[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "南門場",
-                    address: "臺北市中正區延平南路189號B1[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "B1", desc: "收多易南門店門口[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "樂天桃園棒球場",
-                    address: "桃園市中壢區領航北路一段1號[cite: 1]",
-                    hours: "依場館開放時間為主[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "場外廊道三壘側商品部右邊[cite: 1]" },
-                        { floor: "1F-1", desc: "GATE E旁[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "台中廣三SOGO場",
-                    address: "臺中市西區臺灣大道二段459號[cite: 1]",
-                    hours: "11:00-22:00[cite: 1]",
-                    floors: [
-                        { floor: "B1", desc: "女廁旁梯廳[cite: 1]" },
-                        { floor: "B1-1", desc: "往B2停車場梯廳[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "台北京站場",
-                    address: "臺北市大同區市民大道一段209號[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "汽機車停車場入口旁[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "新莊公園場",
-                    address: "新北市新莊區公園路129-1號[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "新莊公園櫃[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "台南仁德場",
-                    address: "台南市仁德區中山路711號[cite: 1]",
-                    hours: "09:00-23:00[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "廁所旁[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "桃園春日場",
-                    address: "桃園市桃園區大業里春日路618號[cite: 1]",
-                    hours: "11:00-22:00[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "貨梯旁[cite: 1]" },
-                        { floor: "B1", desc: "廁所旁[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "板橋愛買場",
-                    address: "新北市板橋區華貴里貴興路101號[cite: 1]",
-                    hours: "09:00-22:30[cite: 1]",
-                    floors: [
-                        { floor: "1F", desc: "賣場入口處[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "海洋都心場",
-                    address: "新北市淡水區新市三路二段213號[cite: 1]",
-                    hours: "24小時[cite: 1]",
-                    floors: [
-                        { floor: "2F", desc: "海洋都心櫃[cite: 1]" }
-                    ]
-                },
-                {
-                    name: "大安場",
-                    address: "臺北市大安區信義路3段153號9樓[cite: 1]",
-                    hours: "06:00-23:00[cite: 1]",
-                    floors: [
-                        { floor: "9F", desc: "大安櫃[cite: 1]" }
                     ]
                 }
             ];
@@ -702,21 +888,22 @@
             let branches = getElockerData();
             const searchKw = document.getElementById('search-input').value.trim().toLowerCase();
             const selectedBranch = document.getElementById('branch-select').value;
+            const selectedType = document.getElementById('type-select').value;
             const container = document.getElementById('branches-container');
 
             let list = branches;
             if (selectedBranch) {
                 list = list.filter(function(b) { return b.name === selectedBranch; });
             }
+            if (selectedType) {
+                list = list.filter(function(b) { return b.rentType === selectedType; });
+            }
             if (searchKw) {
                 list = list.filter(function(b) {
                     let matchName = b.name && b.name.toLowerCase().includes(searchKw);
-                    let matchAddr = b.address && b.address.toLowerCase().includes(searchKw);
-                    let matchFloor = b.floors && b.floors.some(function(f) {
-                        return (f.floor && f.floor.toLowerCase().includes(searchKw)) || 
-                               (f.desc && f.desc.toLowerCase().includes(searchKw));
-                    });
-                    return matchName || matchAddr || matchFloor;
+                    let matchCity = b.city && b.city.toLowerCase().includes(searchKw);
+                    let matchCode = b.code && b.code.toLowerCase().includes(searchKw);
+                    return matchName || matchCity || matchCode;
                 });
             }
 
@@ -727,16 +914,17 @@
 
             container.innerHTML = list.map(function(b) {
                 let floorsHtml = b.floors.map(function(f) {
+                    let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
                     return '<tr>' +
                         '<td style="font-weight:bold; width: 90px;">' + f.floor + '</td>' +
-                        '<td>' + f.desc + '</td>' +
+                        '<td>' + descDisplay + '</td>' +
                     '</tr>';
                 }).join('');
 
-                return '<div class="branch-card">' +
+                return '<div class="branch-card" onclick="openBranchModal(\'' + b.name + '\')">' +
                     '<div class="branch-header">' +
-                        '<span class="branch-title">🏢 ' + b.name + '</span>' +
-                        '<span class="branch-badge">營運中</span>' +
+                        '<span class="branch-title">🏢 ' + b.name + '<span class="code-tag">代碼: ' + b.code + '</span></span>' +
+                        '<span class="branch-badge">' + b.rentTypeText + '</span>' +
                     '</div>' +
                     '<div class="branch-body">' +
                         '<div class="info-row"><strong>📍 地址：</strong><span>' + b.address + '</span></div>' +
@@ -751,6 +939,39 @@
                     '</div>' +
                 '</div>';
             }).join('');
+        }
+
+        function openBranchModal(branchName) {
+            let branches = getElockerData();
+            let b = branches.find(function(item) { return item.name === branchName; });
+            if (!b) return;
+
+            document.getElementById('modal-title').innerText = '🏢 ' + b.name + ' (代碼: ' + b.code + ')';
+            
+            let modalFloorsHtml = b.floors.map(function(f) {
+                let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '無特別說明';
+                return '<tr><td style="font-weight:bold; width: 100px;">' + f.floor + '</td><td>' + descDisplay + '</td></tr>';
+            }).join('');
+
+            let modalBody = document.getElementById('modal-body-content');
+            modalBody.innerHTML = 
+                '<div class="info-row" style="font-size: 1rem;"><strong>📍 完整地址：</strong><span>' + b.address + '</span></div>' +
+                '<div class="info-row" style="font-size: 1rem;"><strong>🕒 進出時間：</strong><span>' + b.hours + '</span></div>' +
+                '<div class="info-row" style="font-size: 1rem;"><strong>📱 承租方式：</strong><span style="color: #059669; font-weight: bold;">' + b.rentTypeText + '</span></div>' +
+                '<div class="info-row" style="font-size: 1rem;"><strong>📐 尺寸與月繳：</strong><span>' + b.sizesAvailable + ' ｜ ' + b.monthlyAvailable + '</span></div>' +
+                '<div style="margin-top: 12px;">' +
+                    '<strong style="font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">📋 各樓層櫃位詳細配置：</strong>' +
+                    '<table class="floor-table">' +
+                        '<thead><tr><th>樓層/櫃號</th><th>位置說明</th></tr></thead>' +
+                        '<tbody>' + modalFloorsHtml + '</tbody>' +
+                    '</table>' +
+                '</div>';
+
+            document.getElementById('branch-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('branch-modal').style.display = 'none';
         }
     </script>
 </body>
