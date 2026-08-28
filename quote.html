@@ -9,6 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
+        /* 💡 左側導覽列固定設定 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -40,6 +41,7 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
+        /* 💡 右側主內容區塊 */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
@@ -66,14 +68,15 @@
 
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
         .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
-        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
+        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
         .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
-        .notes-box { font-size: 0.75rem; color: #64748b; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
+        .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
         .sidebar-overlay.active { display: block; }
 
+        /* 手機響應式適應 */
         @media (max-width: 768px) {
             aside { transform: translateX(-100%); }
             aside.mobile-open { transform: translateX(0); }
@@ -96,7 +99,15 @@
                 position: absolute; left: 0; top: 0; width: 100% !important; 
                 margin: 0 !important; padding: 15px !important; 
                 box-shadow: none !important; border: none !important; 
+                font-size: 8.5pt !important;
             }
+            #quote-preview h1 { font-size: 1.3rem !important; }
+            #quote-preview h2 { font-size: 1rem !important; }
+            #quote-preview .preview-info { padding: 10px !important; margin-bottom: 15px !important; font-size: 8.5pt !important; }
+            #quote-preview table { font-size: 8pt !important; margin-top: 6px !important; margin-bottom: 15px !important; word-break: break-all; }
+            #quote-preview th, #quote-preview td { padding: 6px 6px !important; text-align: center !important; vertical-align: middle !important; }
+            #quote-preview .summary-box { padding: 10px !important; font-size: 9pt !important; margin-top: 15px !important; margin-bottom: 15px !important; }
+            #quote-preview .notes-box { padding: 8px !important; font-size: 7.5pt !important; margin-bottom: 0 !important; }
         }
     </style>
 </head>
@@ -150,8 +161,10 @@
                     <div class="form-group"><label>聯繫電話</label><input type="text" id="q-tel" placeholder="請輸入分店電話"></div>
                     <div class="form-group"><label>報價日期</label><input type="date" id="quote-date"></div>
                     <div class="form-group" style="grid-column: span 2;"><label>分店地址</label><input type="text" id="q-address" placeholder="請輸入分店地址"></div>
-                    <div class="form-group"><label>客戶名稱</label><input type="text" id="q-client" placeholder="姓名"></div>
-                    <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="q-client-phone" placeholder="輸入客電"></div>
+                    <div class="form-group"><label>客戶名稱</label><input type="text" id="q-client-name" placeholder="輸入客戶姓名"></div>
+                    <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="q-client-tel" placeholder="輸入客電"></div>
+                    <div class="form-group"><label>公司抬頭</label><input type="text" id="q-company" placeholder="抬頭"></div>
+                    <div class="form-group"><label>統一編號</label><input type="text" id="q-taxid" placeholder="統編"></div>
                 </div>
 
                 <div class="form-grid" style="align-items: center; margin-bottom: 12px;">
@@ -163,7 +176,7 @@
                     </div>
                     <div class="form-group">
                         <label>🔍 快速搜尋：</label>
-                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: QD335 或 75">
+                        <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: 0.9 或 75">
                     </div>
                 </div>
 
@@ -171,16 +184,16 @@
                     <table>
                         <thead>
                             <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                                <th style="width: 50px;">選取</th>
-                                <th style="width: 100px;">據點名稱</th>
-                                <th style="width: 90px;">倉位編號</th>
-                                <th style="width: 280px;">尺寸 (寬*深*高 m)</th>
-                                <th style="width: 80px;">材積(材)</th>
-                                <th style="width: 90px;">月繳/原價</th>
-                                <th style="width: 85px;">季繳</th>
-                                <th style="width: 85px;">半年繳</th>
-                                <th style="width: 95px;">年繳(85折)</th>
-                                <th style="width: 95px;">年繳(8折)</th>
+                                <th style="width: 40px;">選取</th>
+                                <th>據點名稱</th>
+                                <th>倉位編號</th>
+                                <th>尺寸 (寬*深*高 m)</th>
+                                <th>材積 (材)</th>
+                                <th>月繳/原價</th>
+                                <th>季繳</th>
+                                <th>半年繳</th>
+                                <th>年繳(85折)</th>
+                                <th>年繳(8折)</th>
                             </tr>
                         </thead>
                         <tbody id="quote-selectable-body">
@@ -190,9 +203,9 @@
                 </div>
 
                 <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取項目與方案調整：</h5>
-                    <div id="per-item-quote-container" style="display: flex; flex-direction: column; gap: 12px;">
-                        <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選報價倉位項目</span>
+                    <h5 style="font-size: 0.8rem; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase;">✅ 已選取的報價項目（方案與額外優惠備註）：</h5>
+                    <div id="selected-items-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #475569;">
+                        <span style="color: #94a3b8;">尚未勾選任何項目</span>
                     </div>
                 </div>
 
@@ -204,9 +217,12 @@
                 <div class="preview-header">
                     <div>
                         <h1 style="font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;">收多易迷你倉庫</h1>
-                        <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Quotation Statement</p>
+                        <p style="font-size: 0.75rem; color: #64748b;">Storeasy Storage Solution</p>
                     </div>
-                    <div style="text-align: right;"><h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">報 價 單</h2></div>
+                    <div style="text-align: right;">
+                        <h2 style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">報 價 單</h2>
+                        <p style="font-size: 0.75rem; color: #dc2626; font-weight: 600; margin-top: 4px;">報價有效期限 7 天</p>
+                    </div>
                 </div>
 
                 <div class="preview-info">
@@ -215,39 +231,43 @@
                     <div><strong>店  長：</strong> <span id="v-q-manager">---</span></div>
                     <div><strong>客 戶 電 話：</strong> <span id="v-q-client-phone">---</span></div>
                     <div><strong>分店名稱：</strong> <span id="v-q-branch">---</span></div>
+                    <div><strong>公 司 抬 頭：</strong> <span id="v-q-company">---</span></div>
                     <div><strong>聯 繫 電 話：</strong> <span id="v-q-tel">---</span></div>
+                    <div><strong>統  編：</strong> <span id="v-q-taxid">---</span></div>
                     <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-q-address">---</span></div>
                 </div>
 
-                <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">報價項目明細</div>
                 <table>
                     <thead>
-                        <tr style="background-color: #f8fafc; text-align: center;">
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">據點名稱</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">倉位編號</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">尺寸 (寬*深*高 m)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">材積</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">方案類型</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">優惠單價 (月)</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">承租期數</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">金額小計 (TWD)</th>
+                        <tr style="background-color: #f1f5f9; text-align: center;">
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 12%; text-align: center;">單位<br>(材)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 36%; text-align: center;">倉位尺寸<br>(寬*深*高 m)</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">月繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">季繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">半年繳/月</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">年繳/月</th>
                         </tr>
                     </thead>
                     <tbody id="v-q-items" style="text-align: center;">
-                        <tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">請先於上方勾選項目並點擊生成報價單</td></tr>
+                        <tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">尚未產生內容</td></tr>
                     </tbody>
                 </table>
 
                 <div class="summary-box">
-                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算總表</div>
-                    <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; color: #b45309;"><span>報價總金額 (TWD)：</span> <span id="v-q-total">NT$ 0</span></div>
+                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算表 (依上方各項目所選方案計算)</div>
+                    <div style="display: flex; justify-content: space-between;"><span>租金總計 (NT$)：</span> <span id="v-q-rent" style="font-weight: bold;">0</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>保證金總計 (NT$)：</span> <span id="v-q-deposit">0</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>保險文書處理費總計 (NT$)：</span> <span id="v-q-fee">0</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; border-top: 1px solid #cbd5e1; padding-top: 6px; color: #b45309;"><span>合計 (NT$)：</span> <span id="v-q-total">0</span></div>
                 </div>
 
                 <div class="notes-box">
-                    <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">注意事項：</div>
-                    <div>1. 本報價單有效期限為 7 天，倉位數量有限，以實際完成預約承租為準。</div>
-                    <div>2. 租金均含稅，如需開立統一編號請提前告知店長。</div>
-                    <div>3. 洽詢專線：請洽各分店或免付費客服專線。</div>
+                    <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">匯款資訊：</div>
+                    <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 新莊分行 ｜ 帳號：________________________</div>
+                    <div style="font-weight: bold; color: #1e293b; margin-top: 8px; margin-bottom: 4px;">備註：</div>
+                    <div>1. 辦公時間: 週一~週五 10:00AM~07:00PM; 週六採預約制。</div>
+                    <div>2. 季繳以上，簽約時需押一個月押金(原價)；季繳以下，簽約時需押兩個月押金(原價)。</div>
+                    <div>3. 保險文書處理費 (月租金NT$2999以下每月加收NT$80；月租金NT$3000以上每月加收NT$150)。</div>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px;" class="no-print">
@@ -322,7 +342,7 @@
             }
 
             if (list.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的報價項目（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>'; 
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 24px;">無符合的倉位資料（請確認是否已至「倉位資料」頁面匯入 Excel）</td></tr>'; 
                 return; 
             }
 
@@ -336,7 +356,7 @@
                     '<td style="color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
                     '<td style="font-weight: bold;">' + item.code + '</td>' +
                     '<td style="line-height: 1.4;">' + item.size + '</td>' +
-                    '<td style="color: #64748b;">' + item.unit + '材</td>' +
+                    '<td style="color: #64748b;">' + item.unit + '</td>' +
                     '<td style="font-weight: 600; color: #d97706;">NT$ ' + item.price1.toLocaleString() + '</td>' +
                     '<td>NT$ ' + item.price3.toLocaleString() + '</td>' +
                     '<td>NT$ ' + item.price6.toLocaleString() + '</td>' +
@@ -354,45 +374,38 @@
                 let defaultTerm = '12_85';
                 let bDisc = branchDiscounts[item.branch];
                 if (bDisc === '0.80') defaultTerm = '12_80';
-
-                selectedQuoteItems[idx] = Object.assign({}, item, { 
-                    term: defaultTerm,
-                    months: defaultTerm.startsWith('12') ? 12 : Number(defaultTerm)
-                });
+                selectedQuoteItems[idx] = Object.assign({}, item, { term: defaultTerm, extraNote: '' });
             } else {
                 delete selectedQuoteItems[idx];
             }
-            renderPerItemQuoteInputs();
+            renderSelectedQuoteSummary();
         }
 
-        function renderPerItemQuoteInputs() {
-            const container = document.getElementById('per-item-quote-container');
-            if (!container) return;
+        function renderSelectedQuoteSummary() {
+            const summaryEl = document.getElementById('selected-items-summary');
+            if (!summaryEl) return;
             const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) { container.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選報價倉位項目</span>'; return; }
+            if (keys.length === 0) { summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>'; return; }
             
-            container.innerHTML = keys.map(function(idx) {
+            summaryEl.innerHTML = keys.map(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let currentTerm = item.term || '12_85';
-                let currentMonths = item.months || 12;
-                return '<div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;" data-index="' + idx + '">' +
-                    '<div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：' + item.code + ' ([' + item.branch + '] ' + item.size + ' / ' + item.unit + '材)</div>' +
-                    '<div style="display: flex; gap: 12px; align-items: center;">' +
-                        '<div style="display: flex; align-items: center; gap: 6px;">' +
-                            '<label style="font-size: 0.8rem; color: #475569; font-weight: bold;">方案：</label>' +
-                            '<select onchange="selectedQuoteItems[' + idx + '].term = this.value; selectedQuoteItems[' + idx + '].months = (this.value.startsWith(\'12\')?12:Number(this.value)); renderPerItemQuoteInputs();" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fef3c7; font-weight: bold;">' +
+                let currentNote = item.extraNote || '';
+                return '<div style="display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;">' +
+                    '<div style="font-weight: 600; color: #92400e;">[' + item.branch + '] <b>' + item.code + '</b> - ' + item.size + ' (' + item.unit + '材) - 月繳原價: NT$ ' + item.price1.toLocaleString() + '</div>' +
+                    '<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">' +
+                        '<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">' +
+                            '<select onchange="selectedQuoteItems[' + idx + '].term = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">' +
                                 '<option value="1" ' + (currentTerm==='1'?'selected':'') + '>月繳 (1個月)</option>' +
                                 '<option value="3" ' + (currentTerm==='3'?'selected':'') + '>季繳 (95折)</option>' +
                                 '<option value="6" ' + (currentTerm==='6'?'selected':'') + '>半年繳 (9折)</option>' +
                                 '<option value="12_85" ' + (currentTerm==='12_85'?'selected':'') + '>年繳 (85折)</option>' +
                                 '<option value="12_80" ' + (currentTerm==='12_80'?'selected':'') + '>年繳 (8折)</option>' +
+                                '<option value="none" ' + (currentTerm==='none'?'selected':'') + '>❌ 不列入試算</option>' +
                             '</select>' +
+                            '<input type="text" placeholder="額外折扣備註 (例: 特約75折/送1個月)" value="' + currentNote + '" oninput="selectedQuoteItems[' + idx + '].extraNote = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 220px;">' +
                         '</div>' +
-                        '<div style="display: flex; align-items: center; gap: 6px;">' +
-                            '<label style="font-size: 0.8rem; color: #475569; font-weight: bold;">月數：</label>' +
-                            '<input type="number" value="' + currentMonths + '" min="1" max="60" oninput="selectedQuoteItems[' + idx + '].months = Number(this.value)||1" style="width: 70px; padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem;">' +
-                        '</div>' +
-                        '<button type="button" onclick="delete selectedQuoteItems[' + idx + ']; renderQuoteSelectableItems(); renderPerItemQuoteInputs();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>' +
+                        '<button type="button" onclick="delete selectedQuoteItems[' + idx + ']; renderQuoteSelectableItems(); renderSelectedQuoteSummary();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>' +
                     '</div>' +
                 '</div>';
             }).join('');
@@ -403,102 +416,120 @@
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
 
             document.getElementById('v-q-date').innerText = document.getElementById('quote-date').value;
-            document.getElementById('v-q-client').innerText = document.getElementById('q-client').value || '未填寫';
+            document.getElementById('v-q-client').innerText = document.getElementById('q-client-name').value || '未填寫';
             document.getElementById('v-q-manager').innerText = document.getElementById('q-manager').value || '---';
+            document.getElementById('v-q-company').innerText = document.getElementById('q-company').value || '---';
+            document.getElementById('v-q-taxid').innerText = document.getElementById('q-taxid').value || '---';
             document.getElementById('v-q-branch').innerText = document.getElementById('q-branch').value || '---';
-            document.getElementById('v-q-client-phone').innerText = document.getElementById('q-client-phone').value || '---';
+            document.getElementById('v-q-client-phone').innerText = document.getElementById('q-client-tel').value || '---';
             document.getElementById('v-q-address').innerText = document.getElementById('q-address').value || '---';
             document.getElementById('v-q-tel').innerText = document.getElementById('q-tel').value || '---';
 
-            let tbodyItems = document.getElementById('v-q-items');
-            let itemsHtml = '';
-            let grandTotal = 0;
-            
+            let tbody = document.getElementById('v-q-items'), html = '', rent = 0, fee = 0, deposit = 0;
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let term = item.term || '12_85';
-                let monthlyRate = item.price1;
-                let termName = '月繳';
-                if (term === '3') { monthlyRate = item.price3; termName = '季繳 (95折)'; }
-                else if (term === '6') { monthlyRate = item.price6; termName = '半年繳 (9折)'; }
-                else if (term === '12_85') { monthlyRate = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; termName = '年繳 (85折)'; }
-                else if (term === '12_80') { monthlyRate = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; termName = '年繳 (8折)'; }
+                if (term === 'none') return;
 
-                let months = item.months || 12;
-                let lineTotal = monthlyRate * months;
-                grandTotal += lineTotal;
+                let displayAnnualPrice = 0;
+                if (term === '12_80') {
+                    displayAnnualPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
+                } else if (term === '12_85') {
+                    displayAnnualPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                } else {
+                    let bDisc = branchDiscounts[item.branch];
+                    let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
+                    displayAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                }
 
-                itemsHtml += '<tr>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px; color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold;">' + item.code + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px; line-height: 1.4;">' + item.size + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px;">' + item.unit + '材</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px;">' + termName + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px;">NT$ ' + monthlyRate.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px;">' + months + ' 個月</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #b45309;">NT$ ' + lineTotal.toLocaleString() + '</td>' +
+                let calcPrice = item.price1;
+                let months = 1;
+                if (term === '3') { calcPrice = item.price3; months = 3; }
+                else if (term === '6') { calcPrice = item.price6; months = 6; }
+                else if (term === '12_85') { calcPrice = displayAnnualPrice; months = 12; }
+                else if (term === '12_80') { calcPrice = displayAnnualPrice; months = 12; }
+
+                let extraNote = item.extraNote ? '<br><span style="color: #dc2626; font-size:0.75rem; word-break: break-all;">(' + item.extraNote + ')</span>' : '';
+
+                let unitText = item.unit;
+                if (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') {
+                    unitText = '上層' + item.unit;
+                }
+
+                html += '<tr>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">' + unitText + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; word-break: break-all; line-height: 1.4;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price1.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
+                
+                rent += calcPrice * months; 
+                fee += (calcPrice >= 3000 ? 150 : 80) * months; 
+                deposit += (months <= 2 ? item.price1 * 2 : item.price1);
             });
-
-            tbodyItems.innerHTML = itemsHtml;
-            document.getElementById('v-q-total').innerText = 'NT$ ' + grandTotal.toLocaleString();
+            tbody.innerHTML = html;
+            document.getElementById('v-q-rent').innerText = rent.toLocaleString();
+            document.getElementById('v-q-deposit').innerText = deposit.toLocaleString();
+            document.getElementById('v-q-fee').innerText = fee.toLocaleString();
+            document.getElementById('v-q-total').innerText = (rent + fee + deposit).toLocaleString();
             alert('報價單已成功生成！');
         }
 
         function exportQuoteExcel() {
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { alert('請先生成並確認報價單內容！'); return; }
-
-            let clientName = document.getElementById('q-client').value || '客戶';
+            
+            let clientName = document.getElementById('q-client-name').value || '客戶';
             let branchName = document.getElementById('q-branch').value || '分店';
             let dateStr = document.getElementById('quote-date').value;
 
             let wsData = [
                 ["收多易迷你倉庫 - 報價單明細表"],
                 ["報價日期", dateStr, "分店名稱", branchName],
-                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-phone').value || '---'],
+                ["客戶名稱", clientName, "客戶電話", document.getElementById('q-client-tel').value || '---'],
+                ["公司抬頭", document.getElementById('q-company').value || '---', "統一編號", document.getElementById('q-taxid').value || '---'],
                 [],
-                ["據點名稱", "倉位編號", "尺寸 (寬*深*高 m)", "材積", "方案類型", "優惠單價 (月)", "承租期數", "金額小計 (TWD)"]
+                ["【報價項目明細】"],
+                ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "季繳/月 (NT$)", "半年繳/月 (NT$)", "年繳/月 (NT$)"]
             ];
 
-            let grandTotal = 0;
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
+                if (item.term === 'none') return;
                 let term = item.term || '12_85';
-                let monthlyRate = item.price1;
-                let termName = '月繳';
-                if (term === '3') { monthlyRate = item.price3; termName = '季繳'; }
-                else if (term === '6') { monthlyRate = item.price6; termName = '半年繳'; }
-                else if (term === '12_85') { monthlyRate = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10; termName = '年繳(85折)'; }
-                else if (term === '12_80') { monthlyRate = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; termName = '年繳(8折)'; }
+                let tableAnnualPrice = 0;
+                if (term === '12_80') {
+                    tableAnnualPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
+                } else if (term === '12_85') {
+                    tableAnnualPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                } else {
+                    let bDisc = branchDiscounts[item.branch];
+                    let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
+                    tableAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
+                }
 
-                let months = item.months || 12;
-                let sub = monthlyRate * months;
-                grandTotal += sub;
-
-                wsData.push([
-                    item.branch,
-                    item.code,
-                    item.size,
-                    item.unit + '材',
-                    termName,
-                    monthlyRate,
-                    months + ' 個月',
-                    sub
-                ]);
+                let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
+                let sizeText = "[" + item.branch + "] " + item.size + (item.extraNote ? " (" + item.extraNote + ")" : "");
+                wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
             });
 
-            wsData.push([], ["報價總金額 (TWD)", grandTotal]);
+            wsData.push(
+                [],
+                ["【費用試算彙總表】"],
+                ["租金總計 (NT$)", document.getElementById('v-q-rent').innerText],
+                ["保證金總計 (NT$)", document.getElementById('v-q-deposit').innerText],
+                ["保險文書處理費總計 (NT$)", document.getElementById('v-q-fee').innerText],
+                ["合計總金額 (NT$)", document.getElementById('v-q-total').innerText]
+            );
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-            ws['!cols'] = [{wch: 14}, {wch: 12}, {wch: 28}, {wch: 10}, {wch: 14}, {wch: 14}, {wch: 12}, {wch: 16}];
-
-            XLSX.utils.book_append_sheet(wb, ws, "報價單明細");
+            ws['!cols'] = [{wch: 15}, {wch: 35}, {wch: 16}, {wch: 16}, {wch: 16}, {wch: 16}];
+            XLSX.utils.book_append_sheet(wb, ws, "報價單試算");
             XLSX.writeFile(wb, "報價單_" + clientName + ".xlsx");
         }
     </script>
 </body>
 </html>
-```eof
