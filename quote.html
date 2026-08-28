@@ -61,7 +61,8 @@
         .btn-emerald { background-color: #059669; color: #fff; }
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
-        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        td.size-col { white-space: normal; word-break: break-word; min-width: 220px; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
 
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
@@ -85,7 +86,6 @@
             .version { display: none; }
         }
 
-        /* 💡 列印 / 生成 PDF 專用樣式：鎖定預覽框寬度與客戶資料排版，防止擠到右側 */
         @media print {
             body * { visibility: hidden; }
             aside, header.no-print, .card.no-print, .no-print { display: none !important; }
@@ -111,7 +111,8 @@
                 box-sizing: border-box !important;
             }
             #quote-preview table { font-size: 7.5pt !important; margin-top: 6px !important; margin-bottom: 15px !important; width: 100% !important; }
-            #quote-preview th, #quote-preview td { padding: 6px 4px !important; border: 1px solid #cbd5e1 !important; }
+            #quote-preview th, #quote-preview td { padding: 6px 4px !important; border: 1px solid #cbd5e1 !important; white-space: nowrap !important; }
+            #quote-preview td.size-col { white-space: normal !important; }
             #quote-preview .summary-box { padding: 8px !important; font-size: 8pt !important; margin-top: 12px !important; margin-bottom: 12px !important; }
             #quote-preview .notes-box { padding: 6px !important; font-size: 6.5pt !important; margin-bottom: 0 !important; }
         }
@@ -131,7 +132,7 @@
         </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▼</span></button>
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn active">📄 生成報價單</a>
@@ -139,8 +140,8 @@
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category"><span>🗄️ 快存櫃 (eLocker)</span><span>▶</span></button>
-                <div class="menu-items">
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃 (eLocker)</span><span class="arrow">▶</span></button>
+                <div class="menu-items" style="display: none;">
                     <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
                     <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
                     <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
@@ -308,6 +309,18 @@
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('mobile-open');
             overlay.classList.toggle('active');
+        }
+
+        function toggleMenu(btn) {
+            const items = btn.nextElementSibling;
+            const arrow = btn.querySelector('.arrow');
+            if (items.style.display === 'none') {
+                items.style.display = 'flex';
+                arrow.innerText = '▼';
+            } else {
+                items.style.display = 'none';
+                arrow.innerText = '▶';
+            }
         }
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
