@@ -109,8 +109,8 @@
             <!-- 篩選與搜尋工具列 -->
             <div class="filter-card">
                 <div class="filter-group">
-                    <label>🔍 關鍵字搜尋（據點名稱 / 縣市）：</label>
-                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 台中">
+                    <label>🔍 關鍵字搜尋（據點名稱 / 縣市 / 樓層編碼）：</label>
+                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 AAA">
                 </div>
                 <div class="filter-group">
                     <label>🏢 選擇據點篩選：</label>
@@ -164,7 +164,7 @@
             }
         });
 
-        // 💡 完全對應檔案內現有的 60 間據點與樓層新編碼資料
+        // 💡 嚴格對應您的 Excel 檔案（僅顯示檔案內有的 60 間據點與各樓層新編碼、正確位置資訊）
         function getElockerData() {
             return [
                 {
@@ -187,19 +187,19 @@
                     name: "台北小巨蛋場",
                     address: "台北市松山區南京東路四段2號",
                     city: "台北市",
-                    hours: "10:00-21:00",
+                    hours: "綜合 (詳見各樓層)",
                     rentType: "both",
                     rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "9號出入口", code: "ABA", desc: "9號出入口" },
-                        { floor: "西側廁所旁", code: "ABB", desc: "西側廁所旁" },
-                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "冰上樂園2F女廁旁" },
-                        { floor: "303~386櫃", code: "ABD", desc: "冰上樂園2F女廁旁" },
-                        { floor: "001~124櫃", code: "ABE", desc: "冰上樂園2F女廁旁" },
-                        { floor: "125~302櫃", code: "", desc: "冰上樂園2F女廁旁" },
-                        { floor: "電梯旁", code: "ABF", desc: "電梯旁" }
+                        { floor: "9號出入口", code: "ABA", desc: "" },
+                        { floor: "西側廁所旁", code: "ABB", desc: "" },
+                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "" },
+                        { floor: "303~386櫃", code: "ABD", desc: "" },
+                        { floor: "001~124櫃", code: "ABE", desc: "" },
+                        { floor: "125~302櫃", code: "", desc: "" },
+                        { floor: "電梯旁", code: "ABF", desc: "" }
                     ]
                 },
                 {
@@ -234,7 +234,7 @@
                     name: "南港北流場",
                     address: "台北市南港區忠孝東路七段99號1F",
                     city: "台北市",
-                    hours: "10:00-24:00",
+                    hours: "綜合 (詳見各樓層)",
                     rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
@@ -261,7 +261,7 @@
                     name: "台北車站場",
                     address: "台北市中正區忠孝西路一段50號(亞洲廣場大樓)",
                     city: "台北市",
-                    hours: "24hr",
+                    hours: "綜合 (詳見各樓層)",
                     rentType: "both",
                     rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M、L尺寸",
@@ -871,7 +871,7 @@
                     name: "台中洲際棒球場",
                     address: "臺中市北屯區崇德路三段835號",
                     city: "台中市",
-                    hours: "24小時",
+                    hours: "綜合 (詳見各樓層)",
                     rentType: "both",
                     rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
@@ -898,7 +898,7 @@
                     name: "台中廣三SOGO場",
                     address: "臺中市西區臺灣大道二段459號",
                     city: "台中市",
-                    hours: "11:00-22:00",
+                    hours: "綜合 (詳見各樓層)",
                     rentType: "both",
                     rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M、L尺寸",
@@ -977,7 +977,7 @@
                     name: "基隆好食城場",
                     address: "基隆市中正區中正路3號",
                     city: "基隆市",
-                    hours: "11:00-22:00",
+                    hours: "綜合 (詳見各樓層)",
                     rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
@@ -1038,7 +1038,7 @@
                     let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
                     let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
                     return '<tr>' +
-                        '<td style="font-weight:bold; width: 110px;">' + f.floor + ' ' + codeTag + '</td>' +
+                        '<td style="font-weight:bold; width: 140px;">' + f.floor + ' ' + codeTag + '</td>' +
                         '<td>' + descDisplay + '</td>' +
                     '</tr>';
                 }).join('');
@@ -1073,7 +1073,7 @@
             let modalFloorsHtml = b.floors.map(function(f) {
                 let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
                 let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
-                return '<tr><td style="font-weight:bold; width: 120px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
+                return '<tr><td style="font-weight:bold; width: 150px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
             }).join('');
 
             let modalBody = document.getElementById('modal-body-content');
