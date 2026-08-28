@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 倉位資料</title>
-    <!-- 💡 補上 login.js 進行登入驗證與攔截 -->
-    <script src="login.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -47,10 +45,6 @@
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
-        
-        .user-info { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; color: #475569; }
-        .logout-btn { background: #fee2e2; color: #dc2626; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
-        .logout-btn:hover { background: #fecaca; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
@@ -108,7 +102,7 @@
         </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▼</span></button>
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn active">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
@@ -116,7 +110,7 @@
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category"><span>🗄️ 快存櫃</span><span>▶</span></button>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃</span><span class="arrow">▶</span></button>
                 <div class="menu-items" style="display: none;">
                     <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
                     <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
@@ -133,11 +127,7 @@
                 <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
                 <h2>📦 倉位資料</h2>
             </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <div class="user-info">使用者：<span id="current-username" style="color: #0f172a;">---</span></div>
-                <button type="button" class="logout-btn" onclick="StoreasyAuth.logout()">登出</button>
-                <div class="version" id="system-version">系統版本：載入中...</div>
-            </div>
+            <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
         <div class="content-body">
@@ -201,27 +191,31 @@
         </div>
     </main>
 
+    <script src="login.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            try {
-                const now = new Date();
-                document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
-                
-                const userEl = document.getElementById('current-username');
-                if (userEl && window.StoreasyAuth) {
-                    userEl.innerText = window.StoreasyAuth.getCurrentUser();
-                }
-                renderStorageTable();
-            } catch(e) {
-                console.error("Initialization error:", e);
-            }
-        });
+        (function() {
+            const now = new Date();
+            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+        })();
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('mobile-open');
             overlay.classList.toggle('active');
+        }
+
+        // 💡 補上左側選單分類收合與展開的互動功能
+        function toggleMenu(btn) {
+            const items = btn.nextElementSibling;
+            const arrow = btn.querySelector('.arrow');
+            if (items.style.display === 'none') {
+                items.style.display = 'flex';
+                if (arrow) arrow.innerText = '▼';
+            } else {
+                items.style.display = 'none';
+                if (arrow) arrow.innerText = '▶';
+            }
         }
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
