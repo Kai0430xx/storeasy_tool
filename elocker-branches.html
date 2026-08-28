@@ -176,7 +176,6 @@
             }
         });
 
-        // 💡 完全對應檔案內現有的 60 間據點與樓層詳細資料
         function getElockerData() {
             return [
                 {
@@ -203,13 +202,13 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "9號出入口", code: "ABA", desc: "", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "西側廁所旁", code: "ABB", desc: "", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "303~386櫃", code: "ABD", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "001~124櫃", code: "ABE", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "125~302櫃", code: "", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "電梯旁", code: "ABF", desc: "", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "9號出入口", code: "ABA", desc: "9號出入口", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "西側廁所旁", code: "ABB", desc: "西側廁所旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "冰上樂園2F女廁旁", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "303~386櫃", code: "ABD", desc: "冰上樂園2F女廁旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
+                        { floor: "001~124櫃", code: "ABE", desc: "冰上樂園2F女廁旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
+                        { floor: "125~302櫃", code: "", desc: "冰上樂園2F女廁旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
+                        { floor: "電梯旁", code: "ABF", desc: "電梯旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -245,7 +244,7 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "長期/短租支援",
+                    monthlyAvailable: "限期繳",
                     floors: [
                         { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
                         { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
@@ -285,8 +284,8 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "AIA", desc: "服務台旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B2", code: "AIB", desc: "男廁旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AIA", desc: "服務台旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "B2", code: "AIB", desc: "男廁旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -298,7 +297,7 @@
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
                         { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
                     ]
                 },
@@ -336,7 +335,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "B1", code: "AMA", desc: "運動教室", app: false, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AMA", desc: "運動教室", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -348,8 +347,8 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-1", code: "ANA", desc: "電梯前", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-2", code: "ANB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1-1", code: "ANA", desc: "電梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "B1-2", code: "ANB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -361,8 +360,8 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "AOA", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "AOB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "AOA", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "2F", code: "AOB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -374,7 +373,7 @@
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "APA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "1F", code: "APA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
                         { floor: "2F", code: "APB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
                         { floor: "3F", code: "APC", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
                         { floor: "4F", code: "APD", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
@@ -390,7 +389,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "長期/短租支援",
                     floors: [
-                        { floor: "1F", code: "AQA", desc: "7-11旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "1F", code: "AQA", desc: "7-11旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -402,7 +401,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "長期/短租支援",
                     floors: [
-                        { floor: "3F", code: "ARA", desc: "大門旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "3F", code: "ARA", desc: "大門旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -414,7 +413,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "長期/短租支援",
                     floors: [
-                        { floor: "B2", code: "ASA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "B2", code: "ASA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -426,7 +425,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "長期/短租支援",
                     floors: [
-                        { floor: "B1", code: "ATA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "B1", code: "ATA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -438,7 +437,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "AUA", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AUA", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -450,11 +449,11 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AVB", desc: "", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-C", code: "AVC", desc: "", app: true, machine: true, count: true, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-D", code: "AVD", desc: "", app: true, machine: true, count: true, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-E", code: "AVE", desc: "", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-B", code: "AVB", desc: "聯合醫院對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-C", code: "AVC", desc: "靠近就業服務站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-D", code: "AVD", desc: "誠品對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-E", code: "AVE", desc: "YouBike前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -466,7 +465,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F", code: "AWA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "AWA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -478,7 +477,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F", code: "AXA", desc: "三店門口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "AXA", desc: "三店門口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -490,9 +489,9 @@
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)", app: true, machine: true, count: true, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)", app: true, machine: true, count: true, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -504,7 +503,7 @@
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "B1", code: "AZA", desc: "收多易南門店門口", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "AZA", desc: "收多易南門店門口", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -516,7 +515,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁", app: true, machine: true, count: true, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -528,7 +527,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "9F", code: "BBA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "9F", code: "BBA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -540,20 +539,20 @@
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
                     name: "三重湯城場",
                     address: "新北市三重區重新路5段609巷10號B1(三重湯城廣場內)",
-                    city: "新北市",
+                    city: "New Taipei City",
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -565,7 +564,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "B1", code: "IDA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "IDA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -577,7 +576,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "2F", code: "IEA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "2F", code: "IEA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -589,8 +588,8 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -602,7 +601,7 @@
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
                         { floor: "5F", code: "IGB", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
                         { floor: "6F", code: "IGC", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
                     ]
@@ -616,7 +615,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "1F", code: "IHA", desc: "賣場出入口", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "1F", code: "IHA", desc: "賣場出入口", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
                         { floor: "B2", code: "IHB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
                     ]
                 },
@@ -635,13 +634,13 @@
                 {
                     name: "海洋都心場",
                     address: "新北市淡水區新市三路二段213號",
-                    city: "新北市",
+                    city: "New Taipei City",
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "2F", code: "IJA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "IJA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -653,7 +652,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "1F", code: "IKA", desc: "哺乳室前", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "IKA", desc: "哺乳室前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -689,19 +688,19 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "INA", desc: "往1F手扶梯前", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "INA", desc: "往1F手扶梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
                     name: "板橋愛買場",
                     address: "新北市板橋區華貴里貴興路101號",
-                    city: "New Taipei City",
+                    city: "新北市",
                     hours: "09:00-22:30",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "IPA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "IPA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -713,7 +712,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "MAA", desc: "服務中心對面", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MAA", desc: "服務中心對面", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -750,8 +749,8 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-1", code: "MEB", desc: "GATE E旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-1", code: "MEB", desc: "GATE E旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -763,7 +762,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
                         { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
                     ]
                 },
@@ -837,8 +836,8 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -887,7 +886,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "TBA", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "TBA", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -911,7 +910,7 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -923,7 +922,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "短期支援",
                     floors: [
-                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -935,8 +934,8 @@
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F-B", code: "YCB", desc: "側門入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "2F", code: "YCC", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F-B", code: "YCB", desc: "側門入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "2F", code: "YCC", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 }
             ];
