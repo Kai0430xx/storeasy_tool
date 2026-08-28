@@ -176,6 +176,7 @@
             }
         });
 
+        // 💡 嚴格對應 Excel 檔案內各樓層真實勾選的租期資料
         function getElockerData() {
             return [
                 {
@@ -185,10 +186,10 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F-1", code: "AAA", desc: "手推車區", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "5F-1", code: "AAB", desc: "哺乳室旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "6F-1", code: "AAC", desc: "退稅服務中心", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "6F-2", code: "AAD", desc: "化妝室旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "2F-1", code: "AAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
+                        { floor: "5F-1", code: "AAB", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "6F-1", code: "AAC", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "6F-2", code: "AAD", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -747,7 +748,7 @@
                     ]
                 },
                 {
-                    name: "台中廣三SOGO場",
+                    name: "台中廣3SOGO場",
                     address: "臺中市西區臺灣大道二段459號",
                     city: "台中市",
                     hours: "11:00-22:00",
