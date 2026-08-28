@@ -78,7 +78,7 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .tabs-nav { gap: 4px; }
-            .tab-btn { padding: 8px 10px; font-size: 0.8rem; }
+            .tab-btn { padding: 8px 10px; font-size: 0.80rem; }
             .version { display: none; }
         }
     </style>
@@ -136,31 +136,22 @@
             <!-- 1. APP承租與開櫃 -->
             <div id="tab-app" class="tab-content active">
                 <div class="card">
-                    <h3>🎬 官方影音教學</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                        <div>
-                            <h4 style="margin-bottom: 6px;">如何承租 (短租)</h4>
-                            <div class="video-container">
-                                <iframe src="https://www.youtube.com/embed/ysfIthfH1sg" allowfullscreen></iframe>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 style="margin-bottom: 6px;">如何開櫃</h4>
-                            <div class="video-container">
-                                <iframe src="https://www.youtube.com/embed/ryujm608cCg" allowfullscreen></iframe>
-                            </div>
+                    <h3>🎬 官方 APP 開櫃教學影片</h3>
+                    <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/ryujm608cCg" allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>📱 APP 短期承租與開櫃步驟</h3>
+                    <h3>📱 APP 承租與開櫃步驟</h3>
                     <ul class="steps-list">
                         <li><b>環境設定</b>：指導客戶開啟手機藍牙、定位、允許收多易 APP 權限，並<span style="color: #dc2626; font-weight: bold;">關閉 VPN</span>。</li>
                         <li><b>選擇櫃位</b>：開啟 APP 點擊下方「快存櫃」，搜尋據點、選擇樓層與櫃位尺寸，租期選擇「時租」或「日租」。</li>
                         <li><b>驗證與付款</b>：輸入手機號碼獲取驗證碼（外國人可點選 Foreigner login 以 E-mail 登入），確認金額後完成線上付款（信用卡、Line Pay、悠遊付、街口支付、Apple Pay）。</li>
-                        <li><b>加購無限次存取</b>：機台或 APP 承租後 <span style="color: #dc2626; font-weight: bold;">1 小時內</span>可在 APP 加購無限次存取（每小時 +$20、每日 +$50）。</li>
-                        <li><b>藍牙開櫃</b>：點擊 APP 內「快存櫃 ➔ 租賃紀錄 ➔ 點選綠色鎖頭開櫃」（手機須距離櫃體 3 公尺內）。</li>
+                        <li><b>APP 承租特性</b>：<span style="color: #dc2626; font-weight: bold;">透過 APP 本身承租就已經是無限次存取</span>（無需額外加購）。</li>
+                        <li><b>藍牙開櫃路徑</b>：點擊 APP 內 <span style="color: #0f172a; font-weight: bold; background: #fef3c7; padding: 2px 6px; border-radius: 4px;">「我的 ➔ 租賃紀錄 ➔ 快存櫃 ➔ 開櫃 ➔ 點選綠色鎖頭開櫃」</span>（手機須距離櫃體 3 公尺內）。</li>
                         <li><b>延時與退租</b>：使用中可於租期內點擊「延時」續租；使用完畢請先將物品取出並關上櫃門，等待約 <span style="color: #dc2626; font-weight: bold;">20 秒</span>後再點擊「退租」。</li>
                     </ul>
                 </div>
@@ -168,6 +159,15 @@
 
             <!-- 2. 機台承租與開櫃 -->
             <div id="tab-machine" class="tab-content">
+                <div class="card">
+                    <h3>🎬 官方現場機台操作教學影片</h3>
+                    <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/ysfIthfH1sg" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <h3>🖥️ 機台現場操作步驟（寄物與取物）</h3>
                     <h4>【機台寄物流程】</h4>
@@ -179,6 +179,7 @@
                         <li><b>設定密碼</b>：輸入並再次確認 4 碼數字取物密碼。</li>
                         <li><b>輸入手機/Email</b>：本國人輸入手機號碼；外國人輸入 Email。可下載收多易 APP 登入查看密碼。</li>
                         <li><b>付款與關門</b>：確認發票與付款方式後完成刷卡/電子支付，付款成功後櫃門自動開啟，放入物品後務必<span style="color: #dc2626; font-weight: bold;">確實將櫃門關緊</span>。</li>
+                        <li><b>加購無限次存取</b>：<span style="color: #dc2626; font-weight: bold;">唯有透過機台承租後 1 小時內</span>，才能在 APP 加購無限次存取（加購金額依各據點現場規定而定）。</li>
                     </ul>
 
                     <h4 style="margin-top: 16px;">【機台取物 / 退租流程】</h4>
@@ -194,6 +195,15 @@
 
             <!-- 3. APP申請月租 -->
             <div id="tab-long" class="tab-content">
+                <div class="card">
+                    <h3>🎬 官方長租/月租影音教學</h3>
+                    <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/hsubn2Zt0Lk" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <h3>📋 APP 申請月租與店長後台審核流程</h3>
                     <div class="warning-box">
@@ -262,7 +272,7 @@
                         <li>點選左下方「悠遊卡」➔ 點擊「設定悠遊卡」。</li>
                         <li>輸入自訂名稱與<b>悠遊卡外觀號碼</b>，點擊下一步（注意：APP 輸入後 <span style="color: #dc2626; font-weight: bold;">30 秒內</span>須於機台完成感應）。</li>
                         <li>前往現場機台畫面右下角點擊「設定悠遊卡」，選擇櫃型與櫃號。</li>
-                        <li>點擊「開始讀卡」，將悠遊卡感應機台右側卡機<span style="color: #dc2626; font-weight: bold;">感應兩次</span>，完成後點擊儲存卡號即設定成功。</li>
+                        <li>點擊「開始讀卡」，將悠遊卡感應機台右側卡機<span style="color: #dc2626; font-weight: bold;">感應兩次</span>，完成後點擊儲存卡號即設定完成。</li>
                         <li><b>使用悠遊卡開櫃</b>：設定完成後，直接在現場機台感應已綁定的悠遊卡即可直接開櫃取物。</li>
                     </ul>
                 </div>
