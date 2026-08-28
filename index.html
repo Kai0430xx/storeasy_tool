@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <script src="login.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 倉位資料</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -191,7 +192,6 @@
         </div>
     </main>
 
-    <script src="login.js"></script>
     <script>
         (function() {
             const now = new Date();
@@ -205,7 +205,6 @@
             overlay.classList.toggle('active');
         }
 
-        // 💡 補上左側選單分類收合與展開的互動功能
         function toggleMenu(btn) {
             const items = btn.nextElementSibling;
             const arrow = btn.querySelector('.arrow');
