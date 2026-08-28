@@ -31,7 +31,7 @@
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; align-items: center; }
+        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; align-items: center; }
         .filter-group { display: flex; flex-direction: column; gap: 6px; }
         .filter-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
         .filter-group input, .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
@@ -109,7 +109,7 @@
             <!-- 篩選與搜尋工具列 -->
             <div class="filter-card">
                 <div class="filter-group">
-                    <label>🔍 關鍵字搜尋（據點名稱 / 縣市 / 樓層編碼）：</label>
+                    <label>🔍 關鍵字搜尋（據點 / 縣市 / 編碼）：</label>
                     <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 AAA">
                 </div>
                 <div class="filter-group">
@@ -125,6 +125,16 @@
                         <option value="machine">僅機台承租</option>
                         <option value="app">僅 APP 承租</option>
                         <option value="both">機台 + APP 承租</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>📅 可承租租期篩選：</label>
+                    <select id="term-select" onchange="renderBranches()">
+                        <option value="">-- 全部租期 --</option>
+                        <option value="count">可計次</option>
+                        <option value="hourly">可時租 / 日租</option>
+                        <option value="monthly">可月繳 (長期)</option>
+                        <option value="limited">限期繳 (短期)</option>
                     </select>
                 </div>
             </div>
@@ -164,7 +174,7 @@
             }
         });
 
-        // 💡 嚴格對應您的 Excel 檔案（僅顯示檔案內有的 60 間據點與各樓層新編碼、正確位置資訊）
+        // 💡 完整對應 60 間據點與樓層詳細資料（含精確的樓層級別承租方式與租期支援）
         function getElockerData() {
             return [
                 {
@@ -172,15 +182,14 @@
                     address: "台北市萬華區桂林路1號",
                     city: "台北市",
                     hours: "24hr",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F-1", code: "AAA", desc: "手推車區" },
-                        { floor: "5F-1", code: "AAB", desc: "哺乳室旁" },
-                        { floor: "6F-1", code: "AAC", desc: "退稅服務中心" },
-                        { floor: "6F-2", code: "AAD", desc: "化妝室旁" }
+                        { floor: "2F-1", code: "AAA", desc: "手推車區", app: true, machine: false, count: false, hourly: true, monthly: false },
+                        { floor: "5F-1", code: "AAB", desc: "哺乳室旁", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "6F-1", code: "AAC", desc: "退稅服務中心", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "6F-2", code: "AAD", desc: "化妝室旁", app: true, machine: false, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -188,18 +197,17 @@
                     address: "台北市松山區南京東路四段2號",
                     city: "台北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "9號出入口", code: "ABA", desc: "" },
-                        { floor: "西側廁所旁", code: "ABB", desc: "" },
-                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "" },
-                        { floor: "303~386櫃", code: "ABD", desc: "" },
-                        { floor: "001~124櫃", code: "ABE", desc: "" },
-                        { floor: "125~302櫃", code: "", desc: "" },
-                        { floor: "電梯旁", code: "ABF", desc: "" }
+                        { floor: "9號出入口", code: "ABA", desc: "", app: true, machine: true, count: false, hourly: true, monthly: true },
+                        { floor: "西側廁所旁", code: "ABB", desc: "", app: true, machine: true, count: false, hourly: true, monthly: false },
+                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "", app: false, machine: true, count: true, hourly: false, monthly: false },
+                        { floor: "303~386櫃", code: "ABD", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "001~124櫃", code: "ABE", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "125~302櫃", code: "", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "電梯旁", code: "ABF", desc: "", app: true, machine: true, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -207,12 +215,11 @@
                     address: "台北市中山區民生東路二段119號B1",
                     city: "台北市",
                     hours: "07:00-22:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "B1", code: "ACA", desc: "9號出入口 / 電梯旁 / 西側廁所旁" }
+                        { floor: "B1", code: "ACA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -220,14 +227,13 @@
                     address: "台北市南港區忠孝東路七段371號",
                     city: "台北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B2-1", code: "ADA", desc: "臺鐵南港站西閘門前 (24hr)" },
-                        { floor: "B1AF", code: "ADB", desc: "近南側廣場出口 (24hr)" },
-                        { floor: "B1AF-2", code: "ADC", desc: "計程車招呼站旁 (11:00-22:00)" }
+                        { floor: "B2-1", code: "ADA", desc: "臺鐵南港站西閘門前 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false },
+                        { floor: "B1AF", code: "ADB", desc: "近南側廣場出口 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1AF-2", code: "ADC", desc: "計程車招呼站旁 (11:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -235,13 +241,12 @@
                     address: "台北市南港區忠孝東路七段99號1F",
                     city: "台北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)" },
-                        { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)" }
+                        { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: false },
+                        { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -249,12 +254,11 @@
                     address: "台北市士林區德行西路47號1F(萬家福天母店內)",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F-1", code: "AFA", desc: "萬家福天母店內" }
+                        { floor: "1F-1", code: "AFA", desc: "萬家福天母店內", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -262,13 +266,12 @@
                     address: "台北市中正區忠孝西路一段50號(亞洲廣場大樓)",
                     city: "台北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
                     rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-1", code: "AGA", desc: "收多易台北車站店前" },
-                        { floor: "B3-1", code: "AGB", desc: "站前地下街Z2出口處" }
+                        { floor: "B1-1", code: "AGA", desc: "收多易台北車站店前", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B3-1", code: "AGB", desc: "站前地下街Z2出口處", app: true, machine: true, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -276,13 +279,12 @@
                     address: "台北市大同區重慶北路二段171號",
                     city: "台北市",
                     hours: "09:00-24:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "AIA", desc: "服務台旁" },
-                        { floor: "B2", code: "AIB", desc: "男廁旁" }
+                        { floor: "B1", code: "AIA", desc: "服務台旁", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B2", code: "AIB", desc: "男廁旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -290,13 +292,12 @@
                     address: "台北市信義區逸仙路26巷1號",
                     city: "台北市",
                     hours: "24hr",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F" },
-                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1" }
+                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -304,12 +305,11 @@
                     address: "台北市文山區新光路二段8號",
                     city: "台北市",
                     hours: "06:00-24:00",
-                    rentType: "both",
                     rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-1", code: "AKA", desc: "動物園站" }
+                        { floor: "1F-1", code: "AKA", desc: "動物園站", app: true, machine: true, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -317,13 +317,12 @@
                     address: "臺北市士林區承德路5段55號",
                     city: "台北市",
                     hours: "依樂園開放時間為主",
-                    rentType: "both",
                     rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "ALA", desc: "服務中心對面" },
-                        { floor: "1F-B", code: "ALB", desc: "沙坑" }
+                        { floor: "1F-A", code: "ALA", desc: "服務中心對面", app: true, machine: true, count: false, hourly: true, monthly: false },
+                        { floor: "1F-B", code: "ALB", desc: "沙坑", app: true, machine: true, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -331,12 +330,11 @@
                     address: "臺北市北投區大業路527巷88號",
                     city: "台北市",
                     hours: "平日 15:00-22:00 / 假日 09:00-22:00",
-                    rentType: "machine",
                     rentTypeText: "僅機台承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "AMA", desc: "運動教室" }
+                        { floor: "B1", code: "AMA", desc: "運動教室", app: false, machine: true, count: false, hourly: true, monthly: false }
                     ]
                 },
                 {
@@ -344,13 +342,12 @@
                     address: "台北市南港區南港路二段146號B1",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-1", code: "ANA", desc: "電梯前" },
-                        { floor: "B1-2", code: "ANB", desc: "樓梯旁" }
+                        { floor: "B1-1", code: "ANA", desc: "電梯前", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1-2", code: "ANB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -358,13 +355,12 @@
                     address: "台北市內湖區民善街88號",
                     city: "台北市",
                     hours: "09:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "AOA", desc: "樓梯旁" },
-                        { floor: "2F", code: "AOB", desc: "樓梯旁" }
+                        { floor: "1F", code: "AOA", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "2F", code: "AOB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -372,16 +368,15 @@
                     address: "台北市松山區三民路160號",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "APA", desc: "賣場入口旁" },
-                        { floor: "2F", code: "APB", desc: "手扶梯旁" },
-                        { floor: "3F", code: "APC", desc: "手扶梯前方" },
-                        { floor: "4F", code: "APD", desc: "手扶梯前方" },
-                        { floor: "5F", code: "APE", desc: "手扶梯旁" }
+                        { floor: "1F", code: "APA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "2F", code: "APB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "3F", code: "APC", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "4F", code: "APD", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "5F", code: "APE", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true }
                     ]
                 },
                 {
@@ -389,12 +384,11 @@
                     address: "台北市內湖區瑞光路517號",
                     city: "台北市",
                     hours: "07:00-21:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "AQA", desc: "7-11旁" }
+                        { floor: "1F", code: "AQA", desc: "7-11旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -402,12 +396,11 @@
                     address: "台北市文山區興隆路一段15號3F",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "3F", code: "ARA", desc: "大門旁" }
+                        { floor: "3F", code: "ARA", desc: "大門旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -415,12 +408,11 @@
                     address: "台北市南港區南港路二段20巷5號B2",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B2", code: "ASA", desc: "" }
+                        { floor: "B2", code: "ASA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -428,12 +420,11 @@
                     address: "台北市文山區萬慶街27號B1",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "ATA", desc: "" }
+                        { floor: "B1", code: "ATA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -441,12 +432,11 @@
                     address: "臺北市士林區承德路四段179巷7號",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "AUA", desc: "樓梯下方" }
+                        { floor: "B1", code: "AUA", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -454,16 +444,15 @@
                     address: "臺北市萬華區峨眉街83號",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁" },
-                        { floor: "1F-B", code: "AVB", desc: "" },
-                        { floor: "1F-C", code: "AVC", desc: "" },
-                        { floor: "1F-D", code: "AVD", desc: "" },
-                        { floor: "1F-E", code: "AVE", desc: "" }
+                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁", app: true, machine: true, count: false, hourly: true, monthly: true },
+                        { floor: "1F-B", code: "AVB", desc: "", app: true, machine: true, count: false, hourly: true, monthly: true },
+                        { floor: "1F-C", code: "AVC", desc: "", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "1F-D", code: "AVD", desc: "", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "1F-E", code: "AVE", desc: "", app: true, machine: true, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -471,12 +460,11 @@
                     address: "臺北市士林區中山北路七段154巷6號2樓",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "2F", code: "AWA", desc: "" }
+                        { floor: "2F", code: "AWA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -484,12 +472,11 @@
                     address: "台北市南港區八德路四段768巷9號2F-1",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F", code: "AXA", desc: "三店門口旁" }
+                        { floor: "2F", code: "AXA", desc: "三店門口旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -497,14 +484,13 @@
                     address: "台北市信義區光復南路133號",
                     city: "台北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)" },
-                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)" },
-                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)" }
+                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -512,12 +498,11 @@
                     address: "臺北市中正區延平南路189號B1",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "B1", code: "AZA", desc: "收多易南門店門口" }
+                        { floor: "B1", code: "AZA", desc: "收多易南門店門口", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -525,12 +510,11 @@
                     address: "臺北市大同區市民大道一段209號",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁" }
+                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -538,12 +522,11 @@
                     address: "臺北市大安區信義路3段153號9樓",
                     city: "台北市",
                     hours: "06:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "9F", code: "BBA", desc: "" }
+                        { floor: "9F", code: "BBA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -551,13 +534,12 @@
                     address: "新北市中和區中山路二段291號",
                     city: "新北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)" },
-                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)" }
+                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -565,12 +547,11 @@
                     address: "新北市三重區重新路5段609巷10號B1(三重湯城廣場內)",
                     city: "新北市",
                     hours: "24hr",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內" }
+                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -578,12 +559,11 @@
                     address: "新北市林口區文化二路一段559號B1",
                     city: "新北市",
                     hours: "08:30-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "IDA", desc: "賣場入口旁" }
+                        { floor: "B1", code: "IDA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -591,12 +571,11 @@
                     address: "新北市新店區中興路三段1號",
                     city: "新北市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "2F", code: "IEA", desc: "賣場入口旁" }
+                        { floor: "2F", code: "IEA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -604,13 +583,12 @@
                     address: "新北市汐止區新台五路一段99號B1",
                     city: "新北市",
                     hours: "09:30-22:30",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側" },
-                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁" }
+                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -618,14 +596,13 @@
                     address: "新北市三重區五華街282號",
                     city: "新北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)" },
-                        { floor: "5F", code: "IGB", desc: "07:00-24:00" },
-                        { floor: "6F", code: "IGC", desc: "07:00-24:00" }
+                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "5F", code: "IGB", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true },
+                        { floor: "6F", code: "IGC", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true }
                     ]
                 },
                 {
@@ -633,13 +610,12 @@
                     address: "新北市淡水區中山北路二段383號",
                     city: "新北市",
                     hours: "09:00-22:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "IHA", desc: "賣場出入口" },
-                        { floor: "B2", code: "IHB", desc: "手扶梯旁" }
+                        { floor: "1F", code: "IHA", desc: "賣場出入口", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B2", code: "IHB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true }
                     ]
                 },
                 {
@@ -647,12 +623,11 @@
                     address: "新北市新店區安康路二段196號B1(樂家康安康店內)",
                     city: "新北市",
                     hours: "07:00-01:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "IIA", desc: "" }
+                        { floor: "B1", code: "IIA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -660,12 +635,11 @@
                     address: "新北市淡水區新市三路二段213號",
                     city: "新北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "2F", code: "IJA", desc: "" }
+                        { floor: "2F", code: "IJA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -673,12 +647,11 @@
                     address: "新北市板橋區漢生東路278號",
                     city: "新北市",
                     hours: "05:00-22:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "IKA", desc: "哺乳室前" }
+                        { floor: "1F", code: "IKA", desc: "哺乳室前", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -686,12 +659,11 @@
                     address: "新北市新店區民族路112號",
                     city: "新北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "ILA", desc: "聖母樓一樓走廊" }
+                        { floor: "1F", code: "ILA", desc: "聖母樓一樓走廊", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -699,12 +671,11 @@
                     address: "新北市新莊區民安路179號B1",
                     city: "新北市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "IMA", desc: "" }
+                        { floor: "B1", code: "IMA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -712,12 +683,11 @@
                     address: "新北市土城區青雲路152號",
                     city: "新北市",
                     hours: "10:00-22:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "INA", desc: "往1F手扶梯前" }
+                        { floor: "B1", code: "INA", desc: "往1F手扶梯前", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -725,12 +695,11 @@
                     address: "新北市板橋區華貴里貴興路101號",
                     city: "新北市",
                     hours: "09:00-22:30",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "IPA", desc: "賣場入口處" }
+                        { floor: "1F", code: "IPA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -738,12 +707,11 @@
                     address: "桃園市中壢區中山東路二段510號(萬家福中壢店內)",
                     city: "桃園市",
                     hours: "08:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "MAA", desc: "服務中心對面" }
+                        { floor: "1F", code: "MAA", desc: "服務中心對面", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -751,13 +719,12 @@
                     address: "桃園市桃園區經國路369號(萬家福經國店內)",
                     city: "桃園市",
                     hours: "24hr",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "MBA", desc: "賣場入口旁" },
-                        { floor: "B1", code: "MBB", desc: "賣場入口旁" }
+                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -765,12 +732,11 @@
                     address: "桃園市中壢區中華路一段450號(萬家福內壢店內)",
                     city: "桃園市",
                     hours: "09:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "MCA", desc: "打包區旁" }
+                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -778,13 +744,12 @@
                     address: "桃園市中壢區領航北路一段1號",
                     city: "桃園市",
                     hours: "依場館開放時間為主",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊" },
-                        { floor: "1F-1", code: "MEB", desc: "GATE E旁" }
+                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "1F-1", code: "MEB", desc: "GATE E旁", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -792,13 +757,12 @@
                     address: "桃園市桃園區大業里春日路618號",
                     city: "桃園市",
                     hours: "11:00-22:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "MFA", desc: "貨梯旁" },
-                        { floor: "B1", code: "MFB", desc: "廁所旁" }
+                        { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -806,12 +770,11 @@
                     address: "新竹市東區中華路二段198號",
                     city: "新竹市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "1F", code: "NAA", desc: "" }
+                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -819,13 +782,12 @@
                     address: "台中市西屯區青海路二段207-18號(萬家福青海店內)",
                     city: "台中市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)" },
-                        { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)" }
+                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -833,12 +795,11 @@
                     address: "台中市豐原區成功路500號(萬家福豐原店內)",
                     city: "台中市",
                     hours: "09:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "3F", code: "OBB", desc: "手扶梯旁" }
+                        { floor: "3F", code: "OBB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -846,12 +807,11 @@
                     address: "台中市南屯區文心路一段521號2F(萬家福文心店內)",
                     city: "台中市",
                     hours: "09:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F", code: "OCA", desc: "賣場入口處" }
+                        { floor: "2F", code: "OCA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -859,12 +819,11 @@
                     address: "台中市東區復興路四段186號B1(萬家福德安店內)",
                     city: "台中市",
                     hours: "24hr",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "B1", code: "ODA", desc: "美食街旁" }
+                        { floor: "B1", code: "ODA", desc: "美食街旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -872,13 +831,12 @@
                     address: "臺中市北屯區崇德路三段835號",
                     city: "台中市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側" },
-                        { floor: "1F-B", code: "", desc: "售票處對面右側" }
+                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -886,26 +844,24 @@
                     address: "臺中市西屯區文心路三段65-1號",
                     city: "台中市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "OFA", desc: "" }
+                        { floor: "1F", code: "OFA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
-                    name: "台中廣三SOGO場",
+                    name: "台中廣3SOGO場",
                     address: "臺中市西區臺灣大道二段459號",
                     city: "台中市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳" },
-                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳" }
+                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -913,12 +869,11 @@
                     address: "台南市中西區民生路二段72號",
                     city: "台南市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "1F", code: "TAA", desc: "台南民生櫃" }
+                        { floor: "1F", code: "TAA", desc: "台南民生櫃", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -926,12 +881,11 @@
                     address: "台南市仁德區中山路711號",
                     city: "台南市",
                     hours: "09:00-23:00",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "TBA", desc: "廁所旁" }
+                        { floor: "1F", code: "TBA", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -939,12 +893,11 @@
                     address: "高雄市三民區大順二路849號(萬家福高雄鼎山店內)",
                     city: "高雄市",
                     hours: "24小時",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃" }
+                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -952,12 +905,11 @@
                     address: "基隆市仁愛區港西街5號(基隆火車站南站)",
                     city: "基隆市",
                     hours: "6:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "YAA", desc: "7-11旁" }
+                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -965,12 +917,11 @@
                     address: "基隆市仁愛區港西街55號(基隆火車站北站)",
                     city: "基隆市",
                     hours: "05:00-24:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentTypeText: "綜合承租模式",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "YBA", desc: "北站出口" }
+                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: true, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -978,13 +929,12 @@
                     address: "基隆市中正區中正路3號",
                     city: "基隆市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F-B", code: "YCB", desc: "側門入口處" },
-                        { floor: "2F", code: "YCC", desc: "樓梯下方" }
+                        { floor: "1F-B", code: "YCB", desc: "側門入口處", app: true, machine: false, count: false, hourly: true, monthly: true },
+                        { floor: "2F", code: "YCC", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 }
             ];
@@ -1008,15 +958,34 @@
             const searchKw = document.getElementById('search-input').value.trim().toLowerCase();
             const selectedBranch = document.getElementById('branch-select').value;
             const selectedType = document.getElementById('type-select').value;
+            const selectedTerm = document.getElementById('term-select').value;
             const container = document.getElementById('branches-container');
 
             let list = branches;
             if (selectedBranch) {
                 list = list.filter(function(b) { return b.name === selectedBranch; });
             }
-            if (selectedType) {
-                list = list.filter(function(b) { return b.rentType === selectedType; });
+
+            // 💡 樓層級別承租方式與租期過濾
+            if (selectedType || selectedTerm) {
+                list = list.filter(function(b) {
+                    return b.floors.some(function(f) {
+                        let matchType = true;
+                        if (selectedType === 'machine') matchType = f.machine && !f.app;
+                        else if (selectedType === 'app') matchType = f.app && !f.machine;
+                        else if (selectedType === 'both') matchType = f.app && f.machine;
+
+                        let matchTerm = true;
+                        if (selectedTerm === 'count') matchTerm = f.count;
+                        else if (selectedTerm === 'hourly') matchTerm = f.hourly;
+                        else if (selectedTerm === 'monthly') matchTerm = f.monthly;
+                        else if (selectedTerm === 'limited') matchTerm = !f.monthly;
+
+                        return matchType && matchTerm;
+                    });
+                });
             }
+
             if (searchKw) {
                 list = list.filter(function(b) {
                     let matchName = b.name && b.name.toLowerCase().includes(searchKw);
