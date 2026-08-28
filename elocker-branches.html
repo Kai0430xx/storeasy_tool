@@ -109,8 +109,8 @@
             <!-- 篩選與搜尋工具列 -->
             <div class="filter-card">
                 <div class="filter-group">
-                    <label>🔍 關鍵字搜尋（據點名稱 / 縣市 / 樓層編碼）：</label>
-                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 ARA">
+                    <label>🔍 關鍵字搜尋（據點名稱 / 縣市）：</label>
+                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 台中">
                 </div>
                 <div class="filter-group">
                     <label>🏢 選擇據點篩選：</label>
@@ -164,6 +164,7 @@
             }
         });
 
+        // 💡 完全對應檔案內現有的 60 間據點與樓層新編碼資料
         function getElockerData() {
             return [
                 {
@@ -171,15 +172,15 @@
                     address: "台北市萬華區桂林路1號",
                     city: "台北市",
                     hours: "24hr",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F-1", code: "ARA", desc: "手推車區" },
+                        { floor: "2F-1", code: "AAA", desc: "手推車區" },
                         { floor: "5F-1", code: "AAB", desc: "哺乳室旁" },
                         { floor: "6F-1", code: "AAC", desc: "退稅服務中心" },
-                        { floor: "6F-2", code: "", desc: "化妝室旁" }
+                        { floor: "6F-2", code: "AAD", desc: "化妝室旁" }
                     ]
                 },
                 {
@@ -187,14 +188,18 @@
                     address: "台北市松山區南京東路四段2號",
                     city: "台北市",
                     hours: "10:00-21:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "001~124櫃", code: "AAM", desc: "冰上樂園2F女廁旁" },
+                        { floor: "9號出入口", code: "ABA", desc: "9號出入口" },
+                        { floor: "西側廁所旁", code: "ABB", desc: "西側廁所旁" },
+                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "冰上樂園2F女廁旁" },
+                        { floor: "303~386櫃", code: "ABD", desc: "冰上樂園2F女廁旁" },
+                        { floor: "001~124櫃", code: "ABE", desc: "冰上樂園2F女廁旁" },
                         { floor: "125~302櫃", code: "", desc: "冰上樂園2F女廁旁" },
-                        { floor: "303~386櫃", code: "", desc: "冰上樂園2F女廁旁" }
+                        { floor: "電梯旁", code: "ABF", desc: "電梯旁" }
                     ]
                 },
                 {
@@ -204,10 +209,10 @@
                     hours: "07:00-22:00",
                     rentType: "app",
                     rentTypeText: "僅 APP 承租",
-                    sizesAvailable: "S、M、L、XL尺寸",
+                    sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "B1", code: "ABA", desc: "9號出入口 / 電梯旁 / 西側廁所旁" }
+                        { floor: "B1", code: "ACA", desc: "9號出入口 / 電梯旁 / 西側廁所旁" }
                     ]
                 },
                 {
@@ -215,14 +220,14 @@
                     address: "台北市南港區忠孝東路七段371號",
                     city: "台北市",
                     hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "全尺寸提供",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1F-1", code: "ARC", desc: "近南側廣場出口 (24hr)" },
-                        { floor: "B1F-2", code: "", desc: "計程車招呼站旁 (11:00-22:00)" },
-                        { floor: "B2-1", code: "", desc: "臺鐵南港站西閘門前 (24hr)" }
+                        { floor: "B2-1", code: "ADA", desc: "臺鐵南港站西閘門前 (24hr)" },
+                        { floor: "B1AF", code: "ADB", desc: "近南側廣場出口 (24hr)" },
+                        { floor: "B1AF-2", code: "ADC", desc: "計程車招呼站旁 (11:00-22:00)" }
                     ]
                 },
                 {
@@ -230,26 +235,13 @@
                     address: "台北市南港區忠孝東路七段99號1F",
                     city: "台北市",
                     hours: "10:00-24:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "ACA", desc: "市民大道 (10:00-24:00)" },
-                        { floor: "1F-B", code: "", desc: "天橋下 (24hr)" }
-                    ]
-                },
-                {
-                    name: "信義威秀場",
-                    address: "台北市信義區松壽路20號3F",
-                    city: "台北市",
-                    hours: "09:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "3F", code: "ADA", desc: "3F-4 區域" }
+                        { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)" },
+                        { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)" }
                     ]
                 },
                 {
@@ -257,25 +249,12 @@
                     address: "台北市士林區德行西路47號1F(萬家福天母店內)",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F-1", code: "ALO", desc: "萬家福天母店內" }
-                    ]
-                },
-                {
-                    name: "天母廣場場",
-                    address: "台北市士林區天母西路3號2F",
-                    city: "台北市",
-                    hours: "08:00-24:00",
-                    rentType: "app",
-                    rentTypeText: "僅 APP 承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "2F", code: "AIA", desc: "天母廣場櫃" }
+                        { floor: "1F-1", code: "AFA", desc: "萬家福天母店內" }
                     ]
                 },
                 {
@@ -285,146 +264,11 @@
                     hours: "24hr",
                     rentType: "both",
                     rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "全尺寸提供",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "B1-1", code: "AJA", desc: "收多易台北車站店前" },
-                        { floor: "B3-1", code: "", desc: "站前地下街Z2出口處" }
-                    ]
-                },
-                {
-                    name: "中和威力場",
-                    address: "新北市中和區中山路二段291號",
-                    city: "新北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "6F", code: "AMGA", desc: "605室 (08:00-24:00)" },
-                        { floor: "B1", code: "", desc: "紙箱打包區旁 (09:00-23:00)" }
-                    ]
-                },
-                {
-                    name: "汐止北山場",
-                    address: "新北市汐止區康寧街141號",
-                    city: "新北市",
-                    hours: "24hr",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "AHA", desc: "北山智取櫃" }
-                    ]
-                },
-                {
-                    name: "三重湯城場",
-                    address: "新北市三重區重新路5段609巷10號B1(三重湯城廣場內)",
-                    city: "新北市",
-                    hours: "24hr",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "B1", code: "ALB", desc: "三重湯城廣場內" }
-                    ]
-                },
-                {
-                    name: "台中青海場",
-                    address: "台中市西屯區青海路二段207-18號(萬家福青海店內)",
-                    city: "台中市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "全尺寸提供",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "B1", code: "ANA", desc: "手扶梯旁 (10:00-22:00)" },
-                        { floor: "B1-1", code: "", desc: "收多易青海店內 (10:00-22:00)" },
-                        { floor: "3F", code: "", desc: "電梯旁 (24hr)" }
-                    ]
-                },
-                {
-                    name: "新店萬家福場",
-                    address: "新北市新店區中興路三段1號",
-                    city: "新北市",
-                    hours: "08:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "2F", code: "ACIA", desc: "賣場入口旁" }
-                    ]
-                },
-                {
-                    name: "桃園中壢場",
-                    address: "桃園市中壢區中山東路二段510號(萬家福中壢店內)",
-                    city: "桃園市",
-                    hours: "08:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "1F", code: "ACG", desc: "服務中心對面" }
-                    ]
-                },
-                {
-                    name: "桃園經國場",
-                    address: "桃園市桃園區經國路369號(萬家福經國店內)",
-                    city: "桃園市",
-                    hours: "24hr",
-                    rentType: "app",
-                    rentTypeText: "僅 APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "AFD", desc: "賣場入口旁" },
-                        { floor: "B1", code: "", desc: "賣場入口旁" }
-                    ]
-                },
-                {
-                    name: "台中豐原場",
-                    address: "台中市豐原區成功路500號(萬家福豐原店內)",
-                    city: "台中市",
-                    hours: "09:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "B1", code: "AZD", desc: "電梯旁" },
-                        { floor: "3F", code: "", desc: "手扶梯旁" }
-                    ]
-                },
-                {
-                    name: "台中文心場",
-                    address: "台中市南屯區文心路一段521號2F(萬家福文心店內)",
-                    city: "台中市",
-                    hours: "09:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "2F", code: "ATA", desc: "賣場入口處" }
-                    ]
-                },
-                {
-                    name: "台中德安場",
-                    address: "台中市東區復興路四段186號B1(萬家福德安店內)",
-                    city: "台中市",
-                    hours: "24hr",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "B1", code: "AUA", desc: "美食街旁" }
+                        { floor: "B1-1", code: "AGA", desc: "收多易台北車站店前" },
+                        { floor: "B3-1", code: "AGB", desc: "站前地下街Z2出口處" }
                     ]
                 },
                 {
@@ -432,14 +276,13 @@
                     address: "台北市大同區重慶北路二段171號",
                     city: "台北市",
                     hours: "09:00-24:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "AVA", desc: "服務台旁" },
-                        { floor: "B2", code: "", desc: "男廁旁" },
-                        { floor: "4F", code: "", desc: "男廁前" }
+                        { floor: "B1", code: "AIA", desc: "服務台旁" },
+                        { floor: "B2", code: "AIB", desc: "男廁旁" }
                     ]
                 },
                 {
@@ -447,13 +290,13 @@
                     address: "台北市信義區逸仙路26巷1號",
                     city: "台北市",
                     hours: "24hr",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "全尺寸提供",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "AVC", desc: "信義逸仙櫃 1F" },
-                        { floor: "B1", code: "", desc: "信義逸仙櫃 B1" }
+                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F" },
+                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1" }
                     ]
                 },
                 {
@@ -461,12 +304,12 @@
                     address: "台北市文山區新光路二段8號",
                     city: "台北市",
                     hours: "06:00-24:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-1", code: "AVE", desc: "動物園站" }
+                        { floor: "1F-1", code: "AKA", desc: "動物園站" }
                     ]
                 },
                 {
@@ -474,13 +317,13 @@
                     address: "臺北市士林區承德路5段55號",
                     city: "台北市",
                     hours: "依樂園開放時間為主",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "AWA", desc: "服務中心對面" },
-                        { floor: "1F-B", code: "", desc: "沙坑" }
+                        { floor: "1F-A", code: "ALA", desc: "服務中心對面" },
+                        { floor: "1F-B", code: "ALB", desc: "沙坑" }
                     ]
                 },
                 {
@@ -488,12 +331,12 @@
                     address: "臺北市北投區大業路527巷88號",
                     city: "台北市",
                     hours: "平日 15:00-22:00 / 假日 09:00-22:00",
-                    rentType: "app",
-                    rentTypeText: "僅 APP 承租",
+                    rentType: "machine",
+                    rentTypeText: "僅機台承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "AKA", desc: "運動教室" }
+                        { floor: "B1", code: "AMA", desc: "運動教室" }
                     ]
                 },
                 {
@@ -501,13 +344,13 @@
                     address: "台北市南港區南港路二段146號B1",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-1", code: "AYB", desc: "電梯前" },
-                        { floor: "B1-2", code: "", desc: "樓梯旁" }
+                        { floor: "B1-1", code: "ANA", desc: "電梯前" },
+                        { floor: "B1-2", code: "ANB", desc: "樓梯旁" }
                     ]
                 },
                 {
@@ -515,120 +358,13 @@
                     address: "台北市內湖區民善街88號",
                     city: "台北市",
                     hours: "09:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "AYC", desc: "樓梯旁" },
-                        { floor: "2F", code: "", desc: "樓梯旁" }
-                    ]
-                },
-                {
-                    name: "台南民生場",
-                    address: "台南市中西區民生路二段72號",
-                    city: "台南市",
-                    hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "1F", code: "AZA", desc: "台南民生櫃" }
-                    ]
-                },
-                {
-                    name: "高雄鼎山場",
-                    address: "高雄市三民區大順二路849號(萬家福高雄鼎山店內)",
-                    city: "高雄市",
-                    hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "3F", code: "IGA", desc: "高雄鼎山櫃" }
-                    ]
-                },
-                {
-                    name: "林口萬家福場",
-                    address: "新北市林口區文化二路一段559號B1",
-                    city: "新北市",
-                    hours: "08:30-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "B1", code: "DLA", desc: "賣場入口旁" }
-                    ]
-                },
-                {
-                    name: "基隆南站場",
-                    address: "基隆市仁愛區港西街5號(基隆火車站南站)",
-                    city: "基隆市",
-                    hours: "6:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "INA", desc: "7-11旁" }
-                    ]
-                },
-                {
-                    name: "基隆北站場",
-                    address: "基隆市仁愛區港西街55號(基隆火車站北站)",
-                    city: "基隆市",
-                    hours: "05:00-24:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "B1", code: "BOA", desc: "北站出口" }
-                    ]
-                },
-                {
-                    name: "汐科萬家福場",
-                    address: "新北市汐止區新台五路一段99號B1",
-                    city: "新北市",
-                    hours: "09:30-22:30",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1-A", code: "MAA", desc: "賣場入口左側" },
-                        { floor: "B1-B", code: "", desc: "賣場出口旁" }
-                    ]
-                },
-                {
-                    name: "蘆洲萬家福場",
-                    address: "新北市三重區五華街282號",
-                    city: "新北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "全尺寸提供",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "2F", code: "MILA", desc: "賣場入口 (24小時)" },
-                        { floor: "5F", code: "", desc: "07:00-24:00" },
-                        { floor: "6F", code: "", desc: "07:00-24:00" }
-                    ]
-                },
-                {
-                    name: "洲子美食街場",
-                    address: "台北市內湖區瑞光路517號",
-                    city: "台北市",
-                    hours: "07:00-21:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "MCA", desc: "7-11旁" }
+                        { floor: "1F", code: "AOA", desc: "樓梯旁" },
+                        { floor: "2F", code: "AOB", desc: "樓梯旁" }
                     ]
                 },
                 {
@@ -636,71 +372,29 @@
                     address: "台北市松山區三民路160號",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "MED", desc: "賣場入口旁" },
-                        { floor: "2F", code: "", desc: "手扶梯旁" },
-                        { floor: "3F", code: "", desc: "手扶梯前方" },
-                        { floor: "4F", code: "", desc: "手扶梯前方" },
-                        { floor: "5F", code: "", desc: "手扶梯旁" }
+                        { floor: "1F", code: "APA", desc: "賣場入口旁" },
+                        { floor: "2F", code: "APB", desc: "手扶梯旁" },
+                        { floor: "3F", code: "APC", desc: "手扶梯前方" },
+                        { floor: "4F", code: "APD", desc: "手扶梯前方" },
+                        { floor: "5F", code: "APE", desc: "手扶梯旁" }
                     ]
                 },
                 {
-                    name: "淡新萬家福場",
-                    address: "新北市淡水區中山北路二段383號",
-                    city: "新北市",
-                    hours: "09:00-22:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "NAA", desc: "賣場出入口" },
-                        { floor: "B2", code: "", desc: "手扶梯旁" }
-                    ]
-                },
-                {
-                    name: "新店安康場",
-                    address: "新北市新店區安康路二段196號B1(樂家康安康店內)",
-                    city: "新北市",
-                    hours: "07:00-01:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "B1", code: "OA", desc: "" }
-                    ]
-                },
-                {
-                    name: "基隆好食城場",
-                    address: "基隆市中正區中正路3號",
-                    city: "基隆市",
-                    hours: "11:00-22:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "1F-A", code: "LAC", desc: "廁所旁" },
-                        { floor: "1F-B", code: "", desc: "側門入口處" },
-                        { floor: "2F", code: "", desc: "樓梯下方" }
-                    ]
-                },
-                {
-                    name: "桃園內壢場",
-                    address: "桃園市中壢區中華路一段450號(萬家福內壢店內)",
-                    city: "桃園市",
-                    hours: "09:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
+                    name: "洲子美食街場",
+                    address: "台北市內湖區瑞光路517號",
+                    city: "台北市",
+                    hours: "07:00-21:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "SCA", desc: "打包區旁" }
+                        { floor: "1F", code: "AQA", desc: "7-11旁" }
                     ]
                 },
                 {
@@ -711,9 +405,9 @@
                     rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
+                    monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "3F", code: "ODA", desc: "大門旁" }
+                        { floor: "3F", code: "ARA", desc: "大門旁" }
                     ]
                 },
                 {
@@ -721,12 +415,12 @@
                     address: "台北市南港區南港路二段20巷5號B2",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B2", code: "OCA", desc: "" }
+                        { floor: "B2", code: "ASA", desc: "" }
                     ]
                 },
                 {
@@ -739,20 +433,7 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "CLA", desc: "" }
-                    ]
-                },
-                {
-                    name: "新竹中華場",
-                    address: "新竹市東區中華路二段198號",
-                    city: "新竹市",
-                    hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "全尺寸提供",
-                    monthlyAvailable: "全面開放可月繳",
-                    floors: [
-                        { floor: "1F", code: "THA", desc: "" }
+                        { floor: "B1", code: "ATA", desc: "" }
                     ]
                 },
                 {
@@ -760,51 +441,12 @@
                     address: "臺北市士林區承德路四段179巷7號",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "B1", code: "AZT", desc: "樓梯下方" }
-                    ]
-                },
-                {
-                    name: "板橋第一運動場",
-                    address: "新北市板橋區漢生東路278號",
-                    city: "新北市",
-                    hours: "05:00-22:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "VAA", desc: "哺乳室前" }
-                    ]
-                },
-                {
-                    name: "耕莘專校場",
-                    address: "新北市新店區民族路112號",
-                    city: "新北市",
-                    hours: "24小時",
                     rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "YRA", desc: "聖母樓一樓走廊" }
-                    ]
-                },
-                {
-                    name: "新莊民安場",
-                    address: "新北市新莊區民安路179號B1",
-                    city: "新北市",
-                    hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "B1", code: "", desc: "" }
+                        { floor: "B1", code: "AUA", desc: "樓梯下方" }
                     ]
                 },
                 {
@@ -812,12 +454,16 @@
                     address: "臺北市萬華區峨眉街83號",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "", desc: "機車B1入口旁" }
+                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁" },
+                        { floor: "1F-B", code: "AVB", desc: "" },
+                        { floor: "1F-C", code: "AVC", desc: "" },
+                        { floor: "1F-D", code: "AVD", desc: "" },
+                        { floor: "1F-E", code: "AVE", desc: "" }
                     ]
                 },
                 {
@@ -825,12 +471,12 @@
                     address: "臺北市士林區中山北路七段154巷6號2樓",
                     city: "台北市",
                     hours: "08:00-23:00",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "2F", code: "", desc: "" }
+                        { floor: "2F", code: "AWA", desc: "" }
                     ]
                 },
                 {
@@ -838,12 +484,12 @@
                     address: "台北市南港區八德路四段768巷9號2F-1",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "2F", code: "", desc: "三店門口旁" }
+                        { floor: "2F", code: "AXA", desc: "三店門口旁" }
                     ]
                 },
                 {
@@ -856,49 +502,9 @@
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "1F-A", code: "", desc: "1號與2號倉庫間 (24小時)" },
-                        { floor: "1F-B", code: "", desc: "辦公廳舍哺乳室前 (08:00-21:00)" },
-                        { floor: "1F-C", code: "", desc: "全家旁 (24小時)" }
-                    ]
-                },
-                {
-                    name: "台中洲際棒球場",
-                    address: "臺中市北屯區崇德路三段835號",
-                    city: "台中市",
-                    hours: "24小時",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F-A", code: "", desc: "售票處對面左側" },
-                        { floor: "1F-B", code: "", desc: "售票處對面右側" }
-                    ]
-                },
-                {
-                    name: "土城萬家福場",
-                    address: "新北市土城區青雲路152號",
-                    city: "新北市",
-                    hours: "10:00-22:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "B1", code: "", desc: "往1F手扶梯前" }
-                    ]
-                },
-                {
-                    name: "台中文心洛陽場",
-                    address: "臺中市西屯區文心路三段65-1號",
-                    city: "台中市",
-                    hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "1F", code: "", desc: "" }
+                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)" },
+                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)" },
+                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)" }
                     ]
                 },
                 {
@@ -906,40 +512,12 @@
                     address: "臺北市中正區延平南路189號B1",
                     city: "台北市",
                     hours: "24小時",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "全尺寸提供",
                     monthlyAvailable: "全面開放可月繳",
                     floors: [
-                        { floor: "B1", code: "", desc: "收多易南門店門口" }
-                    ]
-                },
-                {
-                    name: "樂天桃園棒球場",
-                    address: "桃園市中壢區領航北路一段1號",
-                    city: "桃園市",
-                    hours: "依場館開放時間為主",
-                    rentType: "machine",
-                    rentTypeText: "僅機台承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "限期繳",
-                    floors: [
-                        { floor: "1F", code: "", desc: "場外廊道三壘側商品部右邊" },
-                        { floor: "1F-1", code: "", desc: "GATE E旁" }
-                    ]
-                },
-                {
-                    name: "台中廣三SOGO場",
-                    address: "臺中市西區臺灣大道二段459號",
-                    city: "台中市",
-                    hours: "11:00-22:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "B1", code: "", desc: "女廁旁梯廳" },
-                        { floor: "B1-1", code: "", desc: "往B2停車場梯廳" }
+                        { floor: "B1", code: "AZA", desc: "收多易南門店門口" }
                     ]
                 },
                 {
@@ -952,60 +530,129 @@
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "", desc: "汽機車停車場入口旁" }
+                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁" }
                     ]
                 },
                 {
-                    name: "新莊公園場",
-                    address: "新北市新莊區公園路129-1號",
+                    name: "大安場",
+                    address: "臺北市大安區信義路3段153號9樓",
+                    city: "台北市",
+                    hours: "06:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "9F", code: "BBA", desc: "" }
+                    ]
+                },
+                {
+                    name: "中和威力場",
+                    address: "新北市中和區中山路二段291號",
                     city: "新北市",
-                    hours: "24小時",
+                    hours: "綜合 (詳見各樓層)",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)" },
+                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)" }
+                    ]
+                },
+                {
+                    name: "三重湯城場",
+                    address: "新北市三重區重新路5段609巷10號B1(三重湯城廣場內)",
+                    city: "新北市",
+                    hours: "24hr",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內" }
+                    ]
+                },
+                {
+                    name: "林口萬家福場",
+                    address: "新北市林口區文化二路一段559號B1",
+                    city: "新北市",
+                    hours: "08:30-23:00",
                     rentType: "app",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "", desc: "" }
+                        { floor: "B1", code: "IDA", desc: "賣場入口旁" }
                     ]
                 },
                 {
-                    name: "台南仁德場",
-                    address: "台南市仁德區中山路711號",
-                    city: "台南市",
-                    hours: "09:00-23:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "1F", code: "", desc: "廁所旁" }
-                    ]
-                },
-                {
-                    name: "桃園春日場",
-                    address: "桃園市桃園區大業里春日路618號",
-                    city: "桃園市",
-                    hours: "11:00-22:00",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M尺寸",
-                    monthlyAvailable: "部分尺寸可月繳",
-                    floors: [
-                        { floor: "1F", code: "", desc: "貨梯旁" },
-                        { floor: "B1", code: "", desc: "廁所旁" }
-                    ]
-                },
-                {
-                    name: "板橋愛買場",
-                    address: "新北市板橋區華貴里貴興路101號",
+                    name: "新店萬家福場",
+                    address: "新北市新店區中興路三段1號",
                     city: "新北市",
-                    hours: "09:00-22:30",
-                    rentType: "both",
-                    rentTypeText: "機台 + APP 承租",
-                    sizesAvailable: "S、M、L尺寸",
+                    hours: "08:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "2F", code: "IEA", desc: "賣場入口旁" }
+                    ]
+                },
+                {
+                    name: "汐科萬家福場",
+                    address: "新北市汐止區新台五路一段99號B1",
+                    city: "新北市",
+                    hours: "09:30-22:30",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "1F", code: "", desc: "賣場入口處" }
+                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側" },
+                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁" }
+                    ]
+                },
+                {
+                    name: "蘆洲萬家福場",
+                    address: "新北市三重區五華街282號",
+                    city: "新北市",
+                    hours: "綜合 (詳見各樓層)",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
+                    floors: [
+                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)" },
+                        { floor: "5F", code: "IGB", desc: "07:00-24:00" },
+                        { floor: "6F", code: "IGC", desc: "07:00-24:00" }
+                    ]
+                },
+                {
+                    name: "淡新萬家福場",
+                    address: "新北市淡水區中山北路二段383號",
+                    city: "新北市",
+                    hours: "09:00-22:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "IHA", desc: "賣場出入口" },
+                        { floor: "B2", code: "IHB", desc: "手扶梯旁" }
+                    ]
+                },
+                {
+                    name: "新店安康場",
+                    address: "新北市新店區安康路二段196號B1(樂家康安康店內)",
+                    city: "新北市",
+                    hours: "07:00-01:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "B1", code: "IIA", desc: "" }
                     ]
                 },
                 {
@@ -1018,20 +665,326 @@
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "2F", code: "", desc: "" }
+                        { floor: "2F", code: "IJA", desc: "" }
                     ]
                 },
                 {
-                    name: "大安場",
-                    address: "臺北市大安區信義路3段153號9樓",
-                    city: "台北市",
-                    hours: "06:00-23:00",
+                    name: "板橋第一運動場",
+                    address: "新北市板橋區漢生東路278號",
+                    city: "新北市",
+                    hours: "05:00-22:00",
                     rentType: "both",
                     rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "IKA", desc: "哺乳室前" }
+                    ]
+                },
+                {
+                    name: "耕莘專校場",
+                    address: "新北市新店區民族路112號",
+                    city: "新北市",
+                    hours: "24小時",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "ILA", desc: "聖母樓一樓走廊" }
+                    ]
+                },
+                {
+                    name: "新莊民安場",
+                    address: "新北市新莊區民安路179號B1",
+                    city: "新北市",
+                    hours: "24小時",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "9F", code: "", desc: "" }
+                        { floor: "B1", code: "IMA", desc: "" }
+                    ]
+                },
+                {
+                    name: "土城萬家福場",
+                    address: "新北市土城區青雲路152號",
+                    city: "新北市",
+                    hours: "10:00-22:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "B1", code: "INA", desc: "往1F手扶梯前" }
+                    ]
+                },
+                {
+                    name: "板橋愛買場",
+                    address: "新北市板橋區華貴里貴興路101號",
+                    city: "新北市",
+                    hours: "09:00-22:30",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "1F", code: "IPA", desc: "賣場入口處" }
+                    ]
+                },
+                {
+                    name: "桃園中壢場",
+                    address: "桃園市中壢區中山東路二段510號(萬家福中壢店內)",
+                    city: "桃園市",
+                    hours: "08:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "1F", code: "MAA", desc: "服務中心對面" }
+                    ]
+                },
+                {
+                    name: "桃園經國場",
+                    address: "桃園市桃園區經國路369號(萬家福經國店內)",
+                    city: "桃園市",
+                    hours: "24hr",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "MBA", desc: "賣場入口旁" },
+                        { floor: "B1", code: "MBB", desc: "賣場入口旁" }
+                    ]
+                },
+                {
+                    name: "桃園內壢場",
+                    address: "桃園市中壢區中華路一段450號(萬家福內壢店內)",
+                    city: "桃園市",
+                    hours: "09:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "MCA", desc: "打包區旁" }
+                    ]
+                },
+                {
+                    name: "樂天桃園棒球場",
+                    address: "桃園市中壢區領航北路一段1號",
+                    city: "桃園市",
+                    hours: "依場館開放時間為主",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊" },
+                        { floor: "1F-1", code: "MEB", desc: "GATE E旁" }
+                    ]
+                },
+                {
+                    name: "桃園春日場",
+                    address: "桃園市桃園區大業里春日路618號",
+                    city: "桃園市",
+                    hours: "11:00-22:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "1F", code: "MFA", desc: "貨梯旁" },
+                        { floor: "B1", code: "MFB", desc: "廁所旁" }
+                    ]
+                },
+                {
+                    name: "新竹中華場",
+                    address: "新竹市東區中華路二段198號",
+                    city: "新竹市",
+                    hours: "24小時",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
+                    floors: [
+                        { floor: "1F", code: "NAA", desc: "" }
+                    ]
+                },
+                {
+                    name: "台中青海場",
+                    address: "台中市西屯區青海路二段207-18號(萬家福青海店內)",
+                    city: "台中市",
+                    hours: "綜合 (詳見各樓層)",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "全尺寸提供",
+                    monthlyAvailable: "全面開放可月繳",
+                    floors: [
+                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)" },
+                        { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)" }
+                    ]
+                },
+                {
+                    name: "台中豐原場",
+                    address: "台中市豐原區成功路500號(萬家福豐原店內)",
+                    city: "台中市",
+                    hours: "09:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "3F", code: "OBB", desc: "手扶梯旁" }
+                    ]
+                },
+                {
+                    name: "台中文心場",
+                    address: "台中市南屯區文心路一段521號2F(萬家福文心店內)",
+                    city: "台中市",
+                    hours: "09:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "2F", code: "OCA", desc: "賣場入口處" }
+                    ]
+                },
+                {
+                    name: "台中德安場",
+                    address: "台中市東區復興路四段186號B1(萬家福德安店內)",
+                    city: "台中市",
+                    hours: "24hr",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "全面開放可月繳",
+                    floors: [
+                        { floor: "B1", code: "ODA", desc: "美食街旁" }
+                    ]
+                },
+                {
+                    name: "台中洲際棒球場",
+                    address: "臺中市北屯區崇德路三段835號",
+                    city: "台中市",
+                    hours: "24小時",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側" },
+                        { floor: "1F-B", code: "", desc: "售票處對面右側" }
+                    ]
+                },
+                {
+                    name: "台中文心洛陽場",
+                    address: "臺中市西屯區文心路三段65-1號",
+                    city: "台中市",
+                    hours: "24小時",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "1F", code: "OFA", desc: "" }
+                    ]
+                },
+                {
+                    name: "台中廣三SOGO場",
+                    address: "臺中市西區臺灣大道二段459號",
+                    city: "台中市",
+                    hours: "11:00-22:00",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳" },
+                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳" }
+                    ]
+                },
+                {
+                    name: "台南民生場",
+                    address: "台南市中西區民生路二段72號",
+                    city: "台南市",
+                    hours: "24小時",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "全面開放可月繳",
+                    floors: [
+                        { floor: "1F", code: "TAA", desc: "台南民生櫃" }
+                    ]
+                },
+                {
+                    name: "台南仁德場",
+                    address: "台南市仁德區中山路711號",
+                    city: "台南市",
+                    hours: "09:00-23:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "1F", code: "TBA", desc: "廁所旁" }
+                    ]
+                },
+                {
+                    name: "高雄鼎山場",
+                    address: "高雄市三民區大順二路849號(萬家福高雄鼎山店內)",
+                    city: "高雄市",
+                    hours: "24小時",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "全面開放可月繳",
+                    floors: [
+                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃" }
+                    ]
+                },
+                {
+                    name: "基隆南站場",
+                    address: "基隆市仁愛區港西街5號(基隆火車站南站)",
+                    city: "基隆市",
+                    hours: "6:00-23:00",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S、M尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "1F", code: "YAA", desc: "7-11旁" }
+                    ]
+                },
+                {
+                    name: "基隆北站場",
+                    address: "基隆市仁愛區港西街55號(基隆火車站北站)",
+                    city: "基隆市",
+                    hours: "05:00-24:00",
+                    rentType: "both",
+                    rentTypeText: "機台 + APP 承租",
+                    sizesAvailable: "S尺寸",
+                    monthlyAvailable: "限期繳",
+                    floors: [
+                        { floor: "B1", code: "YBA", desc: "北站出口" }
+                    ]
+                },
+                {
+                    name: "基隆好食城場",
+                    address: "基隆市中正區中正路3號",
+                    city: "基隆市",
+                    hours: "11:00-22:00",
+                    rentType: "app",
+                    rentTypeText: "僅 APP 承租",
+                    sizesAvailable: "S、M、L尺寸",
+                    monthlyAvailable: "部分尺寸可月繳",
+                    floors: [
+                        { floor: "1F-B", code: "YCB", desc: "側門入口處" },
+                        { floor: "2F", code: "YCC", desc: "樓梯下方" }
                     ]
                 }
             ];
@@ -1119,7 +1072,7 @@
             
             let modalFloorsHtml = b.floors.map(function(f) {
                 let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
-                let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '無特別說明';
+                let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
                 return '<tr><td style="font-weight:bold; width: 120px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
             }).join('');
 
