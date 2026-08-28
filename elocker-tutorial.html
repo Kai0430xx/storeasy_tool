@@ -2,11 +2,13 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <script src="login.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收多易迷你倉庫 - 快存櫃操作教學 (店長專用)</title>
+    <title>收多易迷你倉庫 - 倉位資料</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
         aside { 
             width: 260px; 
@@ -22,7 +24,6 @@
             left: 0;
             height: 100vh; 
             overflow-y: auto;
-            transition: transform 0.3s ease-in-out;
         }
         .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
@@ -48,29 +49,25 @@
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .card h3 { font-size: 1.1rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
+        .card p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         
-        .tabs-nav { display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 0; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .tab-btn { padding: 12px 18px; font-weight: bold; font-size: 0.9rem; background: #e2e8f0; color: #475569; border: none; border-top-left-radius: 8px; border-top-right-radius: 8px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-        .tab-btn.active { background: #0f172a; color: #fbbf24; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-amber { background-color: #f59e0b; color: #0f172a; }
+        .btn-amber:hover { background-color: #d97706; }
+        .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-        .tab-content { display: none; flex-direction: column; gap: 20px; }
-        .tab-content.active { display: flex; }
-
-        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 16px; }
-        .card h3 { font-size: 1.15rem; font-weight: bold; color: #0f172a; border-left: 4px solid #f59e0b; padding-left: 10px; }
-        .card h4 { font-size: 1rem; font-weight: bold; color: #334155; margin-top: 8px; }
-        
-        .steps-list { display: flex; flex-direction: column; gap: 10px; padding-left: 20px; font-size: 0.9rem; color: #475569; line-height: 1.6; }
-        .steps-list li { margin-bottom: 4px; }
-
-        .video-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 8px; overflow: hidden; margin-top: 10px; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-
-        .warning-box { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 14px 18px; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; }
-        
-        .faq-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
-        .faq-q { font-weight: bold; color: #0f172a; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-        .faq-a { font-size: 0.9rem; color: #475569; line-height: 1.5; padding-left: 20px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        td.size-col { white-space: normal; word-break: break-word; min-width: 220px; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        tr:hover { background-color: #f8fafc; }
 
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
         .sidebar-overlay.active { display: block; }
@@ -83,6 +80,7 @@
             main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
     </style>
@@ -90,6 +88,10 @@
 <body>
 
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+    <datalist id="branch-list">
+        <option value="土城店"><option value="南東店"><option value="民生松江店"><option value="永和店"><option value="延吉店"><option value="逸仙店">
+    </datalist>
 
     <aside id="sidebar">
         <div class="sidebar-header">
@@ -101,18 +103,18 @@
         </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▶</span></button>
-                <div class="menu-items" style="display: none;">
-                    <a href="index.html" class="sub-btn">📦 倉位資料</a>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▼</span></button>
+                <div class="menu-items">
+                    <a href="index.html" class="sub-btn active">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
                     <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃</span><span class="arrow">▼</span></button>
-                <div class="menu-items">
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃</span><span class="arrow">▶</span></button>
+                <div class="menu-items" style="display: none;">
                     <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
-                    <a href="elocker-tutorial.html" class="sub-btn active">📖 操作教學</a>
+                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
                     <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
                 </div>
             </div>
@@ -121,326 +123,80 @@
     </aside>
 
     <main>
-        <header>
+        <header class="no-print">
             <div class="header-left">
                 <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
-                <h2>📖 快存櫃操作教學與營運手冊 (店長版)</h2>
+                <h2>📦 倉位資料</h2>
             </div>
             <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
         <div class="content-body">
-            <div class="tabs-nav">
-                <button class="tab-btn active" onclick="switchTab(event, 'tab-app')">1. APP承租與開櫃</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-machine')">2. 機台承租與開櫃</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-long')">3. APP申請月租</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-renew')">4. APP月租續約</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-card')">5. 悠遊卡設定(部分據點)</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-faq')">6. 常見問題與排障</button>
+            <div class="card">
+                <h3>📥 一鍵上傳各店空倉表 Excel</h3>
+                <p>系統自動在背景智慧辨識「月繳、月租、原價、金額、定價」欄位，店長直接上傳即可，其餘方案金額由系統自動計算</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>分店名稱</label>
+                        <input type="text" id="upload-branch-name" list="branch-list" placeholder="請選擇或輸入分店名稱">
+                    </div>
+                    <div class="form-group">
+                        <label>該店預設年繳方案</label>
+                        <select id="branch-annual-discount" style="background: #fef3c7; font-weight: bold; color: #92400e;">
+                            <option value="0.85">年繳 (85折)</option>
+                            <option value="0.80">年繳 (8折)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>選擇 Excel 檔案</label>
+                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
+                    </div>
+                </div>
+                <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">匯入資料</button>
             </div>
 
-            <!-- 1. APP承租與開櫃 -->
-            <div id="tab-app" class="tab-content active">
-                <div class="card">
-                    <h3>🎬 官方影音教學（APP 承租與開櫃）</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                        <div>
-                            <h4 style="margin-bottom: 6px;">APP 承租教學</h4>
-                            <div class="video-container">
-                                <iframe src="https://www.youtube.com/embed/hsubn2Zt0Lk" allowfullscreen></iframe>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 style="margin-bottom: 6px;">APP 開櫃教學</h4>
-                            <div class="video-container">
-                                <iframe src="https://www.youtube.com/embed/ryujm608cCg" allowfullscreen></iframe>
-                            </div>
-                        </div>
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <h3 style="margin-bottom:0;">📋 已載入的倉位清單</h3>
+                        <select id="storage-branch-filter" onchange="renderStorageTable()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #92400e; background: #fef3c7;">
+                            <option value="all">全部據點</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="deleteSelectedBranchData()" class="btn btn-red-outline" style="padding: 6px 12px; font-size: 0.8rem;">🗑️ 刪除目前選取分店</button>
+                        <button type="button" onclick="clearStorageData()" style="background:none; border:none; color: #94a3b8; font-size: 0.8rem; cursor:pointer; text-decoration: underline;">清空全部本機資料</button>
                     </div>
                 </div>
-
-                <div class="card">
-                    <h3>📱 APP 承租與開櫃操作步驟</h3>
-                    <ul class="steps-list">
-                        <li><b>環境設定</b>：指導客戶開啟手機藍牙、定位、允許收多易 APP 權限，並<span style="color: #dc2626; font-weight: bold;">關閉 VPN</span>。</li>
-                        <li><b>選擇櫃位</b>：開啟 APP 點擊下方「快存櫃」，搜尋據點、選擇樓層與櫃位尺寸，租期選擇「時租」或「日租」。</li>
-                        <li><b>驗證與付款</b>：輸入手機號碼獲取驗證碼（外國人可點選 Foreigner login 以 E-mail 登入），確認金額後完成線上付款（信用卡、Line Pay、悠遊付、街口支付、Apple Pay）。</li>
-                        <li><b>APP 承租特性</b>：<span style="color: #dc2626; font-weight: bold;">透過 APP 本身承租就已經是無限次存取</span>（無需額外加購）。</li>
-                        <li><b>藍牙開櫃路徑</b>：點擊 APP 內 <span style="color: #0f172a; font-weight: bold; background: #fef3c7; padding: 2px 6px; border-radius: 4px;">「我的 ➔ 租賃紀錄 ➔ 快存櫃 ➔ 開櫃 ➔ 點選綠色鎖頭開櫃」</span>（手機須距離櫃體 3 公尺內）。</li>
-                        <li><b>延時與退租</b>：使用中可於租期內點擊「延時」續租；使用完畢請先將物品取出並關上櫃門，等待約 <span style="color: #dc2626; font-weight: bold;">20 秒</span>後再點擊「退租」。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 2. 機台承租與開櫃 -->
-            <div id="tab-machine" class="tab-content">
-                <div class="card">
-                    <h3>🎬 官方現場機台操作教學影片</h3>
-                    <div style="max-width: 600px; margin: 0 auto; width: 100%;">
-                        <div class="video-container">
-                            <iframe src="https://www.youtube.com/embed/ysfIthfH1sg" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>🖥️ 機台現場操作步驟（寄物與取物）</h3>
-                    <h4>【機台寄物流程】</h4>
-                    <ul class="steps-list">
-                        <li><b>選擇語言</b>：於機台螢幕點選中文、英文、日文或韓文。</li>
-                        <li><b>點選存放</b>：點選「存放行李（單次存取）」。</li>
-                        <li><b>選擇櫃型與櫃號</b>：選擇對應櫃型與空置櫃號。</li>
-                        <li><b>選擇租用方式</b>：選擇「時租」（1小時~24小時）或「日租」（1天~7天）。</li>
-                        <li><b>設定密碼</b>：輸入並再次確認 4 碼數字取物密碼。</li>
-                        <li><b>輸入手機/Email</b>：本國人輸入手機號碼；外國人輸入 Email。可下載收多易 APP 登入查看密碼。</li>
-                        <li><b>付款與關門</b>：確認發票與付款方式後完成刷卡/電子支付，付款成功後櫃門自動開啟，放入物品後務必<span style="color: #dc2626; font-weight: bold;">確實將櫃門關緊</span>。</li>
-                        <li><b>加購無限次存取</b>：<span style="color: #dc2626; font-weight: bold;">唯有透過機台承租後 1 小時內</span>，才能在 APP 加購無限次存取（加購金額依各據點現場規定而定）。</li>
-                    </ul>
-
-                    <h4 style="margin-top: 16px;">【機台取物 / 退租流程】</h4>
-                    <ul class="steps-list">
-                        <li>點選機台的「取出行李（退租）」。</li>
-                        <li>選擇對應的櫃號。</li>
-                        <li>輸入設定的 4 碼取物密碼。</li>
-                        <li>櫃門自動解鎖，取完物品後務必將門關上。</li>
-                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 注意（計次櫃說明）</span>：如冰上樂園 2F 等計次型置物櫃，以當天營業時間內為使用範圍，若超過當天營業時間將另計一次收費。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 3. APP申請月租 -->
-            <div id="tab-long" class="tab-content">
-                <div class="card">
-                    <h3>📋 APP 申請月租與店長後台審核流程</h3>
-                    <div class="warning-box">
-                        <b>📌 營業時間限制：</b>月租申辦僅能於<span style="color: #dc2626; font-weight: bold;">週一至週五 10:00-19:00</span>遞出申請與審核。
-                    </div>
-                    
-                    <h4>【客戶端操作步驟】</h4>
-                    <ul class="steps-list">
-                        <li>開啟 APP 點選「快存櫃」 ➔ 搜尋據點、選擇樓層與櫃位 ➔ 租期選取「月租」，系統預設當天起租並預付 1 個月押金。</li>
-                        <li>完成完整註冊，上傳身分證正反面，並進行臉部辨識（<span style="color: #dc2626; font-weight: bold;">畫面中僅限一人入鏡</span>）。</li>
-                        <li>送出審核後等待店長審核通知。</li>
-                    </ul>
-
-                    <h4 style="margin-top: 16px;">【店長 ERP 後台審核步驟】</h4>
-                    <ul class="steps-list">
-                        <li>進入 ERP 系統，點選上方功能區的<b>「快存櫃 ➔ 月租申請」</b>。</li>
-                        <li>點選待審核的對應櫃位訂單。</li>
-                        <li>點選用戶姓名旁的<b>「編輯」</b>，核對客戶姓名、身分證號與 APP 上傳證件是否一致；如有缺失可協助手動補齊。</li>
-                        <li>資料無誤後點選<b>「審核 V」</b>，點擊黃底區產生付款要求，再點<b>「導入 2」</b>導入證件。</li>
-                        <li>點擊<b>「APP 通知」</b>及<b>「SMS」</b>發送簡訊通知客戶。</li>
-                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 提醒店長：審核通過後客戶僅有 2 小時完成簽約付款，請務必主動提醒客戶！</span></li>
-                    </ul>
-
-                    <h4 style="margin-top: 16px;">【客戶端完成簽約與付款】</h4>
-                    <ul class="steps-list">
-                        <li>客戶於 APP「租賃紀錄」點擊待簽約訂單 ➔ 閱讀合約並勾選同意。</li>
-                        <li>補上傳第二證件（健保卡/駕照） ➔ 手機橫向以正楷簽名 ➔ 完成線上付款。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 4. APP月租續約 -->
-            <div id="tab-renew" class="tab-content">
-                <div class="card">
-                    <h3>🔄 APP 月租續約與店長後台設定規範</h3>
-                    
-                    <div class="warning-box" style="margin-bottom: 8px;">
-                        <b>📌 客戶 APP 顯示續約按鈕之雙重條件：</b><br>
-                        1. 店長已在後台設定好<b>「月租續約金」</b>。<br>
-                        2. 時間已進入<span style="color: #dc2626; font-weight: bold;">「訂單結束前七天內」</span>。<br>
-                        <span style="font-size: 0.82rem; color: #64748b;">（必須兩個條件同時成立，客戶的 APP 才會出現續約按鈕並進行付款作業）</span>
-                    </div>
-
-                    <h4>【店長 ERP 後台設定步驟】</h4>
-                    <ul class="steps-list">
-                        <li>系統進入<b>「快存櫃 ➔ 租用紀錄」</b>，以客戶資料搜尋並開啟明細表。</li>
-                        <li>找到明細表右下角的<b>「設定：月租續約金」</b>按鈕並點擊。</li>
-                        <li>選擇對應金額與方案後點擊確定。</li>
-                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 重要規則</span>：
-                            <br>• 輸入的續約金額<span style="color: #dc2626; font-weight: bold;">絕對不能小於當前的月租金</span>（例如當前月租金是1000元，就不能在「月租續約金」輸入小於1000元）。
-                            <br>• 若要取消設定，直接輸入空字串（不輸入任何文字）即可。
-                            <br>• 當畫面上顯示續約金額數字即代表設定完成。
-                        </li>
-                    </ul>
-
-                    <h4 style="margin-top: 16px;">【客戶端 APP 正常續約與逾期繳費】</h4>
-                    <ul class="steps-list">
-                        <li><b>正常續約</b>：訂單結束前 7 天內，開啟 APP 進入快存櫃頁面 ➔ 點選<b>「延時」</b>➔ 下拉選單選擇<b>「月租（續約）」</b>➔ 確認新租期與金額完成線上繳費。</li>
-                        <li><b>逾期未滿 5 分鐘</b>：不計費（緩衝期）。</li>
-                        <li><b>逾期未滿 1 天</b>：按 1 天計算，日租金 = 月租 ÷ 30，另加收 <span style="color: #dc2626; font-weight: bold;">5% 滯納金</span>。</li>
-                        <li><b>逾期超過 1 天</b>：逾期租金按天累計 + 5% 滯納金（滯納金固定只收一次）。</li>
-                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 逾期超過 7 天</span>：APP 功能將會直接鎖定，須聯繫 Dora / Kai 進行人工處理。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 5. 悠遊卡設定(部分據點) -->
-            <div id="tab-card" class="tab-content">
-                <div class="card">
-                    <h3>💳 悠遊卡綁定與開櫃設定（部分據點支援）</h3>
-                    <div class="warning-box">
-                        <b>📌 重要提醒：</b>悠遊卡開櫃功能<span style="color: #dc2626; font-weight: bold;">僅限部分支援之據點與櫃位</span>提供（長租預設包含 1 張悠遊卡無限次開櫃服務，如需加購每張 $100）。請先確認該據點硬體支援後再引導客人操作。
-                    </div>
-                    <h4>【設定步驟】</h4>
-                    <ul class="steps-list">
-                        <li>於 APP「租賃紀錄」點選對應的長租櫃位進入明細。</li>
-                        <li>點選左下方「悠遊卡」➔ 點擊「設定悠遊卡」。</li>
-                        <li>輸入自訂名稱與<b>悠遊卡外觀號碼</b>，點擊下一步（注意：APP 輸入後 <span style="color: #dc2626; font-weight: bold;">30 秒內</span>須於機台完成感應）。</li>
-                        <li>前往現場機台畫面右下角點擊「設定悠遊卡」，選擇櫃型與櫃號。</li>
-                        <li>點擊「開始讀卡」，將悠遊卡感應機台右側卡機<span style="color: #dc2626; font-weight: bold;">感應兩次</span>，完成後點擊儲存卡號即設定完成。</li>
-                        <li><b>使用悠遊卡開櫃</b>：設定完成後，直接在現場機台感應已綁定的悠遊卡即可直接開櫃取物。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 6. 常見問題與排障 -->
-            <div id="tab-faq" class="tab-content">
-                <div class="card">
-                    <h3>🛠️ 快存櫃全方位客服與異常處理標準手冊 (SOP)</h3>
-                    
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 10px;">一、 App 註冊、登入與身分驗證問題</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 外國旅客無台灣門號無法註冊</div>
-                        <div class="faq-a"><b>處理方式：</b>請客人改用 <span style="color: #d97706; font-weight: bold;">Email（電子郵件）</span> 進行 App 登入與註冊。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 收不到簡訊驗證碼</div>
-                        <div class="faq-a">
-                            • 先請 Android 用戶檢查「垃圾簡訊匣」。<br>
-                            • 若垃圾匣中沒有，請聯繫線上客服（Dora / Kai）<span style="color: #dc2626; font-weight: bold;">索取一組專用驗證碼</span>供客人登入。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. VPN 阻擋連線</div>
-                        <div class="faq-a"><b>處理方式：</b>提醒客人先將手機的 <span style="color: #dc2626; font-weight: bold;">VPN 關閉</span>，再重新啟動 App 嘗試。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">4. 外國人護照/身分證上傳卡住</div>
-                        <div class="faq-a"><b>處理方式：</b>若 App 端持續轉圈圈或卡住，請客人直接將證件照傳給線上客服，由後台協助進行人工上傳與審核。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">5. 註冊頁面出現兩個手機欄位</div>
-                        <div class="faq-a"><b>處理方式：</b>告知客人兩個欄位皆可填入相同資訊，或將第二個欄位保持空白即可。</div>
-                    </div>
-
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">二、 現場開櫃、藍牙與連線異常</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 人到現場卻完全無法開櫃（App 無反應）</div>
-                        <div class="faq-a">
-                            • 確認手機已開啟藍牙與定位服務（Location），且 App 權限已授權。<br>
-                            • 確認未開啟 VPN，並建議<span style="color: #d97706; font-weight: bold;">連線現場櫃體上方張貼的據點專屬 Wi-Fi</span>。<br>
-                            • 將 App 完全背景滑掉重啟。<br>
-                            • 若個人端無法解決，聯繫客服於後台嘗試發送遠端開櫃指令或通報工程師。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 聽得到解鎖聲但門推不開</div>
-                        <div class="faq-a"><b>處理方式：</b>詢問行李是否放太滿、超過安全警戒線；請客人<span style="color: #dc2626; font-weight: bold;">「用手壓著櫃門左側中間位置」</span>（靠外力輔助彈簧彈開），同時點擊開櫃。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 後台強制開櫃救援</div>
-                        <div class="faq-a"><b>處理方式：</b>客服核對據點、櫃號及承租電話（必要時輔以現場特徵或監視器畫面確認身分）後，於後台直接執行強制開櫃。</div>
-                    </div>
-
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">三、 現場誤用 / 誤開未退租櫃位之處理（重大情境）</h4>
-                    <div class="faq-item" style="background: #fffbeb; border-color: #fde68a;">
-                        <div class="faq-q" style="color: #b45309;">⚠️ 情境：櫃門未關或前一手未退租，新客人誤以為空櫃而將物品放入，導致系統無此客人的租賃資料。</div>
-                        <div class="faq-a">
-                            <b>標準處理 SOP：</b><br>
-                            1. <b>詢問與記錄</b>：先與客人詳細核對並記錄其「實際放物品的時間」、「放置內容」及「外觀穿著」。<br>
-                            2. <b>調閱監視器</b>：調閱監視器畫面，確認確實是由該新客人在該時段放入。<br>
-                            3. <b>重新正確承租</b>：請客人透過 App 或機台<span style="color: #dc2626; font-weight: bold;">重新承租一個同尺寸的正確空櫃</span>（計算其實際占用時間與費用）。<br>
-                            4. <b>付款與核對</b>：待客人完成新訂單付款並確認後。<br>
-                            5. <b>協助取物與歸位</b>：由後台或店長協助將誤用之原櫃位打開，讓客人將物品取出，轉放到新承租的正確櫃位中；舊櫃由店長進行清空與後台狀態重置。
-                        </div>
-                    </div>
-
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">四、 租期、單次存取與退租機制</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 誤解「時租/日租」為多次存取</div>
-                        <div class="faq-a">
-                            • <b>機台租用</b>：嚴格屬於「單次存取」，中途開門即視同結束租期。<br>
-                            • <b>App 租用</b>：期限內雖可無限次開櫃，但取完物品後必須手動在 App 點選「退租」。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 忘記手動按退租導致持續計費</div>
-                        <div class="faq-a"><b>處理方式：</b>請客人確認物品是否已全部取出；若確認為空櫃，告知客人可先忽略逾期通知，後續由店長巡店確認後台協助標退，不需額外補繳。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 退租按鈕反白或轉圈圈無法點擊</div>
-                        <div class="faq-a"><b>處理方式：</b>提醒客人將櫃門確實關上後<span style="color: #dc2626; font-weight: bold;">等待 20 秒</span>再按退租；若系統延遲，返回前一頁或重啟 App 即可。</div>
-                    </div>
-
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">五、 逾期費、滯納金與計費爭議</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 逾期未取被改收「原價時租/日租 + 滯納金」</div>
-                        <div class="faq-a">
-                            • <b>向客人說明規則</b>：優惠價僅限於正常租期內與到期前主動透過 App 點選延時；逾期後自動恢復原價計算並產生滯納金。<br>
-                            • <b>彈性處理機制</b>：若為初次使用或特殊情況，可經主管同意後提供<span style="color: #d97706; font-weight: bold;">「特別協助一次」</span>，幫客人重新核算為較合理的原價日租與滯納金，透過 APP 發送補繳通知，繳清後完成退租。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 逾期未繳清無法重新承租</div>
-                        <div class="faq-a"><b>處理方式：</b>必須先透過 App 收到補繳通知並完成上一筆逾期金額繳納，系統解鎖後才能重新承租新櫃。</div>
-                    </div>
-
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">六、 退費、發票與折讓單流程</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 非櫃體故障的退費限制</div>
-                        <div class="faq-a">
-                            • <b>原則</b>：非櫃體本身故障（如買錯尺寸、用不到、提早退租）原則上<span style="color: #dc2626; font-weight: bold;">不予退費</span>。<br>
-                            • 若剩餘租期超過 24 小時（針對特定長約）或初次使用的善意例外，才可專案呈報主管申請退款（原付款管道刷退，或悠遊卡需索取存摺封面匯款）。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 重複扣款或系統異常扣款</div>
-                        <div class="faq-a"><b>處理方式：</b>請客人提供租賃紀錄截圖、信用卡末四碼或 Line Pay 訂單編號畫面。後台核對確認後，安排於 7 個工作天內刷退或匯款。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 統編/發票開立與重開（折讓單）</div>
-                        <div class="faq-a"><b>處理方式：</b>若結帳忘記勾選統編需更改，必須作廢重開。請客人提供正確公司名稱、統編、Email，並配合<span style="color: #dc2626; font-weight: bold;">回覆「同意開立折讓單」</span>，才能由會計進行後續重開發票與退差額作業。</div>
-                    </div>
-
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">七、 預約、尺寸、據點與動線指引</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 能否提前線上預約櫃位？</div>
-                        <div class="faq-a"><b>處理方式：</b>明確告知快存櫃<span style="color: #dc2626; font-weight: bold;">無法提前預約</span>，皆採「現場操作、當下起租」制，建議出發前查看 App 即時空櫃率。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 大型行李箱尺寸對應</div>
-                        <div class="faq-a"><b>處理方式：</b>29 吋以上大型行李箱建議租用 S3 或 M/L 型（視各據點櫃型而定）；App 與櫃體皆有長寬高尺寸標示，<span style="color: #dc2626; font-weight: bold;">非櫃體問題無法因放不下而退費</span>。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 車站與場館內部動線迷路</div>
-                        <div class="faq-a"><b>處理方式：</b>立即提供官方準備好的動線影片連結（如北車 Z2 出口、南港車站各連通道影片），或線上文字引導。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">4. 營業時間與小巨蛋活動配合</div>
-                        <div class="faq-a"><b>處理方式：</b>小巨蛋據點若當天有活動，會配合活動散場時間延後關門，以場館實際關門時間為主；若需絕對 24 小時存取，建議改租「信義逸仙」等 24 小時據點。</div>
-                    </div>
-
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>據點名稱</th>
+                                <th>倉位編號</th>
+                                <th>尺寸 (寬*深*高 m)</th>
+                                <th>材積 (材)</th>
+                                <th>月繳/原價</th>
+                                <th>季繳</th>
+                                <th>半年繳</th>
+                                <th id="th-annual-85">年繳 (85折)</th>
+                                <th id="th-annual-80">年繳 (8折)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="storage-table-body">
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- 💡 確保引入登入驗證機制 -->
-    <script src="login.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            try {
-                const now = new Date();
-                const verEl = document.getElementById('system-version');
-                if (verEl) {
-                    verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
-                }
-            } catch(e) {
-                console.error("Initialization error:", e);
-            }
-        });
+        (function() {
+            const now = new Date();
+            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+        })();
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -454,30 +210,216 @@
             const arrow = btn.querySelector('.arrow');
             if (items.style.display === 'none') {
                 items.style.display = 'flex';
-                arrow.innerText = '▼';
+                if (arrow) arrow.innerText = '▼';
             } else {
                 items.style.display = 'none';
-                arrow.innerText = '▶';
+                if (arrow) arrow.innerText = '▶';
             }
         }
 
-        function switchTab(evt, tabId) {
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(c => c.classList.remove('active'));
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
 
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(b => b.classList.remove('active'));
+        function handleSmartExcelUpload() {
+            const branchInput = document.getElementById('upload-branch-name');
+            const branch = branchInput.value.trim();
+            if (!branch) { alert('請先輸入或選擇分店名稱！'); return; }
 
-            document.getElementById(tabId).classList.add('active');
-            evt.currentTarget.classList.add('active');
+            const fileInput = document.getElementById('excelFile');
+            if (!fileInput.files || fileInput.files.length === 0) { alert('請先選擇一個 Excel 檔案！'); return; }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const jsonSheet = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+                    const discountVal = document.getElementById('branch-annual-discount').value;
+                    
+                    branchDiscounts[branch] = discountVal;
+                    localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
 
-            if (window.innerWidth <= 768) {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebar-overlay');
-                sidebar.classList.remove('mobile-open');
-                overlay.classList.remove('active');
+                    let headerRowIdx = -1;
+                    let priceColIdx = -1;
+                    let sizeColIdx = -1;
+                    let unitColIdx = -1;
+                    let codeColIdx = -1;
+
+                    for (let r = 0; r < Math.min(jsonSheet.length, 10); r++) {
+                        let row = jsonSheet[r];
+                        if (!row) continue;
+                        let foundPrice = false;
+
+                        for (let c = 0; c < row.length; c++) {
+                            let val = String(row[c] || '').trim().toLowerCase();
+                            if (!val) continue;
+
+                            if ((val.includes('月繳') || val.includes('月租') || val.includes('原價') || val.includes('金額') || val.includes('定價') || val.includes('牌價')) && priceColIdx === -1) {
+                                priceColIdx = c;
+                                foundPrice = true;
+                            } else if ((val.includes('尺寸') || val.includes('長寬高') || val.includes('規格')) && sizeColIdx === -1) {
+                                sizeColIdx = c;
+                            } else if ((val.includes('材積') || val.includes('才機') || val.includes('才') || val.includes('立方')) && unitColIdx === -1) {
+                                unitColIdx = c;
+                            } else if ((val.includes('編號') || val.includes('倉位') || val.includes('代號')) && codeColIdx === -1) {
+                                codeColIdx = c;
+                            }
+                        }
+                        if (foundPrice) {
+                            headerRowIdx = r;
+                            break;
+                        }
+                    }
+
+                    let newItems = [];
+                    let startRow = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
+
+                    for (let i = startRow; i < jsonSheet.length; i++) {
+                        let row = jsonSheet[i];
+                        if (!row || row.length === 0) continue;
+
+                        let code = '', size = '-', unit = '-';
+                        let price1 = NaN;
+
+                        if (priceColIdx !== -1 && row[priceColIdx] !== undefined) {
+                            let pVal = Number(String(row[priceColIdx]).replace(/[^\d.]/g, ''));
+                            if (!isNaN(pVal) && pVal > 0) price1 = pVal;
+                        }
+
+                        if (codeColIdx !== -1 && row[codeColIdx] !== undefined) code = String(row[codeColIdx]).trim();
+                        if (sizeColIdx !== -1 && row[sizeColIdx] !== undefined) size = String(row[sizeColIdx]).trim();
+                        if (unitColIdx !== -1 && row[unitColIdx] !== undefined) unit = Number(row[unitColIdx]) || String(row[unitColIdx]).trim();
+
+                        for (let c = 0; c < row.length; c++) {
+                            let val = row[c];
+                            if (val == null) continue;
+                            let sVal = String(val).trim();
+
+                            if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
+                                code = sVal; if (!isNaN(row[c+1])) code += row[c+1];
+                            }
+                            if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                                size = sVal;
+                            }
+                            if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 200 && c !== unitColIdx) {
+                                price1 = Number(sVal);
+                            }
+                        }
+
+                        if (code && !isNaN(price1) && price1 > 0) {
+                            newItems.push({
+                                branch: branch, 
+                                code: code, 
+                                size: size !== '-' ? (size.toLowerCase().includes('m') ? size : size + ' m') : '標準尺寸',
+                                unit: unit !== '-' ? unit : '50', 
+                                price1: price1,
+                                price3: Math.round((price1 * 0.95) / 10) * 10,
+                                price6: Math.round((price1 * 0.90) / 10) * 10,
+                                price12_85: Math.round((price1 * 0.85) / 10) * 10,
+                                price12_80: Math.round((price1 * 0.8) / 10) * 10
+                            });
+                        }
+                    }
+
+                    if (newItems.length === 0) { alert('未能抓取到有效資料，請檢查 Excel 標題是否包含「月繳」或「月租」！'); return; }
+                    if (storageData.some(i => i.branch === branch) && confirm(`「${branch}」資料已存在，是否覆蓋？`)) {
+                        storageData = storageData.filter(i => i.branch !== branch);
+                    }
+                    storageData = storageData.concat(newItems);
+                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                    
+                    branchInput.value = '';
+                    fileInput.value = '';
+
+                    const selectEl = document.getElementById('storage-branch-filter');
+                    if (selectEl) selectEl.value = 'all';
+
+                    renderStorageTable();
+                    alert('成功匯入 ' + newItems.length + ' 筆資料！');
+                } catch(err) { alert('解析錯誤：' + err.message); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateBranchFilter(selectedVal = 'all') {
+            let counts = {};
+            storageData.forEach(i => counts[i.branch] = (counts[i.branch]||0)+1);
+            let html = `<option value="all">全部據點 (${storageData.length})</option>`;
+            Object.keys(counts).forEach(b => html += `<option value="${b}">${b} (${counts[b]})</option>`);
+            const selectEl = document.getElementById('storage-branch-filter');
+            if (selectEl) {
+                let currentVal = selectEl.value;
+                selectEl.innerHTML = html;
+                selectEl.value = currentVal || selectedVal;
             }
         }
+
+        function renderStorageTable() {
+            let selectEl = document.getElementById('storage-branch-filter');
+            let filter = selectEl ? selectEl.value : 'all';
+            
+            updateBranchFilter(filter);
+
+            let th85 = document.getElementById('th-annual-85');
+            let th80 = document.getElementById('th-annual-80');
+            
+            let activeBranchDisc = null;
+            if (filter && filter !== 'all') {
+                activeBranchDisc = branchDiscounts[filter] || '0.85';
+            }
+
+            if (activeBranchDisc === '0.80') {
+                th85.innerHTML = '年繳 (85折)';
+                th80.innerHTML = '年繳 (8折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
+            } else if (activeBranchDisc === '0.85') {
+                th85.innerHTML = '年繳 (85折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
+                th80.innerHTML = '年繳 (8折)';
+            } else {
+                th85.innerHTML = '年繳 (85折)';
+                th80.innerHTML = '年繳 (8折)';
+            }
+
+            let list = filter === 'all' ? storageData : storageData.filter(i => i.branch === filter);
+            let tbody = document.getElementById('storage-table-body');
+            if (!tbody) return;
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
+            
+            tbody.innerHTML = list.map(item => {
+                let p85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                let p80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.80) / 10) * 10;
+                return `
+                    <tr>
+                        <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
+                        <td style="font-weight: bold;">${item.code}</td>
+                        <td class="size-col">${item.size}</td>
+                        <td style="color: #64748b;">${item.unit}</td>
+                        <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
+                        <td>NT$ ${item.price3.toLocaleString()}</td>
+                        <td>NT$ ${item.price6.toLocaleString()}</td>
+                        <td style="color: #059669; font-weight: 600;">NT$ ${p85.toLocaleString()}</td>
+                        <td style="color: #047857; font-weight: 600;">NT$ ${p80.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function deleteSelectedBranchData() {
+            let b = document.getElementById('storage-branch-filter').value;
+            if (b === 'all') { alert('請先選擇特定分店！'); return; }
+            if (confirm(`確定刪除 ${b} 的所有資料？`)) {
+                storageData = storageData.filter(i => i.branch !== b);
+                delete branchDiscounts[b];
+                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
+                renderStorageTable();
+            }
+        }
+
+        function clearStorageData() {
+            if (confirm('確定清空全部資料？')) { storageData = []; branchDiscounts = {}; localStorage.removeItem('storeasy_storage_data'); localStorage.removeItem('storeasy_branch_discounts'); renderStorageTable(); }
+        }
+
+        renderStorageTable();
     </script>
 </body>
 </html>
