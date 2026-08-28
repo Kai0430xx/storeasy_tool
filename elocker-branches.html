@@ -174,7 +174,6 @@
             }
         });
 
-        // 💡 完整對應 60 間據點與樓層詳細資料（含精確的樓層級別承租方式與租期支援）
         function getElockerData() {
             return [
                 {
@@ -196,8 +195,8 @@
                     name: "台北小巨蛋場",
                     address: "台北市松山區南京東路四段2號",
                     city: "台北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "綜合承租模式",
+                    hours: "10:00-21:00",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
@@ -830,13 +829,13 @@
                     name: "台中洲際棒球場",
                     address: "臺中市北屯區崇德路三段835號",
                     city: "台中市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "綜合承租模式",
+                    hours: "24小時",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: true, hourly: true, monthly: true },
-                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: true, hourly: true, monthly: true }
+                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: false, hourly: true, monthly: true },
+                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -852,15 +851,15 @@
                     ]
                 },
                 {
-                    name: "台中廣3SOGO場",
+                    name: "台中廣三SOGO場",
                     address: "臺中市西區臺灣大道二段459號",
                     city: "台中市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "綜合承租模式",
+                    hours: "11:00-22:00",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
                     floors: [
-                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: true, hourly: true, monthly: true },
+                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: false, hourly: true, monthly: true },
                         { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true }
                     ]
                 },
@@ -905,11 +904,11 @@
                     address: "基隆市仁愛區港西街5號(基隆火車站南站)",
                     city: "基隆市",
                     hours: "6:00-23:00",
-                    rentTypeText: "綜合承租模式",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S、M尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: true, hourly: true, monthly: true }
+                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
@@ -917,18 +916,18 @@
                     address: "基隆市仁愛區港西街55號(基隆火車站北站)",
                     city: "基隆市",
                     hours: "05:00-24:00",
-                    rentTypeText: "綜合承租模式",
+                    rentTypeText: "機台 + APP 承租",
                     sizesAvailable: "S尺寸",
                     monthlyAvailable: "限期繳",
                     floors: [
-                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: true, hourly: true, monthly: true }
+                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: false, hourly: true, monthly: true }
                     ]
                 },
                 {
                     name: "基隆好食城場",
                     address: "基隆市中正區中正路3號",
                     city: "基隆市",
-                    hours: "綜合 (詳見各樓層)",
+                    hours: "11:00-22:00",
                     rentTypeText: "僅 APP 承租",
                     sizesAvailable: "S、M、L尺寸",
                     monthlyAvailable: "部分尺寸可月繳",
@@ -966,7 +965,7 @@
                 list = list.filter(function(b) { return b.name === selectedBranch; });
             }
 
-            // 💡 樓層級別承租方式與租期過濾
+            // 💡 修正承租方式與租期篩選：只要據點中有任何樓層符合條件即保留該據點
             if (selectedType || selectedTerm) {
                 list = list.filter(function(b) {
                     return b.floors.some(function(f) {
