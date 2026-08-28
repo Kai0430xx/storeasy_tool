@@ -62,7 +62,6 @@
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-        /* 💡 只有尺寸欄位允許換行，其他如金額、編號等絕對維持單行 */
         td.size-col { white-space: normal; word-break: break-word; min-width: 220px; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
 
@@ -87,16 +86,43 @@
             .version { display: none; }
         }
 
+        /* 💡 列印 / 生成 PDF 專用樣式：強制補齊所有儲存格框線，完美貼合不跑版 */
         @media print {
             body * { visibility: hidden; }
             aside, header.no-print, .card.no-print, .no-print { display: none !important; }
             #invoice-preview, #invoice-preview * { visibility: visible; }
             #invoice-preview { 
                 position: absolute; left: 0; top: 0; width: 100% !important; 
-                margin: 0 !important; padding: 15px !important; 
+                margin: 0 !important; padding: 10px !important; 
                 box-shadow: none !important; border: none !important; 
-                font-size: 7.5pt !important;
+                font-size: 7pt !important;
             }
+            #invoice-preview h1 { font-size: 1.1rem !important; }
+            #invoice-preview h2 { font-size: 0.9rem !important; }
+            #invoice-preview .preview-info { 
+                display: grid !important; 
+                grid-template-columns: 1fr 1fr !important; 
+                gap: 4px 16px !important; 
+                padding: 8px !important; 
+                margin-bottom: 10px !important; 
+                font-size: 7pt !important; 
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            #invoice-preview table { 
+                width: 100% !important; 
+                font-size: 6.5pt !important; 
+                margin-top: 4px !important; 
+                margin-bottom: 10px !important; 
+                white-space: nowrap !important; 
+                border-collapse: collapse !important;
+            }
+            #invoice-preview th, #invoice-preview td { 
+                padding: 3px 2px !important; 
+                border: 1px solid #cbd5e1 !important; 
+            }
+            #invoice-preview .summary-box { padding: 6px !important; font-size: 7.5pt !important; margin-top: 8px !important; margin-bottom: 8px !important; }
+            #invoice-preview .notes-box { padding: 4px !important; font-size: 6pt !important; margin-bottom: 0 !important; }
         }
     </style>
 </head>
@@ -513,17 +539,17 @@
                 let dateRangeStr = (item.startDate && item.endDate) ? (item.startDate.replace(/-/g,'/') + ' - ' + item.endDate.replace(/-/g,'/')) : '未填租期';
 
                 itemsHtml += '<tr>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold;">' + item.code + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + item.unit + '材</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + item.price1.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + monthlyRate.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + termMonths + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + unTax.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + tax.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + rentSubtotal.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + deposit.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px; font-size: 0.7rem;">' + dateRangeStr + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold; color: #b45309;">' + lineTotal.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + item.code + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + item.unit + '材</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + item.price1.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + monthlyRate.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + termMonths + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + unTax.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + tax.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + rentSubtotal.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + deposit.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-size: 0.65rem; white-space: nowrap;">' + dateRangeStr + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; color: #b45309; white-space: nowrap;">' + lineTotal.toLocaleString() + '</td>' +
                 '</tr>';
 
                 let lFee = item.lateFee || 0, pFee = item.packingFee || 0, mFee = item.movingFee || 0, oFee = item.otherFee || 0;
@@ -532,15 +558,15 @@
                 let exFee = Math.round(itemExtraSum / 1.05), taxFee = itemExtraSum - exFee;
 
                 feesHtml += '<tr>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold;">' + item.code + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + lFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + insuranceFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + pFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + mFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + oFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + exFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px;">' + taxFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold;">' + itemExtraSum.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + item.code + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + lFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + insuranceFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + pFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + mFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + oFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + exFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + taxFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + itemExtraSum.toLocaleString() + '</td>' +
                 '</tr>';
             });
 
