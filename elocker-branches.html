@@ -545,7 +545,7 @@
                 },
                 {
                     name: "新店萬家福場",
-                    address: "新北市新店區中興路3段1號",
+                    address: "新北市新店區中興路三段1號",
                     city: "新北市",
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
@@ -674,8 +674,8 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false },
-                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -685,7 +685,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -707,7 +707,7 @@
                     rentTypeText: "僅 APP 承租",
                     floors: [
                         { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -717,7 +717,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -883,7 +883,6 @@
                 list = list.filter(function(b) { return b.name === selectedBranch; });
             }
 
-            // 💡 嚴格依照 Excel 檔案內各樓層真實勾選 (V) 進行過濾
             if (selectedType || selectedTerm) {
                 list = list.filter(function(b) {
                     return b.floors.some(function(f) {
