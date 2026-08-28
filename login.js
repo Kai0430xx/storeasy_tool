@@ -7,7 +7,7 @@
         { username: 'kai', password: '123' },
         { username: 'storeasy', password: '666' },
         { username: 'canny4545', password: '121qwe' },
-        { username: 'bear800910', password: 'j06ao3' }
+        { username: 'bear', password: '809105' }
     ];
 
     // 檢查目前是否已登入
@@ -44,4 +44,4 @@
 })();
 ```eof
 
-Your `login.js` file has been successfully updated with the new accounts! Feel free to let me know if you need any further modifications.
+Your `login.js` file has been successfully updated with the new login credentials (`bear` / `809105`)! Let me know if you need anything else.
