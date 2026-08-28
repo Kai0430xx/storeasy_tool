@@ -48,7 +48,7 @@
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
         .tabs-nav { display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 0; flex-wrap: wrap; }
-        .tab-btn { padding: 12px 20px; font-weight: bold; font-size: 0.95rem; background: #e2e8f0; color: #475569; border: none; border-top-left-radius: 8px; border-top-right-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn { padding: 12px 18px; font-weight: bold; font-size: 0.9rem; background: #e2e8f0; color: #475569; border: none; border-top-left-radius: 8px; border-top-right-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .tab-btn.active { background: #0f172a; color: #fbbf24; }
 
         .tab-content { display: none; flex-direction: column; gap: 20px; }
@@ -65,7 +65,6 @@
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
         .warning-box { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 14px 18px; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; }
-        .danger-box { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 14px 18px; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; }
 
         table.info-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 8px; }
         table.info-table th, table.info-table td { padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left; }
@@ -79,7 +78,7 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .tabs-nav { gap: 4px; }
-            .tab-btn { padding: 8px 12px; font-size: 0.85rem; }
+            .tab-btn { padding: 8px 10px; font-size: 0.8rem; }
             .version { display: none; }
         }
     </style>
@@ -126,26 +125,27 @@
 
         <div class="content-body">
             <div class="tabs-nav">
-                <button class="tab-btn active" onclick="switchTab(event, 'tab-short')">1. 短租與機台寄物教學</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-long')">2. 長租/月租申辦與簽約</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-admin')">3. 店長 ERP 後台與續約設定</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-card')">4. 悠遊卡設定 (部分據點)</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-faq')">5. 常見問題與排障 FAQ</button>
+                <button class="tab-btn active" onclick="switchTab(event, 'tab-app')">1. APP承租與開櫃</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-machine')">2. 機台承租與開櫃</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-long')">3. APP申請月租</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-renew')">4. APP月租續約</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-card')">5. 悠遊卡設定(部分據點)</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-faq')">6. 常見問題與排障</button>
             </div>
 
-            <!-- 1. 短租與機台寄物教學 -->
-            <div id="tab-short" class="tab-content active">
+            <!-- 1. APP承租與開櫃 -->
+            <div id="tab-app" class="tab-content active">
                 <div class="card">
                     <h3>🎬 官方影音教學</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
                         <div>
-                            <h4 style="margin-bottom: 6px;">如何承租 (短租)</h4>
+                            <h4 style="margin-bottom: 6px;">如何承租 (短租)[cite: 6]</h4>
                             <div class="video-container">
                                 <iframe src="https://www.youtube.com/embed/ysfIthfH1sg" allowfullscreen></iframe>
                             </div>
                         </div>
                         <div>
-                            <h4 style="margin-bottom: 6px;">如何開櫃</h4>
+                            <h4 style="margin-bottom: 6px;">如何開櫃[cite: 6]</h4>
                             <div class="video-container">
                                 <iframe src="https://www.youtube.com/embed/ryujm608cCg" allowfullscreen></iframe>
                             </div>
@@ -154,149 +154,139 @@
                 </div>
 
                 <div class="card">
-                    <h3>🖥️ 機台現場操作步驟（寄物與取物）</h3>
-                    <h4>【寄物流程】</h4>
+                    <h3>📱 APP 短期承租與開櫃步驟</h3>
                     <ul class="steps-list">
-                        <li><b>選擇語言</b>：於機台螢幕點選中文、英文、日文或韓文。</li>
-                        <li><b>點選存放</b>：點選「存放行李（單次存取）」。</li>
-                        <li><b>選擇櫃型與櫃號</b>：依客戶需求選擇對應櫃型與空置櫃號。</li>
-                        <li><b>選擇租用方式與時間</b>：選擇「時租」（1小時~24小時）或「日租」（1天~7天）。</li>
-                        <li><b>設定取物密碼</b>：輸入並再次確認 4 碼數字密碼。</li>
-                        <li><b>輸入手機/Email</b>：本國人輸入台灣手機號碼；外國人輸入 Email。請提醒客戶下載收多易 APP 即可用此登入查看密碼。</li>
-                        <li><b>確認付款與發票</b>：勾選條款，選擇發票開立方式（APP、手機載具、愛心捐贈、統編），並完成刷卡/電子支付。</li>
-                        <li><b>確實關門</b>：付款成功後櫃門將自動開啟，放入物品後務必<span style="color: #dc2626; font-weight: bold;">確實將櫃門關緊</span>。</li>
-                    </ul>
-
-                    <h4 style="margin-top: 16px;">【取物 / 退租流程】</h4>
-                    <ul class="steps-list">
-                        <li>點選機台的「取出行李（退租）」。</li>
-                        <li>選擇對應的櫃號。</li>
-                        <li>輸入設定的 4 碼取物密碼。</li>
-                        <li>櫃門自動解鎖，取完物品後務必將門關上。</li>
-                    </ul>
-                </div>
-
-                <div class="card">
-                    <h3>📱 客戶端 APP 加購與開櫃</h3>
-                    <ul class="steps-list">
-                        <li><b>藍牙環境設定</b>：指導客戶開啟手機藍牙、定位、允許收多易 APP 權限，並<span style="color: #dc2626; font-weight: bold;">關閉 VPN</span>。</li>
-                        <li><b>加購無限次存取</b>：機台承租後 <span style="color: #dc2626; font-weight: bold;">1 小時內</span>，客戶可於 APP 的「租賃紀錄」中加購無限次存取（每小時 +$20、每日 +$50）。</li>
-                        <li><b>藍牙開櫃</b>：點擊 APP 內「快存櫃 ➔ 租賃紀錄 ➔ 點選綠色鎖頭開櫃」（手機須距離櫃體 3 公尺內；若打不開可連接現場 Wi-Fi）。</li>
+                        <li><b>環境設定</b>：指導客戶開啟手機藍牙、定位、允許收多易 APP 權限，並<span style="color: #dc2626; font-weight: bold;">關閉 VPN</span>[cite: 7]。</li>
+                        <li><b>選擇櫃位</b>：開啟 APP 點擊下方「快存櫃」，搜尋據點、選擇樓層與櫃位尺寸，租期選擇「時租」或「日租」[cite: 7]。</li>
+                        <li><b>驗證與付款</b>：輸入手機號碼獲取驗證碼（外國人可點選 Foreigner login 以 E-mail 登入），確認金額後完成線上付款（信用卡、Line Pay、悠遊付、街口支付、Apple Pay）[cite: 7]。</li>
+                        <li><b>加購無限次存取</b>：機台或 APP 承租後 <span style="color: #dc2626; font-weight: bold;">1 小時內</span>可在 APP 加購無限次存取（每小時 +$20、每日 +$50）[cite: 7]。</li>
+                        <li><b>藍牙開櫃</b>：點擊 APP 內「快存櫃 ➔ 租賃紀錄 ➔ 點選綠色鎖頭開櫃」（手機須距離櫃體 3 公尺內）[cite: 7]。</li>
+                        <li><b>延時與退租</b>：使用中可於租期內點擊「延時」續租；使用完畢請先將物品取出並關上櫃門，等待約 <span style="color: #dc2626; font-weight: bold;">20 秒</span>後再點擊「退租」[cite: 7]。</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- 2. 長租/月租申辦與簽約 -->
+            <!-- 2. 機台承租與開櫃 -->
+            <div id="tab-machine" class="tab-content">
+                <div class="card">
+                    <h3>🖥️ 機台現場操作步驟（寄物與取物）</h3>
+                    <h4>【機台寄物流程】</h4>
+                    <ul class="steps-list">
+                        <li><b>選擇語言</b>：於機台螢幕點選中文、英文、日文或韓文[cite: 7]。</li>
+                        <li><b>點選存放</b>：點選「存放行李（單次存取）」[cite: 7]。</li>
+                        <li><b>選擇櫃型與櫃號</b>：選擇對應櫃型與空置櫃號[cite: 7]。</li>
+                        <li><b>選擇租用方式</b>：選擇「時租」（1小時~24小時）或「日租」（1天~7天）[cite: 7]。</li>
+                        <li><b>設定密碼</b>：輸入並再次確認 4 碼數字取物密碼[cite: 7]。</li>
+                        <li><b>輸入手機/Email</b>：本國人輸入手機號碼；外國人輸入 Email。可下載收多易 APP 登入查看密碼[cite: 7]。</li>
+                        <li><b>付款與關門</b>：確認發票與付款方式後完成刷卡/電子支付，付款成功後櫃門自動開啟，放入物品後務必<span style="color: #dc2626; font-weight: bold;">確實將櫃門關緊</span>[cite: 7]。</li>
+                    </ul>
+
+                    <h4 style="margin-top: 16px;">【機台取物 / 退租流程】</h4>
+                    <ul class="steps-list">
+                        <li>點選機台的「取出行李（退租）」[cite: 7]。</li>
+                        <li>選擇對應的櫃號[cite: 7]。</li>
+                        <li>輸入設定的 4 碼取物密碼[cite: 7]。</li>
+                        <li>櫃門自動解鎖，取完物品後務必將門關上[cite: 7]。</li>
+                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 注意（計次櫃說明）</span>：如冰上樂園 2F 等計次型置物櫃，以當天營業時間內為使用範圍，若超過當天營業時間將另計一次收費。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3. APP申請月租 -->
             <div id="tab-long" class="tab-content">
                 <div class="card">
-                    <h3>📋 長租 / 月租申辦完整 4 步驟（店長教學引導）</h3>
+                    <h3>📋 APP 申請月租與店長後台審核流程</h3>
                     <div class="warning-box">
-                        <b>📌 營業時間限制：</b>月租申辦僅能於<span style="color: #dc2626; font-weight: bold;">週一至週五 10:00-19:00</span>遞出申請與審核。
+                        <b>📌 營業時間限制：</b>月租申辦僅能於<span style="color: #dc2626; font-weight: bold;">週一至週五 10:00-19:00</span>遞出申請與審核[cite: 6]。
                     </div>
+                    
+                    <h4>【客戶端操作步驟】</h4>
                     <ul class="steps-list">
-                        <li><b>步驟一：APP 選擇櫃位與月租</b>
-                            <br>開啟 APP 點選「快存櫃」 ➔ 搜尋據點、選擇樓層與櫃位 ➔ 租期選取「月租」，系統預設當天起租並預付 1 個月押金。
-                        </li>
-                        <li><b>步驟二：身分認證與註冊</b>
-                            <br>引導客戶完成完整註冊，上傳身分證正反面，並進行臉部辨識（<span style="color: #dc2626; font-weight: bold;">畫面中僅限一人入鏡</span>）。
-                        </li>
-                        <li><b>步驟三：店長後台審核</b>（詳見第三分頁店長操作）</li>
-                        <li><b>步驟四：線上簽約與付款</b>
-                            <br>審核通過後，客戶於 APP「租賃紀錄」點擊待簽約訂單 ➔ 閱讀合約並勾選同意 ➔ 補上傳第二證件（健保卡/駕照） ➔ 手機橫向以正楷簽名 ➔ 完成線上付款（支援信用卡、Line Pay、悠遊付、街口支付、Apple Pay）。
-                        </li>
+                        <li>開啟 APP 點選「快存櫃」 ➔ 搜尋據點、選擇樓層與櫃位 ➔ 租期選取「月租」，系統預設當天起租並預付 1 個月押金[cite: 6]。</li>
+                        <li>完成完整註冊，上傳身分證正反面，並進行臉部辨識（<span style="color: #dc2626; font-weight: bold;">畫面中僅限一人入鏡</span>）[cite: 6]。</li>
+                        <li>送出審核後等待店長審核通知[cite: 6]。</li>
+                    </ul>
+
+                    <h4 style="margin-top: 16px;">【店長 ERP 後台審核步驟】</h4>
+                    <ul class="steps-list">
+                        <li>進入 ERP 系統，點選上方功能區的<b>「快存櫃 ➔ 月租申請」</b>[cite: 6]。</li>
+                        <li>點選待審核的對應櫃位訂單[cite: 6]。</li>
+                        <li>點選用戶姓名旁的<b>「編輯」</b>，核對客戶姓名、身分證號與 APP 上傳證件是否一致；如有缺失可協助手動補齊[cite: 6]。</li>
+                        <li>資料無誤後點選<b>「審核 V」</b>，點擊黃底區產生付款要求，再點<b>「導入 2」</b>導入證件[cite: 6]。</li>
+                        <li>點擊<b>「APP 通知」</b>及<b>「SMS」</b>發送簡訊通知客戶[cite: 6]。</li>
+                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 提醒店長：審核通過後客戶僅有 2 小時完成簽約付款，請務必主動提醒客戶！</span>[cite: 6]</li>
+                    </ul>
+
+                    <h4 style="margin-top: 16px;">【客戶端完成簽約與付款】</h4>
+                    <ul class="steps-list">
+                        <li>客戶於 APP「租賃紀錄」點擊待簽約訂單 ➔ 閱讀合約並勾選同意[cite: 6]。</li>
+                        <li>補上傳第二證件（健保卡/駕照） ➔ 手機橫向以正楷簽名 ➔ 完成線上付款[cite: 6]。</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- 3. 店長 ERP 後台與續約設定 -->
-            <div id="tab-admin" class="tab-content">
+            <!-- 4. APP月租續約 -->
+            <div id="tab-renew" class="tab-content">
                 <div class="card">
-                    <h3>🖥️ ERP 後台：月租申辦審核流程</h3>
+                    <h3>🔄 APP 月租續約與店長後台設定</h3>
+                    
+                    <h4>【店長 ERP 後台設定步驟】</h4>
+                    <p style="font-size: 0.88rem; color: #64748b;">若店長未在後台設定續約金，客戶 APP 點擊「延時」將不會顯示月租選項，導致無法自助續約[cite: 6]。</p>
                     <ul class="steps-list">
-                        <li>進入 ERP 系統，點選上方功能區的<b>「快存櫃 ➔ 月租申請」</b>。</li>
-                        <li>點選待審核的對應櫃位訂單。</li>
-                        <li>點選用戶姓名旁的<b>「編輯」</b>，核對客戶姓名、身分證號與 APP 上傳證件是否一致；如有缺失可協助手動補齊。</li>
-                        <li>資料無誤後點選<b>「審核 V」</b>，點擊黃底區產生付款要求，再點<b>「導入 2」</b>導入證件。</li>
-                        <li>點擊<b>「APP 通知」</b>及<b>「SMS」</b>發送簡訊通知客戶。</li>
-                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 提醒店長：審核通過後客戶僅有 2 小時完成簽約付款，請務必主動提醒客戶！</span></li>
+                        <li>系統進入<b>「快存櫃 ➔ 租用紀錄」</b>，以客戶資料搜尋並開啟明細表[cite: 6]。</li>
+                        <li>找到明細表右下角的<b>「設定：月租續約金」</b>按鈕並點擊[cite: 6]。</li>
+                        <li>選擇對應金額與方案後點擊確定，畫面顯示續約金額數字即代表設定完成[cite: 6]。</li>
                     </ul>
-                </div>
 
-                <div class="card">
-                    <h3>🔄 ERP 後台：設定月租續約金（3步驟）</h3>
-                    <p style="font-size: 0.88rem; color: #64748b;">若店長未在後台設定續約金，客戶 APP 點擊「延時」將不會顯示月租選項，導致無法自助續約。</p>
+                    <h4 style="margin-top: 16px;">【客戶端 APP 正常續約與逾期繳費】</h4>
                     <ul class="steps-list">
-                        <li><b>步驟 1</b>：系統進入「快存櫃 ➔ 租用紀錄」，以客戶資料搜尋並開啟明細表。</li>
-                        <li><b>步驟 2</b>：找到明細表右下角的<b>「設定：月租續約金」</b>按鈕並點擊。</li>
-                        <li><b>步驟 3</b>：選擇對應金額與方案後點擊確定，畫面顯示續約金額數字即代表設定完成。</li>
+                        <li><b>正常續約</b>：到期前開啟 APP 進入快存櫃頁面 ➔ 點選「延時」➔ 下拉選單選擇「月租（續約）」➔ 確認新租期與金額完成線上繳費[cite: 6]。</li>
+                        <li><b>逾期未滿 5 分鐘</b>：不計費（緩衝期）[cite: 6]。</li>
+                        <li><b>逾期未滿 1 天</b>：按 1 天計算，日租金 = 月租 ÷ 30，另加收 <span style="color: #dc2626; font-weight: bold;">5% 滯納金</span>[cite: 6]。</li>
+                        <li><b>逾期超過 1 天</b>：逾期租金按天累計 + 5% 滯納金（滯納金固定只收一次）[cite: 6]。</li>
+                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 逾期超過 7 天</span>：APP 功能將會直接鎖定，須聯繫 Dora / Kai 進行人工處理[cite: 6]。</li>
                     </ul>
-                </div>
-
-                <div class="card">
-                    <h3>💰 月租續約與逾期費用計算規則</h3>
-                    <table class="info-table">
-                        <tr>
-                            <th>情境</th>
-                            <th>付款時間</th>
-                            <th>費用明細計算公式</th>
-                        </tr>
-                        <tr>
-                            <td><b>正常續約</b></td>
-                            <td>到期前續約</td>
-                            <td>僅收當期月租金</td>
-                        </tr>
-                        <tr>
-                            <td><b>當天逾期</b></td>
-                            <td>逾期未滿 1 天</td>
-                            <td>日租金（月租 ÷ 30）+ 滯納金（月租 × 5%）</td>
-                        </tr>
-                        <tr>
-                            <td><b>逾期超過 1 天</b></td>
-                            <td>逾期超過 24 小時</td>
-                            <td>（日租金 × 逾期天數）+ 滯納金（<span style="color: #dc2626; font-weight: bold;">固定收一次 5%</span>）</td>
-                        </tr>
-                    </table>
-                    <p style="font-size: 0.85rem; color: #dc2626; margin-top: 8px;"><b>⚠️ 逾期超過 7 天</b>：APP 功能將會直接鎖定，須聯繫 Dora / Kai 進行人工處理。</p>
                 </div>
             </div>
 
-            <!-- 4. 悠遊卡設定 (部分據點) -->
+            <!-- 5. 悠遊卡設定(部分據點) -->
             <div id="tab-card" class="tab-content">
                 <div class="card">
-                    <h3>💳 悠遊卡綁定與設定說明</h3>
+                    <h3>💳 悠遊卡綁定與開櫃設定（部分據點支援）</h3>
                     <div class="warning-box">
-                        <b>📌 重要提醒：</b>悠遊卡開櫃功能<span style="color: #dc2626; font-weight: bold;">僅限部分支援之據點與櫃位</span>提供（長租預設包含 1 張悠遊卡無限次開櫃服務，如需加購每張 $100）。請先確認該據點硬體支援後再引導客人操作。
+                        <b>📌 重要提醒：</b>悠遊卡開櫃功能<span style="color: #dc2626; font-weight: bold;">僅限部分支援之據點與櫃位</span>提供（長租預設包含 1 張悠遊卡無限次開櫃服務，如需加購每張 $100）[cite: 7]。請先確認該據點硬體支援後再引導客人操作。
                     </div>
-                    <h4>【店長 / 客戶設定步驟】</h4>
+                    <h4>【設定步驟】</h4>
                     <ul class="steps-list">
-                        <li>於 APP「租賃紀錄」點選對應的長租櫃位進入明細。</li>
-                        <li>點選左下方「悠遊卡」➔ 點擊「設定悠遊卡」。</li>
-                        <li>輸入自訂名稱與<b>悠遊卡外觀號碼</b>，點擊下一步（注意：APP 輸入後 <span style="color: #dc2626; font-weight: bold;">30 秒內</span>須於機台完成感應）。</li>
-                        <li>前往現場機台畫面右下角點擊「設定悠遊卡」，選擇櫃型與櫃號。</li>
-                        <li>點擊「開始讀卡」，將悠遊卡感應機台右側卡機<span style="color: #dc2626; font-weight: bold;">感應兩次</span>，完成後點擊儲存卡號即設定成功。</li>
+                        <li>於 APP「租賃紀錄」點選對應的長租櫃位進入明細[cite: 7]。</li>
+                        <li>點選左下方「悠遊卡」➔ 點擊「設定悠遊卡」[cite: 7]。</li>
+                        <li>輸入自訂名稱與<b>悠遊卡外觀號碼</b>，點擊下一步（注意：APP 輸入後 <span style="color: #dc2626; font-weight: bold;">30 秒內</span>須於機台完成感應）[cite: 7]。</li>
+                        <li>前往現場機台畫面右下角點擊「設定悠遊卡」，選擇櫃型與櫃號[cite: 7]。</li>
+                        <li>點擊「開始讀卡」，將悠遊卡感應機台右側卡機<span style="color: #dc2626; font-weight: bold;">感應兩次</span>，完成後點擊儲存卡號即設定完成[cite: 7]。</li>
+                        <li><b>使用悠遊卡開櫃</b>：設定完成後，直接在現場機台感應已綁定的悠遊卡即可直接開櫃取物。</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- 5. 常見問題與排障 FAQ -->
+            <!-- 6. 常見問題與排障 -->
             <div id="tab-faq" class="tab-content">
                 <div class="card">
                     <h3>🛠️ 常見障礙排除 (FAQ)</h3>
                     <ul class="steps-list">
                         <li><b>Q1：APP 登入驗證碼收不到？</b>
-                            <br>請先確認手機是否有設定阻擋廣告簡訊；若仍無法接收，請提供承租手機號碼，回報客服遠端協助。
+                            <br>請先確認手機是否有設定阻擋廣告簡訊；若仍無法接收，請提供承租手機號碼，回報客服遠端協助[cite: 7]。
                         </li>
                         <li><b>Q2：點擊 APP 開櫃有聲音但門沒彈開？</b>
-                            <br>請現場協助請客人<span style="color: #dc2626; font-weight: bold;">用手壓住櫃門</span>，店長/客人再點擊一次 APP 開櫃即可。
+                            <br>請現場協助請客人<span style="color: #dc2626; font-weight: bold;">用手壓住櫃門</span>，店長/客人再點擊一次 APP 開櫃即可[cite: 7]。
                         </li>
                         <li><b>Q3：無法在 APP 執行退租？</b>
-                            <br>請確認是否「先將物品取出並將櫃門關上」，關門後須等待約 <span style="color: #dc2626; font-weight: bold;">20 秒</span>再執行 APP 退租。
+                            <br>請確認是否「先將物品取出並將櫃門關上」，關門後須等待約 <span style="color: #dc2626; font-weight: bold;">20 秒</span>再執行 APP 退租[cite: 7]。
                         </li>
                         <li><b>Q4：短租/計日型可以申請退款嗎？</b>
-                            <br>若租期剩餘 24 小時以上（月租型除外），可聯繫客服申請退款（三個工作天）；其餘非櫃體或設備問題恕無法退款。
+                            <br>若租期剩餘 24 小時以上（月租型除外），可聯繫客服申請退款（三個工作天）；其餘非櫃體或設備問題恕無法退款[cite: 7]。
                         </li>
                         <li><b>Q5：緊急情況需要用鑰匙開櫃？</b>
-                            <br>若遇緊急情況需使用實體緊急鑰匙，事前務必告知收多易客服，且<span style="color: #dc2626; font-weight: bold;">必須在監視器畫面下進行</span>。
+                            <br>若遇緊急情況需使用實體緊急鑰匙，事前務必告知收多易客服，且<span style="color: #dc2626; font-weight: bold;">必須在監視器畫面下進行</span>[cite: 7]。
                         </li>
                     </ul>
                 </div>
