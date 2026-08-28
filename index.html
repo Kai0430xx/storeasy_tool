@@ -9,7 +9,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* 💡 左側導覽列固定設定：不管頁面怎麼滾動，選單永遠固定在左側 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -40,7 +39,6 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        /* 💡 右側主內容區塊 */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
@@ -63,12 +61,11 @@
         .btn-amber:hover { background-color: #d97706; }
         .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
-        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: fixed; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; word-break: break-all; white-space: normal; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
 
-        /* 手機響應式適應 */
         @media (max-width: 768px) {
             aside { position: fixed; left: -260px; top: 0; }
             aside.mobile-open { left: 0; }
@@ -166,15 +163,15 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="text-align: left;">據點名稱</th>
-                                <th style="text-align: left;">倉位編號</th>
-                                <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
-                                <th style="text-align: left;">材積 (材)</th>
-                                <th style="text-align: left;">月繳/原價</th>
-                                <th style="text-align: left;">季繳</th>
-                                <th style="text-align: left;">半年繳</th>
-                                <th id="th-annual-85" style="text-align: left;">年繳 (85折)</th>
-                                <th id="th-annual-80" style="text-align: left;">年繳 (8折)</th>
+                                <th style="width: 100px;">據點名稱</th>
+                                <th style="width: 90px;">倉位編號</th>
+                                <th style="width: 240px;">尺寸 (寬*深*高 m)</th>
+                                <th style="width: 75px;">材積 (材)</th>
+                                <th style="width: 100px;">月繳/原價</th>
+                                <th style="width: 90px;">季繳</th>
+                                <th style="width: 90px;">半年繳</th>
+                                <th id="th-annual-85" style="width: 105px;">年繳 (85折)</th>
+                                <th id="th-annual-80" style="width: 105px;">年繳 (8折)</th>
                             </tr>
                         </thead>
                         <tbody id="storage-table-body">
@@ -217,7 +214,6 @@
                     branchDiscounts[branch] = discountVal;
                     localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
 
-                    // 💡 智慧掃描表頭尋找「材積/才機/立方英尺/立方英呎」所在欄位索引
                     let unitColIdx = -1;
                     for (let r = 0; r < Math.min(jsonSheet.length, 5); r++) {
                         let row = jsonSheet[r];
@@ -372,3 +368,6 @@
     </script>
 </body>
 </html>
+```eof
+
+Your updated `index.html` file has been successfully generated! Let me know if you need any further tweaks.
