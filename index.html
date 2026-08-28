@@ -9,10 +9,25 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
-        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
+        /* 💡 左側導覽列固定設定 */
+        aside { 
+            width: 260px; 
+            background-color: #0f172a; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            z-index: 100; 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: auto;
+        }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
         .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        .mobile-close-btn { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
         
         nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
         .menu-group { display: flex; flex-direction: column; gap: 4px; }
@@ -25,9 +40,12 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
+        /* 💡 右側主內容區塊 */
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
@@ -38,7 +56,7 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
@@ -49,6 +67,18 @@
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
+
+        /* 手機響應式適應 */
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -260px; top: 0; }
+            aside.mobile-open { left: 0; }
+            .mobile-close-btn { display: block; }
+            .menu-toggle-btn { display: inline-block; }
+            header { padding: 12px 16px; }
+            .content-body { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .version { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -57,10 +87,13 @@
         <option value="土城店"><option value="南東店"><option value="民生松江店"><option value="永和店"><option value="延吉店"><option value="逸仙店">
     </datalist>
 
-    <aside class="no-print">
+    <aside id="sidebar">
         <div class="sidebar-header">
-            <h1>收多易迷你倉庫</h1>
-            <p>Storeasy Storage</p>
+            <div>
+                <h1>收多易迷你倉庫</h1>
+                <p>Storeasy Storage</p>
+            </div>
+            <button class="mobile-close-btn" onclick="toggleMobileSidebar()">×</button>
         </div>
         <nav>
             <div class="menu-group">
@@ -85,7 +118,10 @@
 
     <main>
         <header class="no-print">
-            <h2>📦 倉位資料</h2>
+            <div class="header-left">
+                <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
+                <h2>📦 倉位資料</h2>
+            </div>
             <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
@@ -156,6 +192,11 @@
             const now = new Date();
             document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
         })();
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
