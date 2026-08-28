@@ -133,7 +133,7 @@
         <div class="content-body">
             <div class="card">
                 <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                <p>選擇檔案後，請指定該 Excel 中的「月繳/原價」對應欄位，系統將自動計算其餘方案金額</p>
+                <p>系統自動在背景智慧辨識「月繳、月租、原價、金額、定價」欄位，店長直接上傳即可，其餘方案金額由系統自動計算</p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>分店名稱</label>
@@ -146,18 +146,12 @@
                             <option value="0.80">年繳 (8折)</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="grid-column: span 2;">
                         <label>選擇 Excel 檔案</label>
-                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;" onchange="previewExcelColumns()">
-                    </div>
-                    <div class="form-group">
-                        <label style="color: #b45309; font-weight: bold;">🎯 指定「月繳/原價」欄位</label>
-                        <select id="excel-price-col-select" style="background: #fef3c7; font-weight: bold;">
-                            <option value="">-- 請先選擇 Excel 檔案 --</option>
-                        </select>
+                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
                     </div>
                 </div>
-                <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">確認匯入資料</button>
+                <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">匯入資料</button>
             </div>
 
             <div class="card">
@@ -213,12 +207,14 @@
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
-        let currentWorkbookData = null;
 
-        // 💡 當選擇檔案時，自動解析 Excel 標題讓店長挑選價格欄位
-        function previewExcelColumns() {
+        function handleSmartExcelUpload() {
+            const branchInput = document.getElementById('upload-branch-name');
+            const branch = branchInput.value.trim();
+            if (!branch) { alert('請先輸入或選擇分店名稱！'); return; }
+
             const fileInput = document.getElementById('excelFile');
-            if (!fileInput.files || fileInput.files.length === 0) return;
+            if (!fileInput.files || fileInput.files.length === 0) { alert('請先選擇一個 Excel 檔案！'); return; }
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -226,119 +222,114 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const jsonSheet = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
-                    currentWorkbookData = jsonSheet;
+                    const discountVal = document.getElementById('branch-annual-discount').value;
+                    
+                    branchDiscounts[branch] = discountVal;
+                    localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
 
-                    let headerRow = [];
-                    let headerIdx = 0;
-                    for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
+                    // 💡 背景自動掃描標題列：支援「月繳」、「月租」、「原價」、「金額」、「定價」等所有可能寫法
+                    let headerRowIdx = -1;
+                    let priceColIdx = -1;
+                    let sizeColIdx = -1;
+                    let unitColIdx = -1;
+                    let codeColIdx = -1;
+
+                    for (let r = 0; r < Math.min(jsonSheet.length, 10); r++) {
                         let row = jsonSheet[r];
-                        if (row && row.some(cell => cell !== undefined && String(cell).trim() !== '')) {
-                            headerRow = row;
-                            headerIdx = r;
+                        if (!row) continue;
+                        let foundPrice = false;
+
+                        for (let c = 0; c < row.length; c++) {
+                            let val = String(row[c] || '').trim().toLowerCase();
+                            if (!val) continue;
+
+                            if ((val.includes('月繳') || val.includes('月租') || val.includes('原價') || val.includes('金額') || val.includes('定價') || val.includes('牌價')) && priceColIdx === -1) {
+                                priceColIdx = c;
+                                foundPrice = true;
+                            } else if ((val.includes('尺寸') || val.includes('長寬高') || val.includes('規格')) && sizeColIdx === -1) {
+                                sizeColIdx = c;
+                            } else if ((val.includes('材積') || val.includes('才機') || val.includes('才') || val.includes('立方')) && unitColIdx === -1) {
+                                unitColIdx = c;
+                            } else if ((val.includes('編號') || val.includes('倉位') || val.includes('代號')) && codeColIdx === -1) {
+                                codeColIdx = c;
+                            }
+                        }
+                        if (foundPrice) {
+                            headerRowIdx = r;
                             break;
                         }
                     }
 
-                    let selectEl = document.getElementById('excel-price-col-select');
-                    let html = '<option value="">-- 請選擇哪一欄是月繳/原價 --</option>';
-                    headerRow.forEach((colName, idx) => {
-                        let label = colName ? String(colName).trim() : `第 ${idx+1} 欄`;
-                        let selected = (label.includes('月繳') || label.includes('原價') || label.includes('金額') || label.includes('定價')) ? 'selected' : '';
-                        html += `<option value="${idx}" ${selected}>欄位 ${idx+1}: ${label}</option>`;
-                    });
-                    selectEl.innerHTML = html;
-                } catch(err) {
-                    console.error("Preview error:", err);
-                }
+                    let newItems = [];
+                    let startRow = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
+
+                    for (let i = startRow; i < jsonSheet.length; i++) {
+                        let row = jsonSheet[i];
+                        if (!row || row.length === 0) continue;
+
+                        let code = '', size = '-', unit = '-';
+                        let price1 = NaN;
+
+                        // 1. 若背景成功鎖定價格欄位，直接精準抓取該欄數值
+                        if (priceColIdx !== -1 && row[priceColIdx] !== undefined) {
+                            let pVal = Number(String(row[priceColIdx]).replace(/[^\d.]/g, ''));
+                            if (!isNaN(pVal) && pVal > 0) price1 = pVal;
+                        }
+
+                        if (codeColIdx !== -1 && row[codeColIdx] !== undefined) code = String(row[codeColIdx]).trim();
+                        if (sizeColIdx !== -1 && row[sizeColIdx] !== undefined) size = String(row[sizeColIdx]).trim();
+                        if (unitColIdx !== -1 && row[unitColIdx] !== undefined) unit = Number(row[unitColIdx]) || String(row[unitColIdx]).trim();
+
+                        // 2. 智慧備用掃描：防範部分行未對齊的情況
+                        for (let c = 0; c < row.length; c++) {
+                            let val = row[c];
+                            if (val == null) continue;
+                            let sVal = String(val).trim();
+
+                            if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
+                                code = sVal; if (!isNaN(row[c+1])) code += row[c+1];
+                            }
+                            if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
+                                size = sVal;
+                            }
+                            if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 200 && c !== unitColIdx) {
+                                price1 = Number(sVal);
+                            }
+                        }
+
+                        if (code && !isNaN(price1) && price1 > 0) {
+                            newItems.push({
+                                branch: branch, 
+                                code: code, 
+                                size: size !== '-' ? (size.toLowerCase().includes('m') ? size : size + ' m') : '標準尺寸',
+                                unit: unit !== '-' ? unit : '50', 
+                                price1: price1,
+                                price3: Math.round((price1 * 0.95) / 10) * 10,
+                                price6: Math.round((price1 * 0.90) / 10) * 10,
+                                price12_85: Math.round((price1 * 0.85) / 10) * 10,
+                                price12_80: Math.round((price1 * 0.8) / 10) * 10
+                            });
+                        }
+                    }
+
+                    if (newItems.length === 0) { alert('未能抓取到有效資料，請檢查 Excel 標題是否包含「月繳」或「月租」！'); return; }
+                    if (storageData.some(i => i.branch === branch) && confirm(`「${branch}」資料已存在，是否覆蓋？`)) {
+                        storageData = storageData.filter(i => i.branch !== branch);
+                    }
+                    storageData = storageData.concat(newItems);
+                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                    
+                    branchInput.value = '';
+                    fileInput.value = '';
+
+                    const selectEl = document.getElementById('storage-branch-filter');
+                    if (selectEl) selectEl.value = 'all';
+
+                    renderStorageTable();
+                    alert('成功匯入 ' + newItems.length + ' 筆資料！');
+                } catch(err) { alert('解析錯誤：' + err.message); }
             };
             reader.readAsArrayBuffer(file);
-        }
-
-        function handleSmartExcelUpload() {
-            const branchInput = document.getElementById('upload-branch-name');
-            const branch = branchInput.value.trim();
-            if (!branch) { alert('請先輸入或選擇分店名稱！'); return; }
-
-            const priceColIdx = document.getElementById('excel-price-col-select').value;
-            if (priceColIdx === '') { alert('請指定哪一欄是「月繳/原價」！'); return; }
-
-            if (!currentWorkbookData) { alert('請先重新選擇 Excel 檔案！'); return; }
-
-            try {
-                const jsonSheet = currentWorkbookData;
-                const discountVal = document.getElementById('branch-annual-discount').value;
-                branchDiscounts[branch] = discountVal;
-                localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
-
-                let headerRowIdx = -1;
-                for (let r = 0; r < Math.min(jsonSheet.length, 8); r++) {
-                    let row = jsonSheet[r];
-                    if (row && row.some(cell => cell !== undefined && String(cell).trim() !== '')) {
-                        headerRowIdx = r;
-                        break;
-                    }
-                }
-
-                let newItems = [];
-                let startRow = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
-
-                for (let i = startRow; i < jsonSheet.length; i++) {
-                    let row = jsonSheet[i];
-                    if (!row || row.length === 0) continue;
-
-                    let code = '', size = '-', unit = '-';
-                    let price1 = Number(row[Number(priceColIdx)]);
-
-                    // 自動尋找編號、尺寸、材積
-                    for (let c = 0; c < row.length; c++) {
-                        let val = row[c];
-                        if (val == null) continue;
-                        let sVal = String(val).trim();
-
-                        if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
-                            code = sVal; if (!isNaN(row[c+1])) code += row[c+1];
-                        }
-                        if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
-                            size = sVal;
-                        }
-                        if (unit === '-' && !isNaN(Number(sVal)) && Number(sVal) > 0 && Number(sVal) < 2000 && c !== Number(priceColIdx)) {
-                            // 材積通常小於 2000 且不是價格欄位
-                            unit = Number(sVal);
-                        }
-                    }
-
-                    if (code && !isNaN(price1) && price1 > 0) {
-                        newItems.push({
-                            branch: branch, 
-                            code: code, 
-                            size: size !== '-' ? (size.toLowerCase().includes('m') ? size : size + ' m') : '標準尺寸',
-                            unit: unit !== '-' ? unit : '50', 
-                            price1: price1,
-                            price3: Math.round((price1 * 0.95) / 10) * 10,
-                            price6: Math.round((price1 * 0.90) / 10) * 10,
-                            price12_85: Math.round((price1 * 0.85) / 10) * 10,
-                            price12_80: Math.round((price1 * 0.8) / 10) * 10
-                        });
-                    }
-                }
-
-                if (newItems.length === 0) { alert('未能抓取到有效資料，請確認指定的價格欄位是否正確！'); return; }
-                if (storageData.some(i => i.branch === branch) && confirm(`「${branch}」資料已存在，是否覆蓋？`)) {
-                    storageData = storageData.filter(i => i.branch !== branch);
-                }
-                storageData = storageData.concat(newItems);
-                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                
-                branchInput.value = '';
-                document.getElementById('excelFile').value = '';
-                document.getElementById('excel-price-col-select').innerHTML = '<option value="">-- 請先選擇 Excel 檔案 --</option>';
-
-                const selectEl = document.getElementById('storage-branch-filter');
-                if (selectEl) selectEl.value = 'all';
-
-                renderStorageTable();
-                alert('成功匯入 ' + newItems.length + ' 筆資料！');
-            } catch(err) { alert('解析錯誤：' + err.message); }
         }
 
         function updateBranchFilter(selectedVal = 'all') {
