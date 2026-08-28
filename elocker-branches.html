@@ -73,13 +73,13 @@
         .floor-table tr:last-child td { border-bottom: none; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: #fff; width: 100%; max-width: 650px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; animation: modalIn 0.2s ease-out; max-height: 90vh; }
+        .modal-content { background: #fff; width: 100%; max-width: 850px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; animation: modalIn 0.2s ease-out; max-height: 90vh; }
         @keyframes modalIn { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-header { background: #0f172a; color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h3 { font-size: 1.25rem; color: #fbbf24; font-weight: bold; }
         .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; font-weight: bold; }
         .modal-close:hover { color: #fff; }
-        .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+        .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
 
         .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; grid-column: 1 / -1; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
 
@@ -209,6 +209,44 @@
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('mobile-open');
+        }
+
+        // 💡 完整價格對照資料 (來自 快存櫃價格.xlsx)
+        function getElockerPrices() {
+            return {
+                "三民萬家福場": [
+                    { floor: "1F", cat: "S2", h_orig: 50, h_spec: 25, d_orig: 180, d_spec: 140, m_price: "", q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "1F", cat: "S3", h_orig: 60, h_spec: 30, d_orig: 190, d_spec: 150, m_price: "", q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "2F", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "3F", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "4F", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "5F", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" }
+                ],
+                "三重湯城場": [
+                    { floor: "B1", cat: "M1", h_orig: 60, h_spec: 40, d_orig: 280, d_spec: 210, m_price: 690, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "B1", cat: "S2", h_orig: 50, h_spec: 25, d_orig: 180, d_spec: 140, m_price: 490, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" }
+                ],
+                "中和威力場": [
+                    { floor: "6F", cat: "L", h_orig: 150, h_spec: 90, d_orig: 560, d_spec: 490, m_price: 2100, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "6F", cat: "M", h_orig: 70, h_spec: 50, d_orig: 300, d_spec: 260, m_price: 1245, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "B1", cat: "S0", h_orig: 20, h_spec: 10, d_orig: 100, d_spec: 90, m_price: "", q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "B1", cat: "S1", h_orig: 40, h_spec: 20, d_orig: 170, d_spec: 130, m_price: "", q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" }
+                ],
+                "台北小巨蛋場": [
+                    { floor: "9號出入口", cat: "L", h_orig: 150, h_spec: 90, d_orig: 560, d_spec: 490, m_price: 2100, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "9號出入口", cat: "M", h_orig: 70, h_spec: 50, d_orig: 300, d_spec: 260, m_price: 1245, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "9號出入口", cat: "S2", h_orig: 50, h_spec: 25, d_orig: 180, d_spec: 140, m_price: 490, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "西側廁所旁", cat: "L", h_orig: 150, h_spec: 90, d_orig: 560, d_spec: 490, m_price: 2100, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "西側廁所旁", cat: "M", h_orig: 70, h_spec: 50, d_orig: 300, d_spec: 260, m_price: 1245, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "西側廁所旁", cat: "S2", h_orig: 50, h_spec: 25, d_orig: 180, d_spec: 140, m_price: 490, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "冰上樂園2F女廁旁", cat: "S2", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: "", q_price: "", half_price: "", year_price: "", m_count_orig: 50, m_count_spec: 40, m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "冰上樂園2F女廁旁", cat: "S3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: "", q_price: "", half_price: "", year_price: "", m_count_orig: 60, m_count_spec: 50, m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "303~386櫃", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "001~124櫃", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "125~302櫃", cat: "C3", h_orig: "", h_spec: "", d_orig: "", d_spec: "", m_price: 2280, q_price: 6510, half_price: 12300, year_price: 23280, m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" },
+                    { floor: "電梯旁", cat: "L", h_orig: 150, h_spec: 90, d_orig: 560, d_spec: 490, m_price: 2100, q_price: "", half_price: "", year_price: "", m_count_orig: "", m_count_spec: "", m_h_orig: "", m_h_spec: "", m_d_orig: "", m_d_spec: "" }
+                ]
+            };
         }
 
         // 💡 100% 嚴格對應 Excel 總表內各樓層真實勾選 (V) 的租期資料
@@ -674,8 +712,8 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false },
+                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -685,7 +723,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -707,7 +745,7 @@
                     rentTypeText: "僅 APP 承租",
                     floors: [
                         { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
                     ]
                 },
                 {
@@ -717,7 +755,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
                     ]
                 },
                 {
@@ -960,21 +998,53 @@
             let modalFloorsHtml = b.floors.map(function(f) {
                 let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
                 let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
-                return '<tr><td style="font-weight:bold; width: 150px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
+                return '<tr><td style="font-weight:bold; width: 120px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
             }).join('');
+
+            // 💡 取得該據點的價格資料
+            let pricesMap = getElockerPrices();
+            let branchPrices = pricesMap[branchName] || [];
+            
+            let priceTableHtml = '';
+            if (branchPrices.length > 0) {
+                let rowsHtml = branchPrices.map(function(p) {
+                    return '<tr>' +
+                        '<td style="font-weight:bold;">' + (p.floor || '-') + '</td>' +
+                        '<td style="color: #b45309; font-weight:bold;">' + (p.cat || '-') + '</td>' +
+                        '<td>' + (p.h_orig !== '' ? p.h_orig : '-') + ' / <span style="color:#059669;">' + (p.h_spec !== '' ? p.h_spec : '-') + '</span></td>' +
+                        '<td>' + (p.d_orig !== '' ? p.d_orig : '-') + ' / <span style="color:#059669;">' + (p.d_spec !== '' ? p.d_spec : '-') + '</span></td>' +
+                        '<td>' + (p.m_price !== '' ? 'NT$ ' + Number(p.m_price).toLocaleString() : '-') + '</td>' +
+                        '<td>' + (p.q_price !== '' ? 'NT$ ' + Number(p.q_price).toLocaleString() : '-') + '</td>' +
+                        '<td>' + (p.half_price !== '' ? 'NT$ ' + Number(p.half_price).toLocaleString() : '-') + '</td>' +
+                        '<td>' + (p.year_price !== '' ? 'NT$ ' + Number(p.year_price).toLocaleString() : '-') + '</td>' +
+                        '<td>' + (p.m_count_spec !== '' ? 'NT$ ' + Number(p.m_count_spec).toLocaleString() : (p.m_count_orig !== '' ? 'NT$ ' + Number(p.m_count_orig).toLocaleString() : '-')) + '</td>' +
+                    '</tr>';
+                }).join('');
+
+                priceTableHtml = '<div style="margin-top: 16px;">' +
+                    '<strong style="font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">💰 各櫃型價格對照表：</strong>' +
+                    '<div style="overflow-x: auto;"><table class="floor-table">' +
+                        '<thead><tr><th>樓層</th><th>櫃型</th><th>時租(原/特)</th><th>日租(原/特)</th><th>月租</th><th>季租</th><th>半年租</th><th>年租</th><th>機台計次特價</th></tr></thead>' +
+                        '<tbody>' + rowsHtml + '</tbody>' +
+                    '</table></div>' +
+                '</div>';
+            } else {
+                priceTableHtml = '<div style="margin-top: 16px; font-size: 0.85rem; color: #94a3b8;">此據點目前無詳細價格對照資料</div>';
+            }
 
             let modalBody = document.getElementById('modal-body-content');
             modalBody.innerHTML = 
                 '<div class="info-row" style="font-size: 1rem;"><strong>📍 完整地址：</strong><span>' + b.address + '</span></div>' +
                 '<div class="info-row" style="font-size: 1rem;"><strong>🕒 進出時間：</strong><span>' + b.hours + '</span></div>' +
                 '<div class="info-row" style="font-size: 1rem;"><strong>📱 承租方式：</strong><span style="color: #059669; font-weight: bold;">' + b.rentTypeText + '</span></div>' +
-                '<div style="margin-top: 12px;">' +
+                '<div style="margin-top: 8px;">' +
                     '<strong style="font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">📋 各樓層櫃位編碼與詳細配置：</strong>' +
                     '<table class="floor-table">' +
                         '<thead><tr><th>樓層 / 編碼</th><th>位置說明</th></tr></thead>' +
                         '<tbody>' + modalFloorsHtml + '</tbody>' +
                     '</table>' +
-                '</div>';
+                '</div>' +
+                priceTableHtml;
 
             document.getElementById('branch-modal').style.display = 'flex';
         }
