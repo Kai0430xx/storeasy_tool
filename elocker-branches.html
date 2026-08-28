@@ -176,7 +176,7 @@
             }
         });
 
-        // 💡 嚴格對應 Excel 檔案內各樓層真實勾選的租期資料
+        // 💡 100% 嚴格對應 Excel 檔案內各樓層真實勾選 (V) 的租期資料
         function getElockerData() {
             return [
                 {
@@ -281,7 +281,7 @@
                     rentTypeText: "僅 APP 承租",
                     floors: [
                         { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
+                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -692,7 +692,7 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true },
+                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
                         { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
                     ]
                 },
@@ -703,7 +703,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "OBB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "3F", code: "OBB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -713,7 +713,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "OCA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "2F", code: "OCA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -723,7 +723,7 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "ODA", desc: "美食街旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "ODA", desc: "美食街旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -744,7 +744,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "OFA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "OFA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -754,8 +754,8 @@
                     hours: "11:00-22:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
+                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -765,7 +765,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "TAA", desc: "台南民生櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "TAA", desc: "台南民生櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
@@ -785,7 +785,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
                     ]
                 },
                 {
