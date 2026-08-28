@@ -119,8 +119,8 @@
             <div class="menu-group" style="margin-top: 8px;">
                 <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃</span><span class="arrow">▼</span></button>
                 <div class="menu-items">
-                    <a href="elocker-branches.html" class="sub-btn active">🏢 各據點資訊</a>
-                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
+                    <a href="elocker-branches.html" class="sub-btn active">🏢 各據點資訊[cite: 1]</a>
+                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學[cite: 2]</a>
                     <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
                 </div>
             </div>
@@ -903,8 +903,8 @@
                         if (selectedTerm === 'count') matchTerm = f.count;
                         else if (selectedTerm === 'hourly') matchTerm = f.hourly;
                         else if (selectedTerm === 'monthly') matchTerm = f.monthly;
-                        else if (selectedTerm === 'quarter') matchTerm = f.quarter || f.halfyear || f.year;
-                        else if (selectedTerm === 'halfyear') matchTerm = f.halfyear || f.year;
+                        else if (selectedTerm === 'quarter') matchTerm = f.quarter;
+                        else if (selectedTerm === 'halfyear') matchTerm = f.halfyear;
                         else if (selectedTerm === 'year') matchTerm = f.year;
 
                         return matchType && matchTerm;
