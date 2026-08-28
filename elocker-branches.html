@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 快存櫃各據點資訊</title>
-    <!-- 💡 優先執行登入驗證 -->
-    <script src="login.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
@@ -18,10 +16,9 @@
             flex-direction: column; 
             flex-shrink: 0; 
             box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
-            z-index: 1000; 
-            position: fixed; 
+            z-index: 100; 
+            position: sticky; 
             top: 0; 
-            left: 0;
             height: 100vh; 
             overflow-y: auto;
         }
@@ -41,14 +38,11 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
-        .user-info { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; color: #475569; }
-        .logout-btn { background: #fee2e2; color: #dc2626; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
-        .logout-btn:hover { background: #fecaca; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
@@ -89,20 +83,19 @@
         .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; grid-column: 1 / -1; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
 
         @media (max-width: 768px) {
-            aside { transform: translateX(-100%); }
-            aside.mobile-open { transform: translateX(0); }
+            aside { position: fixed; left: -260px; top: 0; }
+            aside.mobile-open { left: 0; }
             .mobile-close-btn { display: block; }
             .menu-toggle-btn { display: inline-block; }
-            main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
+            .filter-card { grid-template-columns: 1fr; }
+            .branches-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
     </style>
 </head>
 <body>
-
-    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
     <aside id="sidebar">
         <div class="sidebar-header">
@@ -114,18 +107,18 @@
         </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▶</span></button>
-                <div class="menu-items" style="display: none;">
+                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▶</span></button>
+                <div class="menu-items">
                     <a href="index.html" class="sub-btn">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
                     <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃</span><span class="arrow">▼</span></button>
+                <button type="button" class="menu-category"><span>🗄️ 快存櫃</span><span>▼</span></button>
                 <div class="menu-items">
-                    <a href="elocker-branches.html" class="sub-btn active">🏢 各據點資訊[cite: 1]</a>
-                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學[cite: 2]</a>
+                    <a href="elocker-branches.html" class="sub-btn active">🏢 各據點資訊</a>
+                    <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
                     <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
                 </div>
             </div>
@@ -139,14 +132,11 @@
                 <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
                 <h2>🏢 各據點資訊</h2>
             </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <div class="user-info">使用者：<span id="current-username" style="color: #0f172a;">---</span></div>
-                <button type="button" class="logout-btn" onclick="StoreasyAuth.logout()">登出</button>
-                <div class="version" id="system-version">系統版本：載入中...</div>
-            </div>
+            <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
         <div class="content-body">
+            <!-- 篩選與搜尋工具列 -->
             <div class="filter-card">
                 <div class="filter-group">
                     <label>🔍 關鍵字搜尋（據點 / 縣市 / 編碼）：</label>
@@ -181,20 +171,27 @@
                 </div>
             </div>
 
-            <div id="branches-container" class="branches-grid"></div>
+            <!-- 據點卡片列表容器 -->
+            <div id="branches-container" class="branches-grid">
+                <!-- 動態生成 -->
+            </div>
         </div>
     </main>
 
+    <!-- 據點詳細資訊彈出視窗 (Modal) -->
     <div id="branch-modal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h3 id="modal-title">據點名稱</h3>
                 <button class="modal-close" onclick="closeModal()">×</button>
             </div>
-            <div class="modal-body" id="modal-body-content"></div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- 動態載入詳細內容 -->
+            </div>
         </div>
     </div>
 
+    <script src="login.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             try {
@@ -202,10 +199,6 @@
                 const verEl = document.getElementById('system-version');
                 if (verEl) {
                     verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
-                }
-                const userEl = document.getElementById('current-username');
-                if (userEl && window.StoreasyAuth) {
-                    userEl.innerText = window.StoreasyAuth.getCurrentUser();
                 }
                 initElockerBranches();
             } catch(e) {
@@ -215,23 +208,10 @@
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
         }
 
-        function toggleMenu(btn) {
-            const items = btn.nextElementSibling;
-            const arrow = btn.querySelector('.arrow');
-            if (items.style.display === 'none') {
-                items.style.display = 'flex';
-                arrow.innerText = '▼';
-            } else {
-                items.style.display = 'none';
-                arrow.innerText = '▶';
-            }
-        }
-
+        // 💡 100% 嚴格對應 Excel 總表內各樓層真實勾選 (V) 的租期資料
         function getElockerData() {
             return [
                 {
@@ -565,7 +545,7 @@
                 },
                 {
                     name: "新店萬家福場",
-                    address: "新北市新店區中興路三段1號",
+                    address: "新北市新店區中興路3段1號",
                     city: "新北市",
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
@@ -903,6 +883,7 @@
                 list = list.filter(function(b) { return b.name === selectedBranch; });
             }
 
+            // 💡 嚴格依照 Excel 檔案內各樓層真實勾選 (V) 進行過濾
             if (selectedType || selectedTerm) {
                 list = list.filter(function(b) {
                     return b.floors.some(function(f) {
