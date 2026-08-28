@@ -9,7 +9,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* 💡 左側導覽列固定設定 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -40,7 +39,6 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        /* 💡 右側主內容區塊 */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
@@ -67,12 +65,14 @@
 
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
         .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
-        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
+        
+        /* 💡 修正請款單客戶資料區塊排版 */
+        .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
+        
         .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
-        .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
+        .notes-box { font-size: 0.75rem; color: #64748b; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
-        /* 手機響應式適應 */
         @media (max-width: 768px) {
             aside { position: fixed; left: -260px; top: 0; }
             aside.mobile-open { left: 0; }
@@ -98,7 +98,17 @@
             }
             #invoice-preview h1 { font-size: 1.3rem !important; }
             #invoice-preview h2 { font-size: 1rem !important; }
-            #invoice-preview .preview-info { padding: 10px !important; margin-bottom: 15px !important; font-size: 8pt !important; }
+            /* 💡 列印時固定 .preview-info 左右排版且限制寬度分佈 */
+            #invoice-preview .preview-info { 
+                display: grid !important; 
+                grid-template-columns: 1fr 1fr !important; 
+                gap: 10px 24px !important; 
+                padding: 12px !important; 
+                margin-bottom: 15px !important; 
+                font-size: 8pt !important; 
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+            }
             #invoice-preview table { font-size: 7.5pt !important; margin-top: 6px !important; margin-bottom: 15px !important; }
             #invoice-preview th, #invoice-preview td { padding: 5px 4px !important; }
             #invoice-preview .summary-box { padding: 10px !important; font-size: 8.5pt !important; margin-top: 15px !important; margin-bottom: 15px !important; }
