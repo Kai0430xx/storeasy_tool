@@ -64,6 +64,7 @@
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        /* 💡 只有尺寸欄位允許換行，其他如金額、編號等絕對維持單行 */
         td.size-col { white-space: normal; word-break: break-word; min-width: 220px; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
@@ -79,7 +80,6 @@
             main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
-            .form-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
     </style>
@@ -102,7 +102,7 @@
         </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▼</span></button>
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn active">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
@@ -110,8 +110,8 @@
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category"><span>🗄️ 快存櫃 (eLocker)</span><span>▶</span></button>
-                <div class="menu-items">
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃 (eLocker)</span><span class="arrow">▶</span></button>
+                <div class="menu-items" style="display: none;">
                     <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
                     <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
                     <a href="elocker-data.html" class="sub-btn">⚙️ 管理資料</a>
@@ -133,7 +133,7 @@
         <div class="content-body">
             <div class="card">
                 <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                <p>系統自動在背景智慧辨識「月繳、月租、原價、金額、定價」欄位，店長直接上傳即可，其餘方案金額由系統自動計算</p>
+                <p>系統自動在背景智慧辨識「月繳、月租、原價、金額、定價」欄位，店長直接上傳即可精準匯入</p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>分店名稱</label>
@@ -205,6 +205,19 @@
             overlay.classList.toggle('active');
         }
 
+        // 💡 側邊選單收合展開切換函數
+        function toggleMenu(btn) {
+            const items = btn.nextElementSibling;
+            const arrow = btn.querySelector('.arrow');
+            if (items.style.display === 'none') {
+                items.style.display = 'flex';
+                arrow.innerText = '▼';
+            } else {
+                items.style.display = 'none';
+                arrow.innerText = '▶';
+            }
+        }
+
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
 
@@ -227,7 +240,7 @@
                     branchDiscounts[branch] = discountVal;
                     localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
 
-                    // 💡 背景自動掃描標題列：支援「月繳」、「月租」、「原價」、「金額」、「定價」等所有可能寫法
+                    // 💡 背景自動智慧辨識「月繳、月租、原價、金額、定價」欄位
                     let headerRowIdx = -1;
                     let priceColIdx = -1;
                     let sizeColIdx = -1;
@@ -270,7 +283,6 @@
                         let code = '', size = '-', unit = '-';
                         let price1 = NaN;
 
-                        // 1. 若背景成功鎖定價格欄位，直接精準抓取該欄數值
                         if (priceColIdx !== -1 && row[priceColIdx] !== undefined) {
                             let pVal = Number(String(row[priceColIdx]).replace(/[^\d.]/g, ''));
                             if (!isNaN(pVal) && pVal > 0) price1 = pVal;
@@ -280,7 +292,6 @@
                         if (sizeColIdx !== -1 && row[sizeColIdx] !== undefined) size = String(row[sizeColIdx]).trim();
                         if (unitColIdx !== -1 && row[unitColIdx] !== undefined) unit = Number(row[unitColIdx]) || String(row[unitColIdx]).trim();
 
-                        // 2. 智慧備用掃描：防範部分行未對齊的情況
                         for (let c = 0; c < row.length; c++) {
                             let val = row[c];
                             if (val == null) continue;
