@@ -9,7 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* 💡 左側導覽列固定設定 */
+        /* 💡 左側導覽列固定設定：不管頁面怎麼滾動，選單永遠固定在左側 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -128,7 +128,7 @@
         <div class="content-body">
             <div class="card">
                 <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                <p>系統會自動辨識編號,尺寸,材積,原價與各方案金額，並可指定該店預設年繳折扣方案</p>
+                <p>系統會自動辨識編號,尺寸,材積(支援 材積/才機/立方英尺 等欄位),原價與各方案金額，並可指定該店預設年繳折扣方案</p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>分店名稱</label>
@@ -217,11 +217,33 @@
                     branchDiscounts[branch] = discountVal;
                     localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
 
+                    // 💡 智慧掃描表頭尋找「材積/才機/立方英尺/立方英呎」所在欄位索引
+                    let unitColIdx = -1;
+                    for (let r = 0; r < Math.min(jsonSheet.length, 5); r++) {
+                        let row = jsonSheet[r];
+                        if (!row) continue;
+                        for (let c = 0; c < row.length; c++) {
+                            let cellStr = String(row[c] || '').trim().toLowerCase();
+                            if (cellStr.includes('材積') || cellStr.includes('才機') || cellStr.includes('材') || cellStr.includes('立方') || cellStr.includes('cu') || cellStr.includes('ft')) {
+                                unitColIdx = c;
+                                break;
+                            }
+                        }
+                        if (unitColIdx !== -1) break;
+                    }
+
                     let newItems = [];
                     for (let i = 0; i < jsonSheet.length; i++) {
                         let row = jsonSheet[i];
                         if (!row || row.length === 0) continue;
                         let code = '', size = '-', unit = '-', price1 = NaN;
+
+                        if (unitColIdx !== -1 && row[unitColIdx] !== undefined && row[unitColIdx] !== null && String(row[unitColIdx]).trim() !== '') {
+                            let uVal = Number(row[unitColIdx]);
+                            if (!isNaN(uVal)) unit = uVal;
+                            else unit = String(row[unitColIdx]).trim();
+                        }
+
                         for (let c = 0; c < row.length; c++) {
                             let val = row[c];
                             if (val == null) continue;
@@ -232,8 +254,11 @@
                                 size = sVal;
                             } else if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 300 && Number(sVal) < 100000) {
                                 price1 = Number(sVal);
+                            } else if (unit === '-' && unitColIdx === -1 && !isNaN(Number(sVal)) && Number(sVal) > 0 && Number(sVal) < 500) {
+                                unit = Number(sVal);
                             }
                         }
+
                         if (code && !isNaN(price1) && price1 > 200) {
                             newItems.push({
                                 branch: branch, 
