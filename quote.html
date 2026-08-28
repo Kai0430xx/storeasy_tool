@@ -9,10 +9,25 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
-        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
+        /* 💡 左側導覽列固定設定 */
+        aside { 
+            width: 260px; 
+            background-color: #0f172a; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            z-index: 100; 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: auto;
+        }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
         .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        .mobile-close-btn { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
         
         nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
         .menu-group { display: flex; flex-direction: column; gap: 4px; }
@@ -25,9 +40,12 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
+        /* 💡 右側主內容區塊 */
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
@@ -36,7 +54,7 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
         .btn-dark { background-color: #0f172a; color: #fff; }
@@ -53,6 +71,20 @@
         .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
         .notes-box { font-size: 0.75rem; color: #475569; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
+
+        /* 手機響應式適應 */
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -260px; top: 0; }
+            aside.mobile-open { left: 0; }
+            .mobile-close-btn { display: block; }
+            .menu-toggle-btn { display: inline-block; }
+            header { padding: 12px 16px; }
+            .content-body { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .preview-box { padding: 20px; }
+            .preview-info { grid-template-columns: 1fr; }
+            .version { display: none; }
+        }
 
         @media print {
             body * { visibility: hidden; }
@@ -76,10 +108,13 @@
 </head>
 <body>
 
-    <aside class="no-print">
+    <aside id="sidebar">
         <div class="sidebar-header">
-            <h1>收多易迷你倉庫</h1>
-            <p>Storeasy Storage</p>
+            <div>
+                <h1>收多易迷你倉庫</h1>
+                <p>Storeasy Storage</p>
+            </div>
+            <button class="mobile-close-btn" onclick="toggleMobileSidebar()">×</button>
         </div>
         <nav>
             <div class="menu-group">
@@ -104,7 +139,10 @@
 
     <main>
         <header class="no-print">
-            <h2>📄 生成報價單</h2>
+            <div class="header-left">
+                <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
+                <h2>📄 生成報價單</h2>
+            </div>
             <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
@@ -252,6 +290,11 @@
             }
         });
 
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
         let selectedQuoteItems = {};
@@ -379,14 +422,12 @@
                 let term = item.term || '12_85';
                 if (term === 'none') return;
 
-                // 💡 關鍵：依據店長選擇的方案動態決定報價單表格中的「年繳/月」顯示價格
                 let displayAnnualPrice = 0;
                 if (term === '12_80') {
                     displayAnnualPrice = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
                 } else if (term === '12_85') {
                     displayAnnualPrice = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
                 } else {
-                    // 若選月繳、季繳、半年繳，表格年繳欄位預設顯示分店原本預設的年繳金額
                     let bDisc = branchDiscounts[item.branch];
                     let defaultTableRate = (bDisc === '0.80') ? 0.8 : 0.85;
                     displayAnnualPrice = Math.round((item.price1 * defaultTableRate) / 10) * 10;
