@@ -8,7 +8,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* 💡 左側導覽列固定設定：不管頁面怎麼滾動，選單永遠固定在左側 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -17,9 +16,10 @@
             flex-direction: column; 
             flex-shrink: 0; 
             box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
-            z-index: 100; 
-            position: sticky; 
+            z-index: 1000; 
+            position: fixed; 
             top: 0; 
+            left: 0;
             height: 100vh; 
             overflow-y: auto;
         }
@@ -39,8 +39,7 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        /* 💡 右側主內容區塊 */
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -48,58 +47,30 @@
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         
-        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; align-items: center; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; }
-        .filter-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        .filter-group input, .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
 
-        .branches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .branch-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-        .branch-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); border-color: #cbd5e1; }
-        
-        .branch-header { background: #0f172a; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .branch-title { font-size: 1.1rem; font-weight: bold; color: #fbbf24; }
-        .branch-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; background: #059669; color: #fff; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
+        .sidebar-overlay.active { display: block; }
 
-        .branch-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-        .info-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9rem; color: #475569; }
-        .info-row strong { color: #1e293b; min-width: 70px; flex-shrink: 0; }
-
-        .code-tag { background: #fef3c7; color: #b45309; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #fde68a; display: inline-block; }
-
-        .floor-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
-        .floor-table th, .floor-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        .floor-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
-        .floor-table tr:last-child td { border-bottom: none; }
-        
-        /* 彈出視窗樣式 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: #fff; width: 100%; max-width: 650px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; animation: modalIn 0.2s ease-out; max-height: 90vh; }
-        @keyframes modalIn { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header { background: #0f172a; color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { font-size: 1.25rem; color: #fbbf24; font-weight: bold; }
-        .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; font-weight: bold; }
-        .modal-close:hover { color: #fff; }
-        .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
-
-        .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; grid-column: 1 / -1; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
-
-        /* 手機響應式適應 */
         @media (max-width: 768px) {
-            aside { position: fixed; left: -260px; top: 0; }
-            aside.mobile-open { left: 0; }
+            aside { transform: translateX(-100%); }
+            aside.mobile-open { transform: translateX(0); }
             .mobile-close-btn { display: block; }
             .menu-toggle-btn { display: inline-block; }
+            main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
-            .filter-card { grid-template-columns: 1fr; }
-            .branches-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
     </style>
 </head>
 <body>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
     <aside id="sidebar">
         <div class="sidebar-header">
@@ -111,15 +82,15 @@
         </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▶</span></button>
-                <div class="menu-items">
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>📦 迷你倉庫</span><span class="arrow">▶</span></button>
+                <div class="menu-items" style="display: none;">
                     <a href="index.html" class="sub-btn">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
                     <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category"><span>🗄️ 快存櫃 (eLocker)</span><span>▼</span></button>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃 (eLocker)</span><span class="arrow">▼</span></button>
                 <div class="menu-items">
                     <a href="elocker-branches.html" class="sub-btn active">🏢 各據點資訊</a>
                     <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
@@ -131,862 +102,77 @@
     </aside>
 
     <main>
-        <header>
+        <header class="no-print">
             <div class="header-left">
                 <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
-                <h2>🏢 各據點資訊</h2>
+                <h2>🏢 快存櫃 (eLocker) 各據點資訊</h2>
             </div>
             <div class="version" id="system-version">系統版本：載入中...</div>
         </header>
 
         <div class="content-body">
-            <!-- 篩選與搜尋工具列 -->
-            <div class="filter-card">
-                <div class="filter-group">
-                    <label>🔍 關鍵字搜尋（據點 / 縣市 / 編碼）：</label>
-                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 桂林、台北 或 AAA">
+            <div class="card">
+                <h3 style="margin-bottom: 12px; color: #334155;">📍 快存櫃據點列表</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>據點名稱</th>
+                                <th>地址</th>
+                                <th>櫃體數量</th>
+                                <th>營運狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="elocker-branch-tbody">
+                            <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 24px;">載入中...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="filter-group">
-                    <label>🏢 選擇據點篩選：</label>
-                    <select id="branch-select" onchange="renderBranches()">
-                        <option value="">-- 全部據點 --</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>📱 承租方式篩選：</label>
-                    <select id="type-select" onchange="renderBranches()">
-                        <option value="">-- 全部承租方式 --</option>
-                        <option value="machine">僅機台承租</option>
-                        <option value="app">僅 APP 承租</option>
-                        <option value="both">機台 + APP 承租</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>📅 可承租租期篩選：</label>
-                    <select id="term-select" onchange="renderBranches()">
-                        <option value="">-- 全部租期 --</option>
-                        <option value="count">可計次</option>
-                        <option value="hourly">可時租 / 日租</option>
-                        <option value="monthly">可月繳</option>
-                        <option value="quarter">可季繳</option>
-                        <option value="halfyear">可半年租</option>
-                        <option value="year">可年租</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 據點卡片列表容器 -->
-            <div id="branches-container" class="branches-grid">
-                <!-- 動態生成 -->
             </div>
         </div>
     </main>
 
-    <!-- 據點詳細資訊彈出視窗 (Modal) -->
-    <div id="branch-modal" class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3 id="modal-title">據點名稱</h3>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-body" id="modal-body-content">
-                <!-- 動態載入詳細內容 -->
-            </div>
-        </div>
-    </div>
-
     <script src="login.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            try {
-                const now = new Date();
-                const verEl = document.getElementById('system-version');
-                if (verEl) {
-                    verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
-                }
-                initElockerBranches();
-            } catch(e) {
-                console.error("Initialization error:", e);
-            }
-        });
+        (function() {
+            const now = new Date();
+            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
+        })();
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
         }
 
-        // 💡 100% 嚴格對應 Excel 檔案內各樓層真實勾選 (V) 的租期資料
-        function getElockerData() {
-            return [
-                {
-                    name: "桂林萬家福場",
-                    address: "台北市萬華區桂林路1號",
-                    city: "台北市",
-                    hours: "24hr",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F-1", code: "AAA", desc: "手推車區", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "5F-1", code: "AAB", desc: "哺乳室旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "6F-1", code: "AAC", desc: "退稅服務中心", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "6F-2", code: "AAD", desc: "化妝室旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台北小巨蛋場",
-                    address: "台北市松山區南京東路四段2號",
-                    city: "台北市",
-                    hours: "10:00-21:00",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "9號出入口", code: "ABA", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "西側廁所旁", code: "ABB", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "303~386櫃", code: "ABD", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "001~124櫃", code: "ABE", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "125~302櫃", code: "", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "電梯旁", code: "ABF", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "民生松江場",
-                    address: "台北市中山區民生東路二段119號B1",
-                    city: "台北市",
-                    hours: "07:00-22:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "ACA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "南港車站場",
-                    address: "台北市南港區忠孝東路七段371號",
-                    city: "台北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B2-1", code: "ADA", desc: "臺鐵南港站西閘門前 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1AF", code: "ADB", desc: "近南側廣場出口 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1AF-2", code: "ADC", desc: "計程車招呼站旁 (11:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "南港北流場",
-                    address: "台北市南港區忠孝東路七段99號1F",
-                    city: "台北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "天母德行場",
-                    address: "台北市士林區德行西路47號1F(萬家福天母店內)",
-                    city: "台北市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F-1", code: "AFA", desc: "萬家福天母店內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台北車站場",
-                    address: "台北市中正區忠孝西路一段50號(亞洲廣場大樓)",
-                    city: "台北市",
-                    hours: "24hr",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "B1-1", code: "AGA", desc: "收多易台北車站店前", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B3-1", code: "AGB", desc: "站前地下街Z2出口處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "重慶萬家福場",
-                    address: "台北市大同區重慶北路二段171號",
-                    city: "台北市",
-                    hours: "09:00-24:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "AIA", desc: "服務台旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B2", code: "AIB", desc: "男廁旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "信義逸仙場",
-                    address: "台北市信義區逸仙路26巷1號",
-                    city: "台北市",
-                    hours: "24hr",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "貓空纜車場",
-                    address: "台北市文山區新光路二段8號",
-                    city: "台北市",
-                    hours: "06:00-24:00",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F-1", code: "AKA", desc: "動物園站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "兒童新樂園場",
-                    address: "臺北市士林區承德路5段55號",
-                    city: "台北市",
-                    hours: "依樂園開放時間為主",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F-A", code: "ALA", desc: "服務中心對面", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "ALB", desc: "沙坑", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "北投會館場",
-                    address: "臺北市北投區大業路527巷88號",
-                    city: "台北市",
-                    hours: "平日 15:00-22:00 / 假日 09:00-22:00",
-                    rentTypeText: "僅機台承租",
-                    floors: [
-                        { floor: "B1", code: "AMA", desc: "運動教室", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "南港萬家福場",
-                    address: "台北市南港區南港路二段146號B1",
-                    city: "台北市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1-1", code: "ANA", desc: "電梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-2", code: "ANB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "內湖萬家福場",
-                    address: "台北市內湖區民善街88號",
-                    city: "台北市",
-                    hours: "09:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "AOA", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "AOB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "三民萬家福場",
-                    address: "台北市松山區三民路160號",
-                    city: "台北市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "APA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "APB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "3F", code: "APC", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "4F", code: "APD", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "5F", code: "APE", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "洲子美食街場",
-                    address: "台北市內湖區瑞光路517號",
-                    city: "台北市",
-                    hours: "07:00-21:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "AQA", desc: "7-11旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "文山興隆場",
-                    address: "台北市文山區興隆路一段15號3F",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "3F", code: "ARA", desc: "大門旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "南港興華場",
-                    address: "台北市南港區南港路二段20巷5號B2",
-                    city: "台北市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B2", code: "ASA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "文山萬慶場",
-                    address: "台北市文山區萬慶街27號B1",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "ATA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "士林劍潭場",
-                    address: "臺北市士林區承德路四段179巷7號",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "AUA", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "峨眉停車場",
-                    address: "臺北市萬華區峨眉街83號",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AVB", desc: "聯合醫院對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-C", code: "AVC", desc: "靠近就業服務站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-D", code: "AVD", desc: "誠品對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-E", code: "AVE", desc: "YouBike前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "天母圓環場",
-                    address: "臺北市士林區中山北路七段154巷6號2樓",
-                    city: "台北市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F", code: "AWA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "松山新矽谷場",
-                    address: "台北市南港區八德路四段768巷9號2F-1",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F", code: "AXA", desc: "三店門口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "松山文創場",
-                    address: "台北市信義區光復南路133號",
-                    city: "台北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "南門場",
-                    address: "臺北市中正區延平南路189號B1",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "AZA", desc: "收多易南門店門口", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台北京站場",
-                    address: "臺北市大同區市民大道一段209號",
-                    city: "台北市",
-                    hours: "24小時",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "大安場",
-                    address: "臺北市大安區信義路3段153號9樓",
-                    city: "台北市",
-                    hours: "06:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "9F", code: "BBA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "中和威力場",
-                    address: "新北市中和區中山路二段291號",
-                    city: "新北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "三重湯城場",
-                    address: "新北市三重區重新路5段609巷10號B1(三重湯城廣場內)",
-                    city: "新北市",
-                    hours: "24hr",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "林口萬家福場",
-                    address: "新北市林口區文化二路一段559號B1",
-                    city: "新北市",
-                    hours: "08:30-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "IDA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "新店萬家福場",
-                    address: "新北市新店區中興路三段1號",
-                    city: "新北市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F", code: "IEA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "汐科萬家福場",
-                    address: "新北市汐止區新台五路一段99號B1",
-                    city: "新北市",
-                    hours: "09:30-22:30",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "蘆洲萬家福場",
-                    address: "新北市三重區五華街282號",
-                    city: "新北市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "5F", code: "IGB", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "6F", code: "IGC", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "淡新萬家福場",
-                    address: "新北市淡水區中山北路二段383號",
-                    city: "New Taipei City",
-                    hours: "09:00-22:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "IHA", desc: "賣場出入口", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B2", code: "IHB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "新店安康場",
-                    address: "新北市新店區安康路二段196號B1(樂家康安康店內)",
-                    city: "新北市",
-                    hours: "07:00-01:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "IIA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "海洋都心場",
-                    address: "新北市淡水區新市三路二段213號",
-                    city: "新北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F", code: "IJA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "板橋第一運動場",
-                    address: "新北市板橋區漢生東路278號",
-                    city: "新北市",
-                    hours: "05:00-22:00",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F", code: "IKA", desc: "哺乳室前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "耕莘專校場",
-                    address: "新北市新店區民族路112號",
-                    city: "新北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "ILA", desc: "聖母樓一樓走廊", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "新莊民安場",
-                    address: "新北市新莊區民安路179號B1",
-                    city: "新北市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "IMA", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "土城萬家福場",
-                    address: "新北市土城區青雲路152號",
-                    city: "新北市",
-                    hours: "10:00-22:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "INA", desc: "往1F手扶梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "板橋愛買場",
-                    address: "新北市板橋區華貴里貴興路101號",
-                    city: "新北市",
-                    hours: "09:00-22:30",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "IPA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "桃園中壢場",
-                    address: "桃園市中壢區中山東路二段510號(萬家福中壢店內)",
-                    city: "桃園市",
-                    hours: "08:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "MAA", desc: "服務中心對面", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "桃園經國場",
-                    address: "桃園市桃園區經國路369號(萬家福經國店內)",
-                    city: "桃園市",
-                    hours: "24hr",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false },
-                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "桃園內壢場",
-                    address: "桃園市中壢區中華路一段450號(萬家福內壢店內)",
-                    city: "桃園市",
-                    hours: "09:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "樂天桃園棒球場",
-                    address: "桃園市中壢區領航北路一段1號",
-                    city: "桃園市",
-                    hours: "依場館開放時間為主",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-1", code: "MEB", desc: "GATE E旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "桃園春日場",
-                    address: "桃園市桃園區大業里春日路618號",
-                    city: "桃園市",
-                    hours: "11:00-22:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "新竹中華場",
-                    address: "新竹市東區中華路二段198號",
-                    city: "新竹市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "台中青海場",
-                    address: "台中市西屯區青海路二段207-18號(萬家福青海店內)",
-                    city: "台中市",
-                    hours: "綜合 (詳見各樓層)",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
-                    ]
-                },
-                {
-                    name: "台中豐原場",
-                    address: "台中市豐原區成功路500號(萬家福豐原店內)",
-                    city: "台中市",
-                    hours: "09:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "3F", code: "OBB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台中文心場",
-                    address: "台中市南屯區文心路一段521號2F(萬家福文心店內)",
-                    city: "台中市",
-                    hours: "09:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "2F", code: "OCA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台中德安場",
-                    address: "台中市東區復興路四段186號B1(萬家福德安店內)",
-                    city: "台中市",
-                    hours: "24hr",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "B1", code: "ODA", desc: "美食街旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台中洲際棒球場",
-                    address: "臺中市北屯區崇德路三段835號",
-                    city: "台中市",
-                    hours: "24小時",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台中文心洛陽場",
-                    address: "臺中市西屯區文心路三段65-1號",
-                    city: "台中市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "OFA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台中廣3SOGO場",
-                    address: "臺中市西區臺灣大道二段459號",
-                    city: "台中市",
-                    hours: "11:00-22:00",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台南民生場",
-                    address: "台南市中西區民生路二段72號",
-                    city: "台南市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "TAA", desc: "台南民生櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "台南仁德場",
-                    address: "台南市仁德區中山路711號",
-                    city: "台南市",
-                    hours: "09:00-23:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F", code: "TBA", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "高雄鼎山場",
-                    address: "高雄市三民區大順二路849號(萬家福高雄鼎山店內)",
-                    city: "高雄市",
-                    hours: "24小時",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "基隆南站場",
-                    address: "基隆市仁愛區港西街5號(基隆火車站南站)",
-                    city: "基隆市",
-                    hours: "6:00-23:00",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "基隆北站場",
-                    address: "基隆市仁愛區港西街55號(基隆火車站北站)",
-                    city: "基隆市",
-                    hours: "05:00-24:00",
-                    rentTypeText: "機台 + APP 承租",
-                    floors: [
-                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
-                    ]
-                },
-                {
-                    name: "基隆好食城場",
-                    address: "基隆市中正區中正路3號",
-                    city: "基隆市",
-                    hours: "11:00-22:00",
-                    rentTypeText: "僅 APP 承租",
-                    floors: [
-                        { floor: "1F-B", code: "YCB", desc: "側門入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "YCC", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
-                    ]
-                }
-            ];
-        }
-
-        function initElockerBranches() {
-            let branches = getElockerData();
-            const branchSelect = document.getElementById('branch-select');
-            if (branchSelect) {
-                let html = '<option value="">-- 全部據點 --</option>';
-                branches.forEach(function(b) {
-                    html += '<option value="' + b.name + '">' + b.name + '</option>';
-                });
-                branchSelect.innerHTML = html;
+        function toggleMenu(btn) {
+            const items = btn.nextElementSibling;
+            const arrow = btn.querySelector('.arrow');
+            if (items.style.display === 'none') {
+                items.style.display = 'flex';
+                arrow.innerText = '▼';
+            } else {
+                items.style.display = 'none';
+                arrow.innerText = '▶';
             }
-            renderBranches();
         }
 
-        function renderBranches() {
-            let branches = getElockerData();
-            const searchKw = document.getElementById('search-input').value.trim().toLowerCase();
-            const selectedBranch = document.getElementById('branch-select').value;
-            const selectedType = document.getElementById('type-select').value;
-            const selectedTerm = document.getElementById('term-select').value;
-            const container = document.getElementById('branches-container');
+        // 載入 eLocker 據點資料
+        let elockerData = JSON.parse(localStorage.getItem('storeasy_elocker_data')) || [
+            { branch: '台北旗艦店', address: '台北市信義區...', count: 30, status: '營運中' },
+            { branch: '台中逢甲店', address: '台中市西屯區...', count: 24, status: '營運中' }
+        ];
 
-            let list = branches;
-            if (selectedBranch) {
-                list = list.filter(function(b) { return b.name === selectedBranch; });
-            }
-
-            // 💡 樓層級別精確過濾
-            if (selectedType || selectedTerm) {
-                list = list.filter(function(b) {
-                    return b.floors.some(function(f) {
-                        let matchType = true;
-                        if (selectedType === 'machine') matchType = f.machine && !f.app;
-                        else if (selectedType === 'app') matchType = f.app && !f.machine;
-                        else if (selectedType === 'both') matchType = f.app && f.machine;
-
-                        let matchTerm = true;
-                        if (selectedTerm === 'count') matchTerm = f.count;
-                        else if (selectedTerm === 'hourly') matchTerm = f.hourly;
-                        else if (selectedTerm === 'monthly') matchTerm = f.monthly;
-                        else if (selectedTerm === 'quarter') matchTerm = f.quarter;
-                        else if (selectedTerm === 'halfyear') matchTerm = f.halfyear;
-                        else if (selectedTerm === 'year') matchTerm = f.year;
-
-                        return matchType && matchTerm;
-                    });
-                });
-            }
-
-            if (searchKw) {
-                list = list.filter(function(b) {
-                    let matchName = b.name && b.name.toLowerCase().includes(searchKw);
-                    let matchCity = b.city && b.city.toLowerCase().includes(searchKw);
-                    let matchCode = b.floors && b.floors.some(function(f) {
-                        return f.code && f.code.toLowerCase().includes(searchKw);
-                    });
-                    return matchName || matchCity || matchCode;
-                });
-            }
-
-            if (list.length === 0) {
-                container.innerHTML = '<div class="empty-state">查無符合條件的快存櫃據點資訊</div>';
-                return;
-            }
-
-            container.innerHTML = list.map(function(b) {
-                let floorsHtml = b.floors.map(function(f) {
-                    let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
-                    let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
-                    return '<tr>' +
-                        '<td style="font-weight:bold; width: 140px;">' + f.floor + ' ' + codeTag + '</td>' +
-                        '<td>' + descDisplay + '</td>' +
-                    '</tr>';
-                }).join('');
-
-                return '<div class="branch-card" onclick="openBranchModal(\'' + b.name + '\')">' +
-                    '<div class="branch-header">' +
-                        '<span class="branch-title">🏢 ' + b.name + '</span>' +
-                        '<span class="branch-badge">' + b.rentTypeText + '</span>' +
-                    '</div>' +
-                    '<div class="branch-body">' +
-                        '<div class="info-row"><strong>📍 地址：</strong><span>' + b.address + '</span></div>' +
-                        '<div class="info-row"><strong>🕒 時間：</strong><span>' + b.hours + '</span></div>' +
-                        '<div style="margin-top: 4px;">' +
-                            '<strong style="font-size: 0.85rem; color: #475569; display: block; margin-bottom: 6px;">📐 樓層與櫃位編碼/位置：</strong>' +
-                            '<table class="floor-table">' +
-                                '<thead><tr><th>樓層 / 編碼</th><th>位置說明</th></tr></thead>' +
-                                '<tbody>' + floorsHtml + '</tbody>' +
-                            '</table>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
-            }).join('');
-        }
-
-        function openBranchModal(branchName) {
-            let branches = getElockerData();
-            let b = branches.find(function(item) { return item.name === branchName; });
-            if (!b) return;
-
-            document.getElementById('modal-title').innerText = '🏢 ' + b.name;
-            
-            let modalFloorsHtml = b.floors.map(function(f) {
-                let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
-                let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
-                return '<tr><td style="font-weight:bold; width: 150px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
-            }).join('');
-
-            let modalBody = document.getElementById('modal-body-content');
-            modalBody.innerHTML = 
-                '<div class="info-row" style="font-size: 1rem;"><strong>📍 完整地址：</strong><span>' + b.address + '</span></div>' +
-                '<div class="info-row" style="font-size: 1rem;"><strong>🕒 進出時間：</strong><span>' + b.hours + '</span></div>' +
-                '<div class="info-row" style="font-size: 1rem;"><strong>📱 承租方式：</strong><span style="color: #059669; font-weight: bold;">' + b.rentTypeText + '</span></div>' +
-                '<div style="margin-top: 12px;">' +
-                    '<strong style="font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">📋 各樓層櫃位編碼與詳細配置：</strong>' +
-                    '<table class="floor-table">' +
-                        '<thead><tr><th>樓層 / 編碼</th><th>位置說明</th></tr></thead>' +
-                        '<tbody>' + modalFloorsHtml + '</tbody>' +
-                    '</table>' +
-                '</div>';
-
-            document.getElementById('branch-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('branch-modal').style.display = 'none';
-        }
+        const tbody = document.getElementById('elocker-branch-tbody');
+        tbody.innerHTML = elockerData.map(item => `
+            <tr>
+                <td style="font-weight: bold; color: #b45309;">${item.branch}</td>
+                <td>${item.address}</td>
+                <td>${item.count} 櫃</td>
+                <td><span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${item.status}</span></td>
+            </tr>
+        `).join('');
     </script>
 </body>
 </html>
