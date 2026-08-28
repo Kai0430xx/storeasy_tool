@@ -6,8 +6,9 @@
     <title>收多易迷你倉庫 - 快存櫃操作教學 (店長專用)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
         
+        /* 💡 左側導覽列固定設定：桌面版永遠固定在左側 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -16,11 +17,13 @@
             flex-direction: column; 
             flex-shrink: 0; 
             box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
-            z-index: 100; 
-            position: sticky; 
+            z-index: 1000; 
+            position: fixed; 
             top: 0; 
+            left: 0;
             height: 100vh; 
             overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
         }
         .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
@@ -38,7 +41,8 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        /* 💡 右側主內容區塊：留出左側 260px 寬度 */
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -47,8 +51,9 @@
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .tabs-nav { display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 0; flex-wrap: wrap; }
-        .tab-btn { padding: 12px 18px; font-weight: bold; font-size: 0.9rem; background: #e2e8f0; color: #475569; border: none; border-top-left-radius: 8px; border-top-right-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        /* 標籤頁籤設計 */
+        .tabs-nav { display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 0; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .tab-btn { padding: 12px 18px; font-weight: bold; font-size: 0.9rem; background: #e2e8f0; color: #475569; border: none; border-top-left-radius: 8px; border-top-right-radius: 8px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
         .tab-btn.active { background: #0f172a; color: #fbbf24; }
 
         .tab-content { display: none; flex-direction: column; gap: 20px; }
@@ -65,25 +70,35 @@
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
         .warning-box { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 14px 18px; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; }
+        
+        .faq-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+        .faq-q { font-weight: bold; color: #0f172a; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .faq-a { font-size: 0.9rem; color: #475569; line-height: 1.5; padding-left: 20px; }
 
         table.info-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 8px; }
         table.info-table th, table.info-table td { padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left; }
         table.info-table th { background-color: #f8fafc; font-weight: bold; color: #334155; }
 
+        /* 手機遮罩 */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
+        .sidebar-overlay.active { display: block; }
+
+        /* 手機響應式適應 */
         @media (max-width: 768px) {
-            aside { position: fixed; left: -260px; top: 0; }
-            aside.mobile-open { left: 0; }
+            aside { transform: translateX(-100%); }
+            aside.mobile-open { transform: translateX(0); }
             .mobile-close-btn { display: block; }
             .menu-toggle-btn { display: inline-block; }
+            main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
-            .tabs-nav { gap: 4px; }
-            .tab-btn { padding: 8px 10px; font-size: 0.8rem; }
             .version { display: none; }
         }
     </style>
 </head>
 <body>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
     <aside id="sidebar">
         <div class="sidebar-header">
@@ -261,7 +276,7 @@
 
                     <h4 style="margin-top: 16px;">【客戶端 APP 正常續約與逾期繳費】</h4>
                     <ul class="steps-list">
-                        <li><b>正常續約</b>：訂單結束前 7 天內，開啟 APP 進入快存櫃頁面 ➔ 點選「延時」➔ 下拉選單選擇「月租（續約）」➔ 確認新租期與金額完成線上繳費。</li>
+                        <li><b>正常續約</b>：訂單結束前 7 天內，開啟 APP 進入快存櫃頁面 ➔ 點選「延時」➔ 下拉選單選擇<b>「月租（續約）」</b>➔ 確認新租期與金額完成線上繳費。</li>
                         <li><b>逾期未滿 5 分鐘</b>：不計費（緩衝期）。</li>
                         <li><b>逾期未滿 1 天</b>：按 1 天計算，日租金 = 月租 ÷ 30，另加收 <span style="color: #dc2626; font-weight: bold;">5% 滯納金</span>。</li>
                         <li><b>逾期超過 1 天</b>：逾期租金按天累計 + 5% 滯納金（滯納金固定只收一次）。</li>
@@ -292,24 +307,130 @@
             <!-- 6. 常見問題與排障 -->
             <div id="tab-faq" class="tab-content">
                 <div class="card">
-                    <h3>🛠️ 常見障礙排除 (FAQ)</h3>
-                    <ul class="steps-list">
-                        <li><b>Q1：APP 登入驗證碼收不到？</b>
-                            <br>請先確認手機是否有設定阻擋廣告簡訊；若仍無法接收，請提供承租手機號碼，回報客服遠端協助。
-                        </li>
-                        <li><b>Q2：點擊 APP 開櫃有聲音但門沒彈開？</b>
-                            <br>請現場協助請客人<span style="color: #dc2626; font-weight: bold;">用手壓住櫃門</span>，店長/客人再點擊一次 APP 開櫃即可。
-                        </li>
-                        <li><b>Q3：無法在 APP 執行退租？</b>
-                            <br>請確認是否「先將物品取出並將櫃門關上」，關門後須等待約 <span style="color: #dc2626; font-weight: bold;">20 秒</span>再執行 APP 退租。
-                        </li>
-                        <li><b>Q4：短租/計日型可以申請退款嗎？</b>
-                            <br>若租期剩餘 24 小時以上（月租型除外），可聯繫客服申請退款（三個工作天）；其餘非櫃體或設備問題恕無法退款。
-                        </li>
-                        <li><b>Q5：緊急情況需要用鑰匙開櫃？</b>
-                            <br>若遇緊急情況需使用實體緊急鑰匙，事前務必告知收多易客服，且<span style="color: #dc2626; font-weight: bold;">必須在監視器畫面下進行</span>。
-                        </li>
-                    </ul>
+                    <h3>🛠️ 快存櫃全方位客服與異常處理標準手冊 (SOP)</h3>
+                    
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 10px;">一、 App 註冊、登入與身分驗證問題</h4>
+                    <div class="faq-item">
+                        <div class="faq-q">1. 外國旅客無台灣門號無法註冊</div>
+                        <div class="faq-a"><b>處理方式：</b>請客人改用 <span style="color: #d97706; font-weight: bold;">Email（電子郵件）</span> 進行 App 登入與註冊。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">2. 收不到簡訊驗證碼</div>
+                        <div class="faq-a">
+                            • 先請 Android 用戶檢查「垃圾簡訊匣」。<br>
+                            • 若垃圾匣中沒有，請聯繫線上客服（Dora / Kai）<span style="color: #dc2626; font-weight: bold;">索取一組專用驗證碼</span>供客人登入。
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">3. VPN 阻擋連線</div>
+                        <div class="faq-a"><b>處理方式：</b>提醒客人先將手機的 <span style="color: #dc2626; font-weight: bold;">VPN 關閉</span>，再重新啟動 App 嘗試。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">4. 外國人護照/身分證上傳卡住</div>
+                        <div class="faq-a"><b>處理方式：</b>若 App 端持續轉圈圈或卡住，請客人直接將證件照傳給線上客服，由後台協助進行人工上傳與審核。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">5. 註冊頁面出現兩個手機欄位</div>
+                        <div class="faq-a"><b>處理方式：</b>告知客人兩個欄位皆可填入相同資訊，或將第二個欄位保持空白即可。</div>
+                    </div>
+
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">二、 現場開櫃、藍牙與連線異常</h4>
+                    <div class="faq-item">
+                        <div class="faq-q">1. 人到現場卻完全無法開櫃（App 無反應）</div>
+                        <div class="faq-a">
+                            • 確認手機已開啟藍牙與定位服務（Location），且 App 權限已授權。<br>
+                            • 確認未開啟 VPN，並建議<span style="color: #d97706; font-weight: bold;">連線現場櫃體上方張貼的據點專屬 Wi-Fi</span>。<br>
+                            • 將 App 完全背景滑掉重啟。<br>
+                            • 若個人端無法解決，聯繫客服於後台嘗試發送遠端開櫃指令或通報工程師。
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">2. 聽得到解鎖聲但門推不開</div>
+                        <div class="faq-a"><b>處理方式：</b>詢問行李是否放太滿、超過安全警戒線；請客人<span style="color: #dc2626; font-weight: bold;">「用手壓著櫃門左側中間位置」</span>（靠外力輔助彈簧彈開），同時點擊開櫃。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">3. 後台強制開櫃救援</div>
+                        <div class="faq-a"><b>處理方式：</b>客服核對據點、櫃號及承租電話（必要時輔以現場特徵或監視器畫面確認身分）後，於後台直接執行強制開櫃。</div>
+                    </div>
+
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">三、 現場誤用 / 誤開未退租櫃位之處理（重大情境）</h4>
+                    <div class="faq-item" style="background: #fffbeb; border-color: #fde68a;">
+                        <div class="faq-q" style="color: #b45309;">⚠️ 情境：櫃門未關或前一手未退租，新客人誤以為空櫃而將物品放入，導致系統無此客人的租賃資料。</div>
+                        <div class="faq-a">
+                            <b>標準處理 SOP：</b><br>
+                            1. <b>詢問與記錄</b>：先與客人詳細核對並記錄其「實際放物品的時間」、「放置內容」及「外觀穿著」。<br>
+                            2. <b>調閱監視器</b>：調閱監視器畫面，確認確實是由該新客人在該時段放入。<br>
+                            3. <b>重新正確承租</b>：請客人透過 App 或機台<span style="color: #dc2626; font-weight: bold;">重新承租一個同尺寸的正確空櫃</span>（計算其實際占用時間與費用）。<br>
+                            4. <b>付款與核對</b>：待客人完成新訂單付款並確認後。<br>
+                            5. <b>協助取物與歸位</b>：由後台或店長協助將誤用之原櫃位打開，讓客人將物品取出，轉放到新承租的正確櫃位中；舊櫃由店長進行清空與後台狀態重置。
+                        </div>
+                    </div>
+
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">四、 租期、單次存取與退租機制</h4>
+                    <div class="faq-item">
+                        <div class="faq-q">1. 誤解「時租/日租」為多次存取</div>
+                        <div class="faq-a">
+                            • <b>機台租用</b>：嚴格屬於「單次存取」，中途開門即視同結束租期。<br>
+                            • <b>App 租用</b>：期限內雖可無限次開櫃，但取完物品後必須手動在 App 點選「退租」。
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">2. 忘記手動按退租導致持續計費</div>
+                        <div class="faq-a"><b>處理方式：</b>請客人確認物品是否已全部取出；若確認為空櫃，告知客人可先忽略逾期通知，後續由店長巡店確認後台協助標退，不需額外補繳。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">3. 退租按鈕反白或轉圈圈無法點擊</div>
+                        <div class="faq-a"><b>處理方式：</b>提醒客人將櫃門確實關上後<span style="color: #dc2626; font-weight: bold;">等待 20 秒</span>再按退租；若系統延遲，返回前一頁或重啟 App 即可。</div>
+                    </div>
+
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">五、 逾期費、滯納金與計費爭議</h4>
+                    <div class="faq-item">
+                        <div class="faq-q">1. 逾期未取被改收「原價時租/日租 + 滯納金」</div>
+                        <div class="faq-a">
+                            • <b>向客人說明規則</b>：優惠價僅限於正常租期內與到期前主動透過 App 點選延時；逾期後自動恢復原價計算並產生滯納金。<br>
+                            • <b>彈性處理機制</b>：若為初次使用或特殊情況，可經主管同意後提供<span style="color: #d97706; font-weight: bold;">「特別協助一次」</span>，幫客人重新核算為較合理的原價日租與滯納金，透過 APP 發送補繳通知，繳清後完成退租。
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">2. 逾期未繳清無法重新承租</div>
+                        <div class="faq-a"><b>處理方式：</b>必須先透過 App 收到補繳通知並完成上一筆逾期金額繳納，系統解鎖後才能重新承租新櫃。</div>
+                    </div>
+
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">六、 退費、發票與折讓單流程</h4>
+                    <div class="faq-item">
+                        <div class="faq-q">1. 非櫃體故障的退費限制</div>
+                        <div class="faq-a">
+                            • <b>原則</b>：非櫃體本身故障（如買錯尺寸、用不到、提早退租）原則上<span style="color: #dc2626; font-weight: bold;">不予退費</span>。<br>
+                            • 若剩餘租期超過 24 小時（針對特定長約）或初次使用的善意例外，才可專案呈報主管申請退款（原付款管道刷退，或悠遊卡需索取存摺封面匯款）。
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">2. 重複扣款或系統異常扣款</div>
+                        <div class="faq-a"><b>處理方式：</b>請客人提供租賃紀錄截圖、信用卡末四碼或 Line Pay 訂單編號畫面。後台核對確認後，安排於 7 個工作天內刷退或匯款。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">3. 統編/發票開立與重開（折讓單）</div>
+                        <div class="faq-a"><b>處理方式：</b>若結帳忘記勾選統編需更改，必須作廢重開。請客人提供正確公司名稱、統編、Email，並配合<span style="color: #dc2626; font-weight: bold;">回覆「同意開立折讓單」</span>，才能由會計進行後續重開發票與退差額作業。</div>
+                    </div>
+
+                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">七、 預約、尺寸、據點與動線指引</h4>
+                    <div class="faq-item">
+                        <div class="faq-q">1. 能否提前線上預約櫃位？</div>
+                        <div class="faq-a"><b>處理方式：</b>明確告知快存櫃<span style="color: #dc2626; font-weight: bold;">無法提前預約</span>，皆採「現場操作、當下起租」制，建議出發前查看 App 即時空櫃率。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">2. 大型行李箱尺寸對應</div>
+                        <div class="faq-a"><b>處理方式：</b>29 吋以上大型行李箱建議租用 S3 或 M/L 型（視各據點櫃型而定）；App 與櫃體皆有長寬高尺寸標示，<span style="color: #dc2626; font-weight: bold;">非櫃體問題無法因放不下而退費</span>。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">3. 車站與場館內部動線迷路</div>
+                        <div class="faq-a"><b>處理方式：</b>立即提供官方準備好的動線影片連結（如北車 Z2 出口、南港車站各連通道影片），或線上文字引導。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">4. 營業時間與小巨蛋活動配合</div>
+                        <div class="faq-a"><b>處理方式：</b>小巨蛋據點若當天有活動，會配合活動散場時間延後關門，以場館實際關門時間為主；若需絕對 24 小時存取，建議改租「信義逸仙」等 24 小時據點。</div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -331,7 +452,9 @@
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
         }
 
         function switchTab(evt, tabId) {
@@ -343,6 +466,14 @@
 
             document.getElementById(tabId).classList.add('active');
             evt.currentTarget.classList.add('active');
+
+            // 手機版切換分頁後自動收合側邊選單
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            }
         }
     </script>
 </body>
