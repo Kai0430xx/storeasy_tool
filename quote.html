@@ -448,7 +448,6 @@
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let term = item.term || '12_85';
-                if (term === 'none') return;
 
                 let displayAnnualPrice = 0;
                 if (term === '12_80') {
@@ -484,9 +483,12 @@
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309; white-space: nowrap;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
                 
-                rent += calcPrice * months; 
-                fee += (calcPrice >= 3000 ? 150 : 80) * months; 
-                deposit += (months <= 2 ? item.price1 * 2 : item.price1);
+                // 💡 如果選擇「不列入試算」，則不累加進費用試算總額中
+                if (term !== 'none') {
+                    rent += calcPrice * months; 
+                    fee += (calcPrice >= 3000 ? 150 : 80) * months; 
+                    deposit += (months <= 2 ? item.price1 * 2 : item.price1);
+                }
             });
             tbody.innerHTML = html;
             document.getElementById('v-q-rent').innerText = rent.toLocaleString();
@@ -516,7 +518,6 @@
 
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
-                if (item.term === 'none') return;
                 let term = item.term || '12_85';
                 let tableAnnualPrice = 0;
                 if (term === '12_80') {
@@ -530,7 +531,7 @@
                 }
 
                 let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
-                let sizeText = "[" + item.branch + "] " + item.size + (item.extraNote ? " (" + item.extraNote + ")" : "");
+                let sizeText = "[" + item.branch + "] " + item.size + (item.extraNote ? " (" + item.extraNote + ")" : "") + (term === 'none' ? " [不列入試算]" : "");
                 wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
             });
 
