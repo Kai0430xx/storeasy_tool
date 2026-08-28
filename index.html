@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收多易迷你倉庫 - 倉位資料</title>
+    <title>收多易迷你倉庫 - 倉位資料管理</title>
+    <!-- 💡 優先執行登入驗證與狀態檢查 -->
+    <script src="login.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -45,29 +47,29 @@
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .user-info { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; color: #475569; }
+        .logout-btn { background: #fee2e2; color: #dc2626; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+        .logout-btn:hover { background: #fecaca; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
-        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .content-body { padding: 32px; max-width: 1400px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .card h3 { font-size: 1.1rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
-        .card p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
-
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; align-items: flex-end; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
         .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-dark { background-color: #0f172a; color: #fff; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
-        .btn-amber:hover { background-color: #d97706; }
-        .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .btn-emerald { background-color: #059669; color: #fff; }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
+        .table-container { max-height: 500px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-top: 12px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; table-layout: auto; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-        /* 💡 只有尺寸欄位允許換行，其他如金額、編號等絕對維持單行 */
-        td.size-col { white-space: normal; word-break: break-word; min-width: 220px; }
-        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
-        tr:hover { background-color: #f8fafc; }
+        td.size-col { white-space: normal; word-break: break-word; min-width: 200px; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; position: sticky; top: 0; z-index: 10; }
 
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
         .sidebar-overlay.active { display: block; }
@@ -88,10 +90,6 @@
 
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
-    <datalist id="branch-list">
-        <option value="土城店"><option value="南東店"><option value="民生松江店"><option value="永和店"><option value="延吉店"><option value="逸仙店">
-    </datalist>
-
     <aside id="sidebar">
         <div class="sidebar-header">
             <div>
@@ -110,7 +108,7 @@
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
-                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃 (eLocker)</span><span class="arrow">▶</span></button>
+                <button type="button" class="menu-category" onclick="toggleMenu(this)"><span>🗄️ 快存櫃</span><span class="arrow">▶</span></button>
                 <div class="menu-items" style="display: none;">
                     <a href="elocker-branches.html" class="sub-btn">🏢 各據點資訊</a>
                     <a href="elocker-tutorial.html" class="sub-btn">📖 操作教學</a>
@@ -122,52 +120,48 @@
     </aside>
 
     <main>
-        <header class="no-print">
+        <header>
             <div class="header-left">
                 <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
-                <h2>📦 倉位資料</h2>
+                <h2>📦 倉位資料管理</h2>
             </div>
-            <div class="version" id="system-version">系統版本：載入中...</div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="user-info">使用者：<span id="current-username" style="color: #0f172a;">---</span></div>
+                <button type="button" class="logout-btn" onclick="StoreasyAuth.logout()">登出</button>
+                <div class="version" id="system-version">系統版本：載入中...</div>
+            </div>
         </header>
 
         <div class="content-body">
             <div class="card">
-                <h3>📥 一鍵上傳各店空倉表 Excel</h3>
-                <p>系統自動在背景智慧辨識「月繳、月租、原價、金額、定價」欄位，店長直接上傳即可精準匯入</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                    <div>
+                        <h3 style="font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 4px;">📥 匯入空倉表 Excel</h3>
+                        <p style="font-size: 0.85rem; color: #64748b;">上傳各分店的倉位資料 Excel 檔案以更新系統資料庫。</p>
+                    </div>
+                    <div>
+                        <input type="file" id="excel-file-input" accept=".xlsx, .xls" style="display: none;" onchange="handleExcelUpload(event)">
+                        <button type="button" onclick="document.getElementById('excel-file-input').click()" class="btn btn-amber">📂 選擇 Excel 檔案上傳</button>
+                    </div>
+                </div>
+
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>分店名稱</label>
-                        <input type="text" id="upload-branch-name" list="branch-list" placeholder="請選擇或輸入分店名稱">
+                        <label>🏢 篩選分店據點：</label>
+                        <select id="index-branch-filter" onchange="renderStorageTable()">
+                            <option value="">-- 全部據點 --</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>該店預設年繳方案</label>
-                        <select id="branch-annual-discount" style="background: #fef3c7; font-weight: bold; color: #92400e;">
-                            <option value="0.85">年繳 (85折)</option>
-                            <option value="0.80">年繳 (8折)</option>
-                        </select>
+                        <label>🔍 快速搜尋編號/尺寸：</label>
+                        <input type="text" id="index-search-input" oninput="renderStorageTable()" placeholder="例如: A01 或 0.9">
                     </div>
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label>選擇 Excel 檔案</label>
-                        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 6px;">
+                    <div class="form-group" style="display: flex; flex-direction: row; gap: 8px;">
+                        <button type="button" onclick="clearStorageData()" class="btn" style="background: #fee2e2; color: #dc2626; width: 100%;">🗑️ 清空所有倉位資料</button>
                     </div>
                 </div>
-                <button type="button" onclick="handleSmartExcelUpload()" class="btn btn-amber">匯入資料</button>
-            </div>
 
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <h3 style="margin-bottom:0;">📋 已載入的倉位清單</h3>
-                        <select id="storage-branch-filter" onchange="renderStorageTable()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #92400e; background: #fef3c7;">
-                            <option value="all">全部據點</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" onclick="deleteSelectedBranchData()" class="btn btn-red-outline" style="padding: 6px 12px; font-size: 0.8rem;">🗑️ 刪除目前選取分店</button>
-                        <button type="button" onclick="clearStorageData()" style="background:none; border:none; color: #94a3b8; font-size: 0.8rem; cursor:pointer; text-decoration: underline;">清空全部本機資料</button>
-                    </div>
-                </div>
-                <div style="overflow-x: auto;">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
@@ -178,12 +172,12 @@
                                 <th>月繳/原價</th>
                                 <th>季繳</th>
                                 <th>半年繳</th>
-                                <th id="th-annual-85">年繳 (85折)</th>
-                                <th id="th-annual-80">年繳 (8折)</th>
+                                <th>年繳(85折)</th>
+                                <th>年繳(8折)</th>
                             </tr>
                         </thead>
-                        <tbody id="storage-table-body">
-                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>
+                        <tbody id="storage-tbody">
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 32px;">尚未匯入任何倉位資料，請點擊上方按鈕上傳 Excel</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -191,12 +185,23 @@
         </div>
     </main>
 
-    <script src="login.js"></script>
     <script>
-        (function() {
-            const now = new Date();
-            document.getElementById('system-version').innerText = `系統版本：${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_1`;
-        })();
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                const now = new Date();
+                const verEl = document.getElementById('system-version');
+                if (verEl) {
+                    verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
+                }
+                const userEl = document.getElementById('current-username');
+                if (userEl && window.StoreasyAuth) {
+                    userEl.innerText = window.StoreasyAuth.getCurrentUser();
+                }
+                initStorageTable();
+            } catch(e) {
+                console.error("Initialization error:", e);
+            }
+        });
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -205,7 +210,6 @@
             overlay.classList.toggle('active');
         }
 
-        // 💡 側邊選單收合展開切換函數
         function toggleMenu(btn) {
             const items = btn.nextElementSibling;
             const arrow = btn.querySelector('.arrow');
@@ -219,209 +223,117 @@
         }
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
-        let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
 
-        function handleSmartExcelUpload() {
-            const branchInput = document.getElementById('upload-branch-name');
-            const branch = branchInput.value.trim();
-            if (!branch) { alert('請先輸入或選擇分店名稱！'); return; }
+        function initStorageTable() {
+            const branchSelect = document.getElementById('index-branch-filter');
+            if (!branchSelect) return;
+            const branches = [...new Set(storageData.map(item => item.branch))];
+            let html = '<option value="">-- 全部據點 --</option>';
+            branches.forEach(function(b) {
+                html += '<option value="' + b + '">' + b + '</option>';
+            });
+            branchSelect.innerHTML = html;
+            renderStorageTable();
+        }
 
-            const fileInput = document.getElementById('excelFile');
-            if (!fileInput.files || fileInput.files.length === 0) { alert('請先選擇一個 Excel 檔案！'); return; }
-            const file = fileInput.files[0];
+        function renderStorageTable() {
+            const branchSelect = document.getElementById('index-branch-filter');
+            const searchInput = document.getElementById('index-search-input');
+            const tbody = document.getElementById('storage-tbody');
+            if (!tbody) return;
+
+            const selectedBranch = branchSelect ? branchSelect.value : '';
+            const searchKw = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+            let list = storageData;
+            if (selectedBranch) {
+                list = list.filter(function(item) { return item.branch === selectedBranch; });
+            }
+            if (searchKw) {
+                list = list.filter(function(item) {
+                    return (item.code && item.code.toLowerCase().includes(searchKw)) || 
+                           (item.size && item.size.toLowerCase().includes(searchKw)) || 
+                           (item.unit && String(item.unit).toLowerCase().includes(searchKw));
+                });
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 32px;">目前無符合的倉位資料</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(function(item) {
+                let p12_85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
+                let p12_80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10;
+                return '<tr>' +
+                    '<td style="color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
+                    '<td style="font-weight: bold;">' + item.code + '</td>' +
+                    '<td class="size-col">' + item.size + '</td>' +
+                    '<td style="color: #64748b;">' + item.unit + '</td>' +
+                    '<td style="font-weight: 600; color: #d97706;">NT$ ' + item.price1.toLocaleString() + '</td>' +
+                    '<td>NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td>NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td style="color: #059669; font-weight: 600;">NT$ ' + p12_85.toLocaleString() + '</td>' +
+                    '<td style="color: #047857; font-weight: 600;">NT$ ' + p12_80.toLocaleString() + '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        function handleExcelUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const jsonSheet = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
-                    const discountVal = document.getElementById('branch-annual-discount').value;
-                    
-                    branchDiscounts[branch] = discountVal;
-                    localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    let parsedList = [];
 
-                    // 💡 背景自動智慧辨識「月繳、月租、原價、金額、定價」欄位
-                    let headerRowIdx = -1;
-                    let priceColIdx = -1;
-                    let sizeColIdx = -1;
-                    let unitColIdx = -1;
-                    let codeColIdx = -1;
-
-                    for (let r = 0; r < Math.min(jsonSheet.length, 10); r++) {
-                        let row = jsonSheet[r];
-                        if (!row) continue;
-                        let foundPrice = false;
-
-                        for (let c = 0; c < row.length; c++) {
-                            let val = String(row[c] || '').trim().toLowerCase();
-                            if (!val) continue;
-
-                            if ((val.includes('月繳') || val.includes('月租') || val.includes('原價') || val.includes('金額') || val.includes('定價') || val.includes('牌價')) && priceColIdx === -1) {
-                                priceColIdx = c;
-                                foundPrice = true;
-                            } else if ((val.includes('尺寸') || val.includes('長寬高') || val.includes('規格')) && sizeColIdx === -1) {
-                                sizeColIdx = c;
-                            } else if ((val.includes('材積') || val.includes('才機') || val.includes('才') || val.includes('立方')) && unitColIdx === -1) {
-                                unitColIdx = c;
-                            } else if ((val.includes('編號') || val.includes('倉位') || val.includes('代號')) && codeColIdx === -1) {
-                                codeColIdx = c;
+                    workbook.SheetNames.forEach(function(sheetName) {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        // 解析 Excel 邏輯 (依據您原有的匯入格式)
+                        json.forEach(function(row) {
+                            if (row.length >= 6 && typeof row[1] === 'string' && !isNaN(row[4])) {
+                                parsedList.push({
+                                    branch: row[0] || sheetName,
+                                    code: row[1],
+                                    size: row[2],
+                                    unit: row[3],
+                                    price1: Number(row[4]) || 0,
+                                    price3: Number(row[5]) || 0,
+                                    price6: Number(row[6]) || 0,
+                                    price12_85: row[7] ? Number(row[7]) : undefined,
+                                    price12_80: row[8] ? Number(row[8]) : undefined
+                                });
                             }
-                        }
-                        if (foundPrice) {
-                            headerRowIdx = r;
-                            break;
-                        }
+                        });
+                    });
+
+                    if (parsedList.length > 0) {
+                        storageData = parsedList;
+                        localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
+                        initStorageTable();
+                        alert('Excel 倉位資料匯入成功！共載入 ' + parsedList.length筆資料);
+                    } else {
+                        alert('未能成功解析資料，請確認 Excel 格式是否正確！');
                     }
-
-                    let newItems = [];
-                    let startRow = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
-
-                    for (let i = startRow; i < jsonSheet.length; i++) {
-                        let row = jsonSheet[i];
-                        if (!row || row.length === 0) continue;
-
-                        let code = '', size = '-', unit = '-';
-                        let price1 = NaN;
-
-                        if (priceColIdx !== -1 && row[priceColIdx] !== undefined) {
-                            let pVal = Number(String(row[priceColIdx]).replace(/[^\d.]/g, ''));
-                            if (!isNaN(pVal) && pVal > 0) price1 = pVal;
-                        }
-
-                        if (codeColIdx !== -1 && row[codeColIdx] !== undefined) code = String(row[codeColIdx]).trim();
-                        if (sizeColIdx !== -1 && row[sizeColIdx] !== undefined) size = String(row[sizeColIdx]).trim();
-                        if (unitColIdx !== -1 && row[unitColIdx] !== undefined) unit = Number(row[unitColIdx]) || String(row[unitColIdx]).trim();
-
-                        for (let c = 0; c < row.length; c++) {
-                            let val = row[c];
-                            if (val == null) continue;
-                            let sVal = String(val).trim();
-
-                            if (!code && (/^[A-Za-z]+\d+/.test(sVal) || (/^[A-Za-z]+$/.test(sVal) && row[c+1] !== undefined && !isNaN(row[c+1])))) {
-                                code = sVal; if (!isNaN(row[c+1])) code += row[c+1];
-                            }
-                            if (size === '-' && /(\d+(\.\d+)?)\s*[*xX]\s*(\d+(\.\d+)?)/.test(sVal)) {
-                                size = sVal;
-                            }
-                            if (isNaN(price1) && !isNaN(Number(sVal)) && Number(sVal) > 200 && c !== unitColIdx) {
-                                price1 = Number(sVal);
-                            }
-                        }
-
-                        if (code && !isNaN(price1) && price1 > 0) {
-                            newItems.push({
-                                branch: branch, 
-                                code: code, 
-                                size: size !== '-' ? (size.toLowerCase().includes('m') ? size : size + ' m') : '標準尺寸',
-                                unit: unit !== '-' ? unit : '50', 
-                                price1: price1,
-                                price3: Math.round((price1 * 0.95) / 10) * 10,
-                                price6: Math.round((price1 * 0.90) / 10) * 10,
-                                price12_85: Math.round((price1 * 0.85) / 10) * 10,
-                                price12_80: Math.round((price1 * 0.8) / 10) * 10
-                            });
-                        }
-                    }
-
-                    if (newItems.length === 0) { alert('未能抓取到有效資料，請檢查 Excel 標題是否包含「月繳」或「月租」！'); return; }
-                    if (storageData.some(i => i.branch === branch) && confirm(`「${branch}」資料已存在，是否覆蓋？`)) {
-                        storageData = storageData.filter(i => i.branch !== branch);
-                    }
-                    storageData = storageData.concat(newItems);
-                    localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                    
-                    branchInput.value = '';
-                    fileInput.value = '';
-
-                    const selectEl = document.getElementById('storage-branch-filter');
-                    if (selectEl) selectEl.value = 'all';
-
-                    renderStorageTable();
-                    alert('成功匯入 ' + newItems.length + ' 筆資料！');
-                } catch(err) { alert('解析錯誤：' + err.message); }
+                } catch(err) {
+                    console.error(err);
+                    alert('解析 Excel 發生錯誤：' + err.message);
+                }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function updateBranchFilter(selectedVal = 'all') {
-            let counts = {};
-            storageData.forEach(i => counts[i.branch] = (counts[i.branch]||0)+1);
-            let html = `<option value="all">全部據點 (${storageData.length})</option>`;
-            Object.keys(counts).forEach(b => html += `<option value="${b}">${b} (${counts[b]})</option>`);
-            const selectEl = document.getElementById('storage-branch-filter');
-            if (selectEl) {
-                let currentVal = selectEl.value;
-                selectEl.innerHTML = html;
-                selectEl.value = currentVal || selectedVal;
-            }
-        }
-
-        function renderStorageTable() {
-            let selectEl = document.getElementById('storage-branch-filter');
-            let filter = selectEl ? selectEl.value : 'all';
-            
-            updateBranchFilter(filter);
-
-            let th85 = document.getElementById('th-annual-85');
-            let th80 = document.getElementById('th-annual-80');
-            
-            let activeBranchDisc = null;
-            if (filter && filter !== 'all') {
-                activeBranchDisc = branchDiscounts[filter] || '0.85';
-            }
-
-            if (activeBranchDisc === '0.80') {
-                th85.innerHTML = '年繳 (85折)';
-                th80.innerHTML = '年繳 (8折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
-            } else if (activeBranchDisc === '0.85') {
-                th85.innerHTML = '年繳 (85折) <span style="color: #dc2626; font-size: 0.75rem; font-weight: bold;">(已設定)</span>';
-                th80.innerHTML = '年繳 (8折)';
-            } else {
-                th85.innerHTML = '年繳 (85折)';
-                th80.innerHTML = '年繳 (8折)';
-            }
-
-            let list = filter === 'all' ? storageData : storageData.filter(i => i.branch === filter);
-            let tbody = document.getElementById('storage-table-body');
-            if (!tbody) return;
-            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">尚未匯入資料</td></tr>`; return; }
-            
-            tbody.innerHTML = list.map(item => {
-                let p85 = item.price12_85 !== undefined ? item.price12_85 : Math.round((item.price1 * 0.85) / 10) * 10;
-                let p80 = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.80) / 10) * 10;
-                return `
-                    <tr>
-                        <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
-                        <td style="font-weight: bold;">${item.code}</td>
-                        <td class="size-col">${item.size}</td>
-                        <td style="color: #64748b;">${item.unit}</td>
-                        <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
-                        <td>NT$ ${item.price3.toLocaleString()}</td>
-                        <td>NT$ ${item.price6.toLocaleString()}</td>
-                        <td style="color: #059669; font-weight: 600;">NT$ ${p85.toLocaleString()}</td>
-                        <td style="color: #047857; font-weight: 600;">NT$ ${p80.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function deleteSelectedBranchData() {
-            let b = document.getElementById('storage-branch-filter').value;
-            if (b === 'all') { alert('請先選擇特定分店！'); return; }
-            if (confirm(`確定刪除 ${b} 的所有資料？`)) {
-                storageData = storageData.filter(i => i.branch !== b);
-                delete branchDiscounts[b];
-                localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
-                localStorage.setItem('storeasy_branch_discounts', JSON.stringify(branchDiscounts));
-                renderStorageTable();
-            }
-        }
-
         function clearStorageData() {
-            if (confirm('確定清空全部資料？')) { storageData = []; branchDiscounts = {}; localStorage.removeItem('storeasy_storage_data'); localStorage.removeItem('storeasy_branch_discounts'); renderStorageTable(); }
+            if (confirm('確定要清空所有本機儲存的倉位資料嗎？')) {
+                localStorage.removeItem('storeasy_storage_data');
+                storageData = [];
+                initStorageTable();
+                alert('已清空所有倉位資料。');
+            }
         }
-
-        renderStorageTable();
     </script>
 </body>
 </html>
