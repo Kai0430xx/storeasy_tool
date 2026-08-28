@@ -9,7 +9,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
         
-        /* 💡 左側導覽列固定設定 */
         aside { 
             width: 260px; 
             background-color: #0f172a; 
@@ -41,7 +40,6 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        /* 💡 右側主內容區塊 */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
@@ -63,7 +61,7 @@
         .btn-emerald { background-color: #059669; color: #fff; }
 
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
-        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; word-break: break-word; white-space: normal; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
 
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
@@ -76,7 +74,6 @@
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
         .sidebar-overlay.active { display: block; }
 
-        /* 手機響應式適應 */
         @media (max-width: 768px) {
             aside { transform: translateX(-100%); }
             aside.mobile-open { transform: translateX(0); }
@@ -85,12 +82,10 @@
             main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
-            .form-grid { grid-template-columns: 1fr; }
-            .preview-box { padding: 20px; }
-            .preview-info { grid-template-columns: 1fr; }
             .version { display: none; }
         }
 
+        /* 💡 列印 / 生成 PDF 專用樣式：鎖定預覽框寬度與客戶資料排版，防止擠到右側 */
         @media print {
             body * { visibility: hidden; }
             aside, header.no-print, .card.no-print, .no-print { display: none !important; }
@@ -99,15 +94,26 @@
                 position: absolute; left: 0; top: 0; width: 100% !important; 
                 margin: 0 !important; padding: 15px !important; 
                 box-shadow: none !important; border: none !important; 
-                font-size: 8.5pt !important;
+                font-size: 8pt !important;
             }
-            #quote-preview h1 { font-size: 1.3rem !important; }
-            #quote-preview h2 { font-size: 1rem !important; }
-            #quote-preview .preview-info { padding: 10px !important; margin-bottom: 15px !important; font-size: 8.5pt !important; }
-            #quote-preview table { font-size: 8pt !important; margin-top: 6px !important; margin-bottom: 15px !important; word-break: break-all; }
-            #quote-preview th, #quote-preview td { padding: 6px 6px !important; text-align: center !important; vertical-align: middle !important; }
-            #quote-preview .summary-box { padding: 10px !important; font-size: 9pt !important; margin-top: 15px !important; margin-bottom: 15px !important; }
-            #quote-preview .notes-box { padding: 8px !important; font-size: 7.5pt !important; margin-bottom: 0 !important; }
+            #quote-preview h1 { font-size: 1.2rem !important; }
+            #quote-preview h2 { font-size: 0.95rem !important; }
+            #quote-preview .preview-info { 
+                display: grid !important; 
+                grid-template-columns: 1fr 1fr !important; 
+                gap: 6px 20px !important; 
+                padding: 10px !important; 
+                margin-bottom: 15px !important; 
+                font-size: 8pt !important; 
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            #quote-preview table { font-size: 7.5pt !important; margin-top: 6px !important; margin-bottom: 15px !important; width: 100% !important; }
+            #quote-preview th, #quote-preview td { padding: 6px 4px !important; border: 1px solid #cbd5e1 !important; }
+            #quote-preview .summary-box { padding: 8px !important; font-size: 8pt !important; margin-top: 12px !important; margin-bottom: 12px !important; }
+            #quote-preview .notes-box { padding: 6px !important; font-size: 6.5pt !important; margin-bottom: 0 !important; }
         }
     </style>
 </head>
@@ -355,7 +361,7 @@
                     '<td><input type="checkbox" class="q-item-chk" ' + isChecked + ' onchange="toggleQuoteItem(' + idx + ')" data-index="' + idx + '" style="width: 18px; height: 18px; accent-color: #f59e0b;"></td>' +
                     '<td style="color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
                     '<td style="font-weight: bold;">' + item.code + '</td>' +
-                    '<td style="line-height: 1.4;">' + item.size + '</td>' +
+                    '<td class="size-col">' + item.size + '</td>' +
                     '<td style="color: #64748b;">' + item.unit + '</td>' +
                     '<td style="font-weight: 600; color: #d97706;">NT$ ' + item.price1.toLocaleString() + '</td>' +
                     '<td>NT$ ' + item.price3.toLocaleString() + '</td>' +
@@ -457,12 +463,12 @@
                 }
 
                 html += '<tr>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">' + unitText + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">' + unitText + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; word-break: break-all; line-height: 1.4;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price1.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price3.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle;">NT$ ' + item.price6.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price1.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309; white-space: nowrap;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
                 
                 rent += calcPrice * months; 
