@@ -67,7 +67,8 @@
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
         .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
         .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
-        .notes-box { font-size: 0.85rem; color: #475569; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.6; margin-top: 24px; margin-bottom: 24px; }
+        .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
+        .notes-box { font-size: 0.75rem; color: #64748b; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
 
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
@@ -189,9 +190,9 @@
                 </div>
 
                 <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取的報價項目（方案與額外優惠備註）：</h5>
-                    <div id="per-item-quote-container" style="display: flex; flex-direction: column; gap: 8px;">
-                        <span style="color: #94a3b8; font-size: 0.85rem;">尚未勾選任何項目</span>
+                    <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取項目與方案調整：</h5>
+                    <div id="per-item-quote-container" style="display: flex; flex-direction: column; gap: 12px;">
+                        <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選報價倉位項目</span>
                     </div>
                 </div>
 
@@ -236,6 +237,11 @@
                         <tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 24px;">請先於上方勾選項目並點擊生成報價單</td></tr>
                     </tbody>
                 </table>
+
+                <div class="summary-box">
+                    <div style="font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #334155;">費用試算總表</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 900; color: #b45309;"><span>報價總金額 (TWD)：</span> <span id="v-q-total">NT$ 0</span></div>
+                </div>
 
                 <div class="notes-box">
                     <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">注意事項：</div>
@@ -330,7 +336,7 @@
                     '<td style="color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
                     '<td style="font-weight: bold;">' + item.code + '</td>' +
                     '<td style="line-height: 1.4;">' + item.size + '</td>' +
-                    '<td style="color: #64748b;">' + item.unit + '</td>' +
+                    '<td style="color: #64748b;">' + item.unit + '材</td>' +
                     '<td style="font-weight: 600; color: #d97706;">NT$ ' + item.price1.toLocaleString() + '</td>' +
                     '<td>NT$ ' + item.price3.toLocaleString() + '</td>' +
                     '<td>NT$ ' + item.price6.toLocaleString() + '</td>' +
@@ -351,8 +357,7 @@
 
                 selectedQuoteItems[idx] = Object.assign({}, item, { 
                     term: defaultTerm,
-                    months: defaultTerm.startsWith('12') ? 12 : Number(defaultTerm),
-                    remark: ''
+                    months: defaultTerm.startsWith('12') ? 12 : Number(defaultTerm)
                 });
             } else {
                 delete selectedQuoteItems[idx];
@@ -364,11 +369,32 @@
             const container = document.getElementById('per-item-quote-container');
             if (!container) return;
             const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) { container.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">尚未勾選任何項目</span>'; return; }
+            if (keys.length === 0) { container.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選報價倉位項目</span>'; return; }
             
             container.innerHTML = keys.map(function(idx) {
                 let item = selectedQuoteItems[idx];
-                return '<div style="font-size: 0.85rem; color: #334155;">• ' + item.branch + ' / ' + item.code + ' (' + item.size + ') 已納入報價計算</div>';
+                let currentTerm = item.term || '12_85';
+                let currentMonths = item.months || 12;
+                return '<div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;" data-index="' + idx + '">' +
+                    '<div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：' + item.code + ' ([' + item.branch + '] ' + item.size + ' / ' + item.unit + '材)</div>' +
+                    '<div style="display: flex; gap: 12px; align-items: center;">' +
+                        '<div style="display: flex; align-items: center; gap: 6px;">' +
+                            '<label style="font-size: 0.8rem; color: #475569; font-weight: bold;">方案：</label>' +
+                            '<select onchange="selectedQuoteItems[' + idx + '].term = this.value; selectedQuoteItems[' + idx + '].months = (this.value.startsWith(\'12\')?12:Number(this.value)); renderPerItemQuoteInputs();" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fef3c7; font-weight: bold;">' +
+                                '<option value="1" ' + (currentTerm==='1'?'selected':'') + '>月繳 (1個月)</option>' +
+                                '<option value="3" ' + (currentTerm==='3'?'selected':'') + '>季繳 (95折)</option>' +
+                                '<option value="6" ' + (currentTerm==='6'?'selected':'') + '>半年繳 (9折)</option>' +
+                                '<option value="12_85" ' + (currentTerm==='12_85'?'selected':'') + '>年繳 (85折)</option>' +
+                                '<option value="12_80" ' + (currentTerm==='12_80'?'selected':'') + '>年繳 (8折)</option>' +
+                            '</select>' +
+                        '</div>' +
+                        '<div style="display: flex; align-items: center; gap: 6px;">' +
+                            '<label style="font-size: 0.8rem; color: #475569; font-weight: bold;">月數：</label>' +
+                            '<input type="number" value="' + currentMonths + '" min="1" max="60" oninput="selectedQuoteItems[' + idx + '].months = Number(this.value)||1" style="width: 70px; padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem;">' +
+                        '</div>' +
+                        '<button type="button" onclick="delete selectedQuoteItems[' + idx + ']; renderQuoteSelectableItems(); renderPerItemQuoteInputs();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>' +
+                    '</div>' +
+                '</div>';
             }).join('');
         }
 
@@ -386,6 +412,7 @@
 
             let tbodyItems = document.getElementById('v-q-items');
             let itemsHtml = '';
+            let grandTotal = 0;
             
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
@@ -399,6 +426,7 @@
 
                 let months = item.months || 12;
                 let lineTotal = monthlyRate * months;
+                grandTotal += lineTotal;
 
                 itemsHtml += '<tr>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 10px; color: #b45309; font-weight: 500;">' + item.branch + '</td>' +
@@ -413,6 +441,7 @@
             });
 
             tbodyItems.innerHTML = itemsHtml;
+            document.getElementById('v-q-total').innerText = 'NT$ ' + grandTotal.toLocaleString();
             alert('報價單已成功生成！');
         }
 
@@ -432,6 +461,7 @@
                 ["據點名稱", "倉位編號", "尺寸 (寬*深*高 m)", "材積", "方案類型", "優惠單價 (月)", "承租期數", "金額小計 (TWD)"]
             ];
 
+            let grandTotal = 0;
             keys.forEach(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let term = item.term || '12_85';
@@ -443,6 +473,9 @@
                 else if (term === '12_80') { monthlyRate = item.price12_80 !== undefined ? item.price12_80 : Math.round((item.price1 * 0.8) / 10) * 10; termName = '年繳(8折)'; }
 
                 let months = item.months || 12;
+                let sub = monthlyRate * months;
+                grandTotal += sub;
+
                 wsData.push([
                     item.branch,
                     item.code,
@@ -451,9 +484,11 @@
                     termName,
                     monthlyRate,
                     months + ' 個月',
-                    monthlyRate * months
+                    sub
                 ]);
             });
+
+            wsData.push([], ["報價總金額 (TWD)", grandTotal]);
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
