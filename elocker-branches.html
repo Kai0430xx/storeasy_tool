@@ -3,37 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收多易迷你倉庫 - 各據點資訊</title>
+    <title>收多易迷你倉庫 - 快存櫃各據點資訊</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
         aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
         .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
         .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        
         nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
         .menu-group { display: flex; flex-direction: column; gap: 4px; }
         .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
+        
         nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
         nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
         nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
+
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
-        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; }
-        .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .card h3 { font-size: 1.1rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
-        .card p { font-size: 0.85rem; color: #64748b; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        
+        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; align-items: center; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+        .filter-group input, .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+
+        .branches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .branch-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+        .branch-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        .branch-header { background: #0f172a; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .branch-title { font-size: 1.1rem; font-weight: bold; color: #fbbf24; }
+        .branch-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; background: #334155; color: #e2e8f0; }
+        .branch-badge.app-only { background: #dc2626; color: #fff; }
+        .branch-badge.machine { background: #059669; color: #fff; }
+
+        .branch-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+        .info-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9rem; color: #475569; }
+        .info-row strong { color: #1e293b; min-width: 70px; flex-shrink: 0; }
+
+        .floor-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .floor-table th, .floor-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .floor-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        .floor-table tr:last-child td { border-bottom: none; }
+        
+        .tag-monthly { background: #fef3c7; color: #b45309; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #fde68a; display: inline-block; }
+
+        .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; grid-column: 1 / -1; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
+
+        @media (max-width: 768px) {
+            .filter-card { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+
     <aside class="no-print">
-        <div class="sidebar-header"><h1>收多易迷你倉庫</h1><p>Storeasy Storage</p></div>
+        <div class="sidebar-header">
+            <h1>收多易迷你倉庫</h1>
+            <p>Storeasy Storage</p>
+        </div>
         <nav>
             <div class="menu-group">
-                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▼</span></button>
+                <button type="button" class="menu-category"><span>📦 迷你倉庫</span><span>▶</span></button>
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
@@ -51,15 +91,172 @@
         </nav>
         <div class="sidebar-footer">資料已永久儲存於本機瀏覽器</div>
     </aside>
+
     <main>
-        <header><h2>🏢 各據點資訊</h2><div class="version">系統版本：20260401</div></header>
+        <header>
+            <h2>🏢 快存櫃 (eLocker) 各據點資訊</h2>
+            <div class="version" id="system-version">系統版本：載入中...</div>
+        </header>
+
         <div class="content-body">
-            <div class="card">
-                <h3>快存櫃 (eLocker) 各據點分布</h3>
-                <p>在此檢視與管理全台快存櫃據點的詳細地址與聯絡資訊。</p>
+            <!-- 篩選與搜尋工具列 -->
+            <div class="filter-card">
+                <div class="filter-group">
+                    <label>🔍 關鍵字搜尋（據點名稱 / 地址 / 尺寸）：</label>
+                    <input type="text" id="search-input" oninput="renderBranches()" placeholder="例如: 土城 或 S尺寸">
+                </div>
+                <div class="filter-group">
+                    <label>🏢 選擇據點篩選：</label>
+                    <select id="branch-select" onchange="renderBranches()">
+                        <option value="">-- 全部據點 --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>📱 承租方式篩選：</label>
+                    <select id="type-select" onchange="renderBranches()">
+                        <option value="">-- 全部方式 --</option>
+                        <option value="app">僅限 APP 承租</option>
+                        <option value="machine">支援現場機台 / APP</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 據點卡片列表容器 -->
+            <div id="branches-container" class="branches-grid">
+                <!-- 動態生成 -->
             </div>
         </div>
     </main>
+
     <script src="login.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                const now = new Date();
+                const verEl = document.getElementById('system-version');
+                if (verEl) {
+                    verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
+                }
+                initElockerBranches();
+            } catch(e) {
+                console.error("Initialization error:", e);
+            }
+        });
+
+        // 取得快存櫃據點資料（若 localStorage 尚無資料，自動載入預設示範資料）
+        function getElockerData() {
+            let data = localStorage.getItem('storeasy_elocker_branches');
+            if (!data) {
+                // 預設示範資料
+                const defaultData = [
+                    {
+                        id: 1,
+                        name: "土城金城場",
+                        address: "新北市土城區金城路二段xxx號",
+                        hours: "24小時營業",
+                        rentType: "machine", // machine: 支援機台/APP, app: 僅限APP
+                        floors: [
+                            { floor: "1F", sizes: "S尺寸 (30*40*50cm)、M尺寸 (50*40*50cm)", monthly: "S尺寸可月繳" },
+                            { floor: "B1", sizes: "L尺寸 (大型行李專用)", monthly: "不可月繳 (限期繳)" }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "板橋文化場",
+                        address: "新北市板橋區文化路一段xxx號",
+                        hours: "08:00 - 22:00",
+                        rentType: "app",
+                        floors: [
+                            { floor: "1F", sizes: "S尺寸、M尺寸、L尺寸", monthly: "全面開放可月繳" }
+                        ]
+                    }
+                ];
+                localStorage.setItem('storeasy_elocker_branches', JSON.stringify(defaultData));
+                return defaultData;
+            }
+            try {
+                return JSON.parse(data) || [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function initElockerBranches() {
+            let branches = getElockerData();
+            const branchSelect = document.getElementById('branch-select');
+            if (branchSelect) {
+                let html = '<option value="">-- 全部據點 --</option>';
+                branches.forEach(function(b) {
+                    html += '<option value="' + b.name + '">' + b.name + '</option>';
+                });
+                branchSelect.innerHTML = html;
+            }
+            renderBranches();
+        }
+
+        function renderBranches() {
+            let branches = getElockerData();
+            const searchKw = document.getElementById('search-input').value.trim().toLowerCase();
+            const selectedBranch = document.getElementById('branch-select').value;
+            const selectedType = document.getElementById('type-select').value;
+            const container = document.getElementById('branches-container');
+
+            let list = branches;
+            if (selectedBranch) {
+                list = list.filter(function(b) { return b.name === selectedBranch; });
+            }
+            if (selectedType) {
+                list = list.filter(function(b) { return b.rentType === selectedType; });
+            }
+            if (searchKw) {
+                list = list.filter(function(b) {
+                    let matchName = b.name && b.name.toLowerCase().includes(searchKw);
+                    let matchAddr = b.address && b.address.toLowerCase().includes(searchKw);
+                    let matchFloor = b.floors && b.floors.some(function(f) {
+                        return (f.sizes && f.sizes.toLowerCase().includes(searchKw)) || 
+                               (f.monthly && f.monthly.toLowerCase().includes(searchKw));
+                    });
+                    return matchName || matchAddr || matchFloor;
+                });
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="empty-state">查無符合條件的快存櫃據點資訊（可至「管理資料」頁面新增或維護）</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(function(b) {
+                let badgeClass = b.rentType === 'app' ? 'app-only' : 'machine';
+                let badgeText = b.rentType === 'app' ? '📱 僅限 APP 承租' : '🖥️ 支援機台 / APP';
+
+                let floorsHtml = b.floors.map(function(f) {
+                    let monthlyTag = f.monthly && f.monthly.includes('可月繳') ? '<span class="tag-monthly">✨ ' + f.monthly + '</span>' : '<span style="color:#64748b; font-size:0.8rem;">' + (f.monthly || '無特別標示') + '</span>';
+                    return '<tr>' +
+                        '<td style="font-weight:bold; width: 60px;">' + f.floor + '</td>' +
+                        '<td>' + f.sizes + '</td>' +
+                        '<td style="width: 120px; text-align: right;">' + monthlyTag + '</td>' +
+                    '</tr>';
+                }).join('');
+
+                return '<div class="branch-card">' +
+                    '<div class="branch-header">' +
+                        '<span class="branch-title">🏢 ' + b.name + '</span>' +
+                        '<span class="branch-badge ' + badgeClass + '">' + badgeText + '</span>' +
+                    '</div>' +
+                    '<div class="branch-body">' +
+                        '<div class="info-row"><strong>📍 地址：</strong><span>' + b.address + '</span></div>' +
+                        '<div class="info-row"><strong>🕒 時間：</strong><span>' + b.hours + '</span></div>' +
+                        '<div style="margin-top: 4px;">' +
+                            '<strong style="font-size: 0.85rem; color: #475569; display: block; margin-bottom: 6px;">📐 各樓層尺寸與月繳規則：</strong>' +
+                            '<table class="floor-table">' +
+                                '<thead><tr><th>樓層</th><th>尺寸規格</th><th style="text-align: right;">月繳資格</th></tr></thead>' +
+                                '<tbody>' + floorsHtml + '</tbody>' +
+                            '</table>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+    </script>
 </body>
 </html>
