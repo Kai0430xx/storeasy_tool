@@ -598,13 +598,12 @@
                 ["保證金合計 (NT$)", document.getElementById('v-i-deposit').innerText],
                 ["保險文書處理費合計 (NT$)", document.getElementById('v-i-fee-total').innerText],
                 ["其他雜費合計 (NT$)", document.getElementById('v-i-extra-total').innerText],
-                ["請款總金額 (TWD)", document.getElementById('v-i-total'].innerText]
+                ["請款總金額 (TWD)", document.getElementById('v-i-total').innerText]
             );
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-            // 💡 設定精美自動欄寬
             ws['!cols'] = [
                 {wch: 14}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 10}, 
                 {wch: 12}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 24}, {wch: 14}
