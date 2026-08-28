@@ -65,10 +65,7 @@
 
         .preview-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 950px; margin: 0 auto; width: 100%; }
         .preview-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px; }
-        
-        /* 💡 修正請款單客戶資料區塊排版 */
         .preview-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem; margin-bottom: 24px; }
-        
         .summary-box { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; margin-top: 24px; margin-bottom: 24px; }
         .notes-box { font-size: 0.75rem; color: #64748b; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.5; margin-bottom: 24px; }
         .table-container { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 16px; }
@@ -98,7 +95,6 @@
             }
             #invoice-preview h1 { font-size: 1.3rem !important; }
             #invoice-preview h2 { font-size: 1rem !important; }
-            /* 💡 列印時固定 .preview-info 左右排版且限制寬度分佈 */
             #invoice-preview .preview-info { 
                 display: grid !important; 
                 grid-template-columns: 1fr 1fr !important; 
@@ -399,15 +395,6 @@
                 let bDisc = branchDiscounts[item.branch];
                 if (bDisc === '0.80') defaultTerm = '12_80';
                 let today = new Date().toISOString().split('T')[0];
-                
-                let existingKeys = Object.keys(selectedInvoiceItems);
-                let targetStart = today;
-                let targetEnd = today;
-                if (existingKeys.length > 0) {
-                    let firstItem = selectedInvoiceItems[existingKeys[0]];
-                    if (firstItem.startDate) targetStart = firstItem.startDate;
-                    if (firstItem.endDate) targetEnd = firstItem.endDate;
-                }
 
                 selectedInvoiceItems[idx] = Object.assign({}, item, { 
                     term: defaultTerm, 
@@ -416,23 +403,13 @@
                     packingFee: 0,
                     movingFee: 0,
                     otherFee: 0,
-                    startDate: targetStart, 
-                    endDate: targetEnd 
+                    startDate: today, 
+                    endDate: today 
                 });
             } else {
                 delete selectedInvoiceItems[idx];
             }
             renderPerItemFeesInputs();
-        }
-
-        function updateAllDates(field, value) {
-            Object.keys(selectedInvoiceItems).forEach(function(idx) {
-                selectedInvoiceItems[idx][field] = value;
-            });
-            const inputs = document.querySelectorAll('input[data-date-field="' + field + '"]');
-            inputs.forEach(function(input) {
-                if (input.value !== value) input.value = value;
-            });
         }
 
         function renderPerItemFeesInputs() {
@@ -467,9 +444,9 @@
                         '<div style="grid-column: span 2;">' +
                             '<label style="font-size: 0.75rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 4px;">📅 租期區間</label>' +
                             '<div style="display: flex; align-items: center;">' +
-                                '<input type="date" value="' + (item.startDate || '') + '" data-date-field="startDate" onchange="selectedInvoiceItems[' + idx + '].startDate = this.value; updateAllDates(\'startDate\', this.value);" style="padding: 6px 8px; font-size: 0.85rem; border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; width: 50%;">' +
+                                '<input type="date" value="' + (item.startDate || '') + '" onchange="selectedInvoiceItems[' + idx + '].startDate = this.value;" style="padding: 6px 8px; font-size: 0.85rem; border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; width: 50%;">' +
                                 '<span style="background: #f1f5f9; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; padding: 7px 8px; font-size: 0.8rem; color: #64748b;">至</span>' +
-                                '<input type="date" value="' + (item.endDate || '') + '" data-date-field="endDate" onchange="selectedInvoiceItems[' + idx + '].endDate = this.value; updateAllDates(\'endDate\', this.value);" style="padding: 6px 8px; font-size: 0.85rem; border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: none; width: 50%;">' +
+                                '<input type="date" value="' + (item.endDate || '') + '" onchange="selectedInvoiceItems[' + idx + '].endDate = this.value;" style="padding: 6px 8px; font-size: 0.85rem; border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: none; width: 50%;">' +
                             '</div>' +
                         '</div>' +
                         '<div>' +
