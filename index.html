@@ -17,9 +17,10 @@
             flex-direction: column; 
             flex-shrink: 0; 
             box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
-            z-index: 100; 
-            position: sticky; 
+            z-index: 1000; 
+            position: fixed; 
             top: 0; 
+            left: 0;
             height: 100vh; 
             overflow-y: auto;
         }
@@ -39,7 +40,7 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -61,16 +62,20 @@
         .btn-amber:hover { background-color: #d97706; }
         .btn-red-outline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; }
-        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; word-break: break-all; white-space: normal; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; margin-top: 12px; table-layout: auto; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; word-break: break-word; white-space: normal; }
         th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         tr:hover { background-color: #f8fafc; }
 
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
+        .sidebar-overlay.active { display: block; }
+
         @media (max-width: 768px) {
-            aside { position: fixed; left: -260px; top: 0; }
-            aside.mobile-open { left: 0; }
+            aside { transform: translateX(-100%); }
+            aside.mobile-open { transform: translateX(0); }
             .mobile-close-btn { display: block; }
             .menu-toggle-btn { display: inline-block; }
+            main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .form-grid { grid-template-columns: 1fr; }
@@ -79,6 +84,8 @@
     </style>
 </head>
 <body>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
     <datalist id="branch-list">
         <option value="土城店"><option value="南東店"><option value="民生松江店"><option value="永和店"><option value="延吉店"><option value="逸仙店">
@@ -98,7 +105,7 @@
                 <div class="menu-items">
                     <a href="index.html" class="sub-btn active">📦 倉位資料</a>
                     <a href="quote.html" class="sub-btn">📄 生成報價單</a>
-                    <a href="invoice.html" class="sub-btn">💰 請款單</a>
+                    <a href="invoice.html" class="sub-btn">💰 生成請款單</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
@@ -129,7 +136,7 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>分店名稱</label>
-                        <input type="text" id="upload-branch-name" list="branch-list" value="土城店">
+                        <input type="text" id="upload-branch-name" list="branch-list" placeholder="請選擇或輸入分店名稱">
                     </div>
                     <div class="form-group">
                         <label>該店預設年繳方案</label>
@@ -163,15 +170,15 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="text-align: left;">據點名稱</th>
-                                <th style="text-align: left;">倉位編號</th>
-                                <th style="text-align: left;">尺寸 (寬*深*高 m)</th>
-                                <th style="text-align: left;">材積 (材)</th>
-                                <th style="text-align: left;">月繳/原價</th>
-                                <th style="text-align: left;">季繳</th>
-                                <th style="text-align: left;">半年繳</th>
-                                <th id="th-annual-85" style="text-align: left;">年繳 (85折)</th>
-                                <th id="th-annual-80" style="text-align: left;">年繳 (8折)</th>
+                                <th style="width: 100px;">據點名稱</th>
+                                <th style="width: 90px;">倉位編號</th>
+                                <th style="width: 350px;">尺寸 (寬*深*高 m)</th>
+                                <th style="width: 80px;">材積 (材)</th>
+                                <th style="width: 100px;">月繳/原價</th>
+                                <th style="width: 90px;">季繳</th>
+                                <th style="width: 90px;">半年繳</th>
+                                <th id="th-annual-85" style="width: 105px;">年繳 (85折)</th>
+                                <th id="th-annual-80" style="width: 105px;">年繳 (8折)</th>
                             </tr>
                         </thead>
                         <tbody id="storage-table-body">
@@ -192,13 +199,19 @@
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
         }
 
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let branchDiscounts = JSON.parse(localStorage.getItem('storeasy_branch_discounts')) || {};
 
         function handleSmartExcelUpload() {
+            const branchInput = document.getElementById('upload-branch-name');
+            const branch = branchInput.value.trim();
+            if (!branch) { alert('請先輸入或選擇分店名稱！'); return; }
+
             const fileInput = document.getElementById('excelFile');
             if (!fileInput.files || fileInput.files.length === 0) { alert('請先選擇一個 Excel 檔案！'); return; }
             const file = fileInput.files[0];
@@ -208,7 +221,6 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const jsonSheet = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
-                    const branch = document.getElementById('upload-branch-name').value.trim() || '土城店';
                     const discountVal = document.getElementById('branch-annual-discount').value;
                     
                     branchDiscounts[branch] = discountVal;
@@ -276,6 +288,10 @@
                     storageData = storageData.concat(newItems);
                     localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                     
+                    // 💡 匯入成功後自動將分店名稱清空並重置檔案選擇器
+                    branchInput.value = '';
+                    fileInput.value = '';
+
                     const selectEl = document.getElementById('storage-branch-filter');
                     if (selectEl) selectEl.value = 'all';
 
@@ -299,7 +315,7 @@
             }
         }
 
-        function renderStorageTable() {
+    function renderStorageTable() {
             let selectEl = document.getElementById('storage-branch-filter');
             let filter = selectEl ? selectEl.value : 'all';
             
@@ -336,7 +352,7 @@
                     <tr>
                         <td style="font-weight: 500; color: #b45309;">${item.branch}</td>
                         <td style="font-weight: bold;">${item.code}</td>
-                        <td>${item.size}</td>
+                        <td style="line-height: 1.4;">${item.size}</td>
                         <td style="color: #64748b;">${item.unit}</td>
                         <td style="font-weight: 600; color: #d97706;">NT$ ${item.price1.toLocaleString()}</td>
                         <td>NT$ ${item.price3.toLocaleString()}</td>
