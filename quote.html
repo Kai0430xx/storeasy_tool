@@ -189,9 +189,9 @@
                 </div>
 
                 <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取項目與方案調整：</h5>
-                    <div id="per-item-quote-container" style="display: flex; flex-direction: column; gap: 12px;">
-                        <span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選報價倉位項目</span>
+                    <h5 style="font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase;">⚙️ 已選取的報價項目（方案與額外優惠備註）：</h5>
+                    <div id="per-item-quote-container" style="display: flex; flex-direction: column; gap: 8px;">
+                        <span style="color: #94a3b8; font-size: 0.85rem;">尚未勾選任何項目</span>
                     </div>
                 </div>
 
@@ -351,7 +351,8 @@
 
                 selectedQuoteItems[idx] = Object.assign({}, item, { 
                     term: defaultTerm,
-                    months: defaultTerm.startsWith('12') ? 12 : Number(defaultTerm)
+                    months: defaultTerm.startsWith('12') ? 12 : Number(defaultTerm),
+                    remark: ''
                 });
             } else {
                 delete selectedQuoteItems[idx];
@@ -363,32 +364,11 @@
             const container = document.getElementById('per-item-quote-container');
             if (!container) return;
             const keys = Object.keys(selectedQuoteItems);
-            if (keys.length === 0) { container.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">請先於上方勾選報價倉位項目</span>'; return; }
+            if (keys.length === 0) { container.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">尚未勾選任何項目</span>'; return; }
             
             container.innerHTML = keys.map(function(idx) {
                 let item = selectedQuoteItems[idx];
-                let currentTerm = item.term || '12_85';
-                let currentMonths = item.months || 12;
-                return '<div style="background: #fff; border: 1px solid #cbd5e1; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;" data-index="' + idx + '">' +
-                    '<div style="font-weight: bold; color: #92400e; font-size: 0.9rem;">📍 倉位編號：' + item.code + ' ([' + item.branch + '] ' + item.size + ' / ' + item.unit + '材)</div>' +
-                    '<div style="display: flex; gap: 12px; align-items: center;">' +
-                        '<div style="display: flex; align-items: center; gap: 6px;">' +
-                            '<label style="font-size: 0.8rem; color: #475569; font-weight: bold;">方案：</label>' +
-                            '<select onchange="selectedQuoteItems[' + idx + '].term = this.value; selectedQuoteItems[' + idx + '].months = (this.value.startsWith(\'12\')?12:Number(this.value)); renderPerItemQuoteInputs();" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fef3c7; font-weight: bold;">' +
-                                '<option value="1" ' + (currentTerm==='1'?'selected':'') + '>月繳 (1個月)</option>' +
-                                '<option value="3" ' + (currentTerm==='3'?'selected':'') + '>季繳 (95折)</option>' +
-                                '<option value="6" ' + (currentTerm==='6'?'selected':'') + '>半年繳 (9折)</option>' +
-                                '<option value="12_85" ' + (currentTerm==='12_85'?'selected':'') + '>年繳 (85折)</option>' +
-                                '<option value="12_80" ' + (currentTerm==='12_80'?'selected':'') + '>年繳 (8折)</option>' +
-                            '</select>' +
-                        '</div>' +
-                        '<div style="display: flex; align-items: center; gap: 6px;">' +
-                            '<label style="font-size: 0.8rem; color: #475569; font-weight: bold;">月數：</label>' +
-                            '<input type="number" value="' + currentMonths + '" min="1" max="60" oninput="selectedQuoteItems[' + idx + '].months = Number(this.value)||1" style="width: 70px; padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem;">' +
-                        '</div>' +
-                        '<button type="button" onclick="delete selectedQuoteItems[' + idx + ']; renderQuoteSelectableItems(); renderPerItemQuoteInputs();" style="background:none; border:none; color: #dc2626; font-weight: bold; font-size: 1.1rem; cursor: pointer;">×</button>' +
-                    '</div>' +
-                '</div>';
+                return '<div style="font-size: 0.85rem; color: #334155;">• ' + item.branch + ' / ' + item.code + ' (' + item.size + ') 已納入報價計算</div>';
             }).join('');
         }
 
