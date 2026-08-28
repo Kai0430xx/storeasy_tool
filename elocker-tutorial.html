@@ -78,7 +78,7 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .tabs-nav { gap: 4px; }
-            .tab-btn { padding: 8px 10px; font-size: 0.8rem; }
+            .tab-btn { padding: 8px 10px; font-size: 0.80rem; }
             .version { display: none; }
         }
     </style>
@@ -181,7 +181,7 @@
                     <h3>🖥️ 機台現場操作步驟（寄物與取物）</h3>
                     <h4>【機台寄物流程】</h4>
                     <ul class="steps-list">
-                        <li><b>選擇語言</b>：於機台螢幕點選中文,英文,日文或韓文。</li>
+                        <li><b>選擇語言</b>：於機台螢幕點選中文、英文、日文或韓文。</li>
                         <li><b>點選存放</b>：點選「存放行李（單次存取）」。</li>
                         <li><b>選擇櫃型與櫃號</b>：選擇對應櫃型與空置櫃號。</li>
                         <li><b>選擇租用方式</b>：選擇「時租」（1小時~24小時）或「日租」（1天~7天）。</li>
@@ -238,19 +238,25 @@
             <!-- 4. APP月租續約 -->
             <div id="tab-renew" class="tab-content">
                 <div class="card">
-                    <h3>🔄 APP 月租續約與店長後台設定</h3>
+                    <h3>🔄 APP 月租續約與店長後台設定規範</h3>
                     
+                    <div class="warning-box" style="margin-bottom: 8px;">
+                        <b>📌 核心顯示條件：</b>客戶 APP 要能夠看到續約按鈕並進行付款，必須同時滿足以下兩個條件：<br>
+                        1. 店長已在後台設定好<b>「月租續約金」</b>。<br>
+                        2. 時間已進入<span style="color: #dc2626; font-weight: bold;">「訂單結束前七天內」</span>。
+                    </div>
+
                     <h4>【店長 ERP 後台設定步驟】</h4>
-                    <p style="font-size: 0.88rem; color: #64748b;">若店長未在後台設定續約金，客戶 APP 點擊「延時」將不會顯示月租選項，導致無法自助續約。</p>
                     <ul class="steps-list">
                         <li>系統進入<b>「快存櫃 ➔ 租用紀錄」</b>，以客戶資料搜尋並開啟明細表。</li>
                         <li>找到明細表右下角的<b>「設定：月租續約金」</b>按鈕並點擊。</li>
-                        <li>選擇對應金額與方案後點擊確定，畫面顯示續約金額數字即代表設定完成。</li>
+                        <li>選擇對應金額與方案後點擊確定。</li>
+                        <li><span style="color: #dc2626; font-weight: bold;">⚠️ 注意事項</span>：輸入的續約金額<span style="color: #dc2626; font-weight: bold;">絕對不能小於當前的月租金</span>（例如當前月租金是1000元，就不能輸入小於1000元）。若要取消設定，直接輸入空字串（不輸入任何文字）即可。當畫面上顯示續約金額數字即代表設定完成。</li>
                     </ul>
 
                     <h4 style="margin-top: 16px;">【客戶端 APP 正常續約與逾期繳費】</h4>
                     <ul class="steps-list">
-                        <li><b>正常續約</b>：到期前開啟 APP 進入快存櫃頁面 ➔ 點選「延時」➔ 下拉選單選擇「月租（續約）」➔ 確認新租期與金額完成線上繳費。</li>
+                        <li><b>正常續約</b>：訂單結束前 7 天內，開啟 APP 進入快存櫃頁面 ➔ 點選「延時」➔ 下拉選單選擇「月租（續約）」➔ 確認新租期與金額完成線上繳費。</li>
                         <li><b>逾期未滿 5 分鐘</b>：不計費（緩衝期）。</li>
                         <li><b>逾期未滿 1 天</b>：按 1 天計算，日租金 = 月租 ÷ 30，另加收 <span style="color: #dc2626; font-weight: bold;">5% 滯納金</span>。</li>
                         <li><b>逾期超過 1 天</b>：逾期租金按天累計 + 5% 滯納金（滯納金固定只收一次）。</li>
