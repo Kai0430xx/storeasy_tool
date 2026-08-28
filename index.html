@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 倉位資料管理</title>
-    <!-- 💡 優先執行登入驗證與狀態檢查 -->
+    <!-- 💡 保留登入檢查保護 -->
     <script src="login.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -47,6 +47,7 @@
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        
         .user-info { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; color: #475569; }
         .logout-btn { background: #fee2e2; color: #dc2626; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
         .logout-btn:hover { background: #fecaca; }
@@ -61,9 +62,7 @@
         .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         
         .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; }
-        .btn-dark { background-color: #0f172a; color: #fff; }
         .btn-amber { background-color: #f59e0b; color: #0f172a; }
-        .btn-emerald { background-color: #059669; color: #fff; }
 
         .table-container { max-height: 500px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-top: 12px; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; table-layout: auto; }
@@ -123,7 +122,7 @@
         <header>
             <div class="header-left">
                 <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
-                <h2>📦 倉位資料管理</h2>
+                <h2>倉位資料管理</h2>
             </div>
             <div style="display: flex; align-items: center; gap: 16px;">
                 <div class="user-info">使用者：<span id="current-username" style="color: #0f172a;">---</span></div>
@@ -292,7 +291,6 @@
                     workbook.SheetNames.forEach(function(sheetName) {
                         const worksheet = workbook.Sheets[sheetName];
                         const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                        // 解析 Excel 邏輯 (依據您原有的匯入格式)
                         json.forEach(function(row) {
                             if (row.length >= 6 && typeof row[1] === 'string' && !isNaN(row[4])) {
                                 parsedList.push({
@@ -314,7 +312,7 @@
                         storageData = parsedList;
                         localStorage.setItem('storeasy_storage_data', JSON.stringify(storageData));
                         initStorageTable();
-                        alert('Excel 倉位資料匯入成功！共載入 ' + parsedList.length筆資料);
+                        alert('Excel 倉位資料匯入成功！共載入 ' + parsedList.length + ' 筆資料');
                     } else {
                         alert('未能成功解析資料，請確認 Excel 格式是否正確！');
                     }
