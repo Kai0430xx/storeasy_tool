@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <script src="login.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收多易迷你倉庫 - 生成報價單</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -285,7 +286,6 @@
         </div>
     </main>
 
-    <script src="login.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             try {
@@ -483,7 +483,6 @@
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309; white-space: nowrap;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
                 
-                // 💡 如果選擇「不列入試算」，則不累加進費用試算總額中
                 if (term !== 'none') {
                     rent += calcPrice * months; 
                     fee += (calcPrice >= 3000 ? 150 : 80) * months; 
