@@ -2253,7 +2253,7 @@
         };
         }
 
-        // 💡 完整據點與各樓層設定資料（已完整納入您上傳之「網頁需要資料.xlsx」中所有據點與進階屬性）
+        // 💡 完整據點與各樓層設定資料（已完美納入您上傳之「網頁需要資料.xlsx」中所有據點與進階屬性）
         function getElockerData() {
             return [
                 {
@@ -2263,10 +2263,10 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F-1", code: "AAA", desc: "手推車區", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "5F-1", code: "AAB", desc: "哺乳室旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "6F-1", code: "AAC", desc: "退稅服務中心", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "6F-2", code: "AAD", desc: "化妝室旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "2F-1", code: "AAA", desc: "手推車區", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "5F-1", code: "AAB", desc: "哺乳室旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "6F-1", code: "AAC", desc: "退稅服務中心", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "6F-2", code: "AAD", desc: "化妝室旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2276,13 +2276,13 @@
                     hours: "10:00-21:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "9號出入口", code: "ABA", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "西側廁所旁", code: "ABB", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "303~386櫃", code: "ABD", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "001~124櫃", code: "ABE", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "125~302櫃", code: "", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "電梯旁", code: "ABF", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "9號出入口", code: "ABA", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "20", daily_add: "50" },
+                        { floor: "西側廁所旁", code: "ABB", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "20", daily_add: "50" },
+                        { floor: "冰上樂園2F女廁旁", code: "ABC", desc: "", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "303~386櫃", code: "ABD", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "V", hourly_add: "", daily_add: "" },
+                        { floor: "001~124櫃", code: "ABE", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "V", hourly_add: "", daily_add: "" },
+                        { floor: "125~302櫃", code: "", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "V", hourly_add: "", daily_add: "" },
+                        { floor: "電梯旁", code: "ABF", desc: "若當天有活動依小巨蛋關門時間為主", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "20", daily_add: "50" }
                     ]
                 },
                 {
@@ -2292,7 +2292,7 @@
                     hours: "07:00-22:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "ACA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "ACA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2302,9 +2302,9 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B2-1", code: "ADA", desc: "臺鐵南港站西閘門前 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1AF", code: "ADB", desc: "近南側廣場出口 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1AF-2", code: "ADC", desc: "計程車招呼站旁 (11:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B2-1", code: "ADA", desc: "臺鐵南港站西閘門前 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1AF", code: "ADB", desc: "近南側廣場出口 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1AF-2", code: "ADC", desc: "計程車招呼站旁 (11:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2314,8 +2314,8 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "AEA", desc: "市民大道 (10:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "", first_discount: "X", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "1F-B", code: "AEB", desc: "天橋下 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "", first_discount: "X", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2325,7 +2325,7 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F-1", code: "AFA", desc: "萬家福天母店內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-1", code: "AFA", desc: "萬家福天母店內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2335,8 +2335,8 @@
                     hours: "24hr",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "B1-1", code: "AGA", desc: "收多易台北車站店前", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B3-1", code: "AGB", desc: "站前地下街Z2出口處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1-1", code: "AGA", desc: "收多易台北車站店前", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B3-1", code: "AGB", desc: "站前地下街Z2出口處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "10", daily_add: "25" }
                     ]
                 },
                 {
@@ -2346,8 +2346,8 @@
                     hours: "09:00-24:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "AIA", desc: "服務台旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B2", code: "AIB", desc: "男廁旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AIA", desc: "服務台旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B2", code: "AIB", desc: "男廁旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2357,8 +2357,8 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "AJA", desc: "信義逸仙櫃 1F", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1", code: "AJB", desc: "信義逸仙櫃 B1", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2368,7 +2368,7 @@
                     hours: "06:00-24:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F-1", code: "AKA", desc: "動物園站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-1", code: "AKA", desc: "動物園站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "20", daily_add: "50" }
                     ]
                 },
                 {
@@ -2378,8 +2378,8 @@
                     hours: "依樂園開放時間為主",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F-A", code: "ALA", desc: "服務中心對面", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "ALB", desc: "沙坑", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "ALA", desc: "服務中心對面", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "20", daily_add: "50" },
+                        { floor: "1F-B", code: "ALB", desc: "沙坑", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "20", daily_add: "50" }
                     ]
                 },
                 {
@@ -2389,7 +2389,7 @@
                     hours: "平日 15:00-22:00 / 假日 09:00-22:00",
                     rentTypeText: "僅機台承租",
                     floors: [
-                        { floor: "B1", code: "AMA", desc: "運動教室", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AMA", desc: "運動教室", app: false, machine: true, count: true, hourly: false, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2399,8 +2399,8 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1-1", code: "ANA", desc: "電梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-2", code: "ANB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1-1", code: "ANA", desc: "電梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1-2", code: "ANB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2410,8 +2410,8 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "AOA", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "AOB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "AOA", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "2F", code: "AOB", desc: "樓梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2421,11 +2421,11 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "APA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "APB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "3F", code: "APC", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "4F", code: "APD", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "5F", code: "APE", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "APA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "2F", code: "APB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "3F", code: "APC", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "4F", code: "APD", desc: "手扶梯前方", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "5F", code: "APE", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2435,7 +2435,7 @@
                     hours: "07:00-21:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "AQA", desc: "7-11旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "AQA", desc: "7-11旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2445,7 +2445,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "ARA", desc: "大門旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "3F", code: "ARA", desc: "大門旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2455,7 +2455,7 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B2", code: "ASA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B2", code: "ASA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2465,7 +2465,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "ATA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "ATA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2475,7 +2475,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "AUA", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AUA", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2485,11 +2485,11 @@
                     hours: "24小時",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AVB", desc: "聯合醫院對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-C", code: "AVC", desc: "靠近就業服務站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-D", code: "AVD", desc: "誠品對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-E", code: "AVE", desc: "YouBike前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "AVA", desc: "機車B1入口旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "1F-B", code: "AVB", desc: "聯合醫院對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "1F-C", code: "AVC", desc: "靠近就業服務站", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", hourly_add: "30", daily_add: "130" },
+                        { floor: "1F-D", code: "AVD", desc: "誠品對面處", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", hourly_add: "45", daily_add: "250" },
+                        { floor: "1F-E", code: "AVE", desc: "YouBike前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2499,7 +2499,7 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "AWA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "AWA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2509,7 +2509,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "AXA", desc: "三店門口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "AXA", desc: "三店門口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2519,9 +2519,9 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "AYA", desc: "1號與2號倉庫間 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "35", daily_add: "190" },
+                        { floor: "1F-B", code: "AYB", desc: "辦公廳舍哺乳室前 (08:00-21:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "1F-C", code: "AYC", desc: "全家旁 (24小時)", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "45", daily_add: "250" }
                     ]
                 },
                 {
@@ -2531,7 +2531,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "AZA", desc: "收多易南門店門口", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "AZA", desc: "收多易南門店門口", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2541,7 +2541,7 @@
                     hours: "24小時",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "BAA", desc: "汽機車停車場入口旁", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "35", daily_add: "190" }
                     ]
                 },
                 {
@@ -2551,7 +2551,7 @@
                     hours: "06:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "9F", code: "BBA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "9F", code: "BBA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2561,8 +2561,8 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "6F", code: "IAA", desc: "605室 (08:00-24:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1", code: "IAB", desc: "紙箱打包區旁 (09:00-23:00)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2572,7 +2572,7 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "ICA", desc: "三重湯城廣場內", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2582,7 +2582,7 @@
                     hours: "08:30-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "IDA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "IDA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2592,7 +2592,7 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "IEA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "IEA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2602,8 +2602,8 @@
                     hours: "09:30-22:30",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1-A", code: "IFA", desc: "賣場入口左側", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1-B", code: "IFB", desc: "賣場出口旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2613,9 +2613,9 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "5F", code: "IGB", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true },
-                        { floor: "6F", code: "IGC", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "2F", code: "IGA", desc: "賣場入口 (24小時)", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "5F", code: "IGB", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "6F", code: "IGC", desc: "07:00-24:00", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2625,8 +2625,8 @@
                     hours: "09:00-22:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "IHA", desc: "賣場出入口", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B2", code: "IHB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "1F", code: "IHA", desc: "賣場出入口", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B2", code: "IHB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2636,7 +2636,7 @@
                     hours: "07:00-01:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "IIA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "IIA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2646,7 +2646,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "IJA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "IJA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2656,7 +2656,7 @@
                     hours: "05:00-22:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F", code: "IKA", desc: "哺乳室前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "IKA", desc: "哺乳室前", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "", first_discount: "", easy_card: "", hourly_add: "10", daily_add: "80" }
                     ]
                 },
                 {
@@ -2666,7 +2666,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "ILA", desc: "聖母樓一樓走廊", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "ILA", desc: "聖母樓一樓走廊", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "X", overdue: "X", first_discount: "X", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2676,7 +2676,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "IMA", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "B1", code: "IMA", desc: "", app: true, machine: false, count: false, hourly: false, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "V", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2686,7 +2686,7 @@
                     hours: "10:00-22:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "INA", desc: "往1F手扶梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "INA", desc: "往1F手扶梯前", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2696,7 +2696,7 @@
                     hours: "09:00-22:30",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "IPA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "IPA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2706,7 +2706,7 @@
                     hours: "08:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MAA", desc: "服務中心對面", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MAA", desc: "服務中心對面", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2716,8 +2716,8 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MBA", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1", code: "MBB", desc: "賣場入口旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2727,7 +2727,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MCA", desc: "打包區旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2737,8 +2737,8 @@
                     hours: "依場館開放時間為主",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-1", code: "MEB", desc: "GATE E旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MEA", desc: "場外廊道三壘側商品部右邊", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "40", daily_add: "210" },
+                        { floor: "1F-1", code: "MEB", desc: "GATE E旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "40", daily_add: "210" }
                     ]
                 },
                 {
@@ -2748,8 +2748,8 @@
                     hours: "11:00-22:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "MFA", desc: "貨梯旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1", code: "MFB", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2759,7 +2759,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "NAA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2769,8 +2769,8 @@
                     hours: "綜合 (詳見各樓層)",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true }
+                        { floor: "3F", code: "OAB", desc: "電梯旁 (24hr)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "B1", code: "OAC", desc: "手扶梯旁 (10:00-22:00)", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: true, halfyear: true, year: true, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2780,7 +2780,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "OBB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "3F", code: "OBB", desc: "手扶梯旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2790,7 +2790,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "2F", code: "OCA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "2F", code: "OCA", desc: "賣場入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2800,7 +2800,7 @@
                     hours: "24hr",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "B1", code: "ODA", desc: "美食街旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "ODA", desc: "美食街旁", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2810,8 +2810,8 @@
                     hours: "24小時",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false },
-                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-A", code: "OEA", desc: "售票處對面左側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "30", daily_add: "170" },
+                        { floor: "1F-B", code: "", desc: "售票處對面右側", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "40", daily_add: "210" }
                     ]
                 },
                 {
@@ -2821,7 +2821,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "OFA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "OFA", desc: "", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2831,8 +2831,8 @@
                     hours: "11:00-22:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "OGA", desc: "女廁旁梯廳", app: true, machine: true, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "35", daily_add: "170" },
+                        { floor: "B1-1", code: "OGB", desc: "往B2停車場梯廳", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2842,7 +2842,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "TAA", desc: "台南民生櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "TAA", desc: "台南民生櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2852,7 +2852,7 @@
                     hours: "09:00-23:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F", code: "TBA", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "TBA", desc: "廁所旁", app: true, machine: false, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2862,7 +2862,7 @@
                     hours: "24小時",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "3F", code: "VAA", desc: "高雄鼎山櫃", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 },
                 {
@@ -2872,7 +2872,7 @@
                     hours: "6:00-23:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "1F", code: "YAA", desc: "7-11旁", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "30", daily_add: "130" }
                     ]
                 },
                 {
@@ -2882,7 +2882,7 @@
                     hours: "05:00-24:00",
                     rentTypeText: "機台 + APP 承租",
                     floors: [
-                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false }
+                        { floor: "B1", code: "YBA", desc: "北站出口", app: true, machine: true, count: false, hourly: true, monthly: false, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "25", daily_add: "110" }
                     ]
                 },
                 {
@@ -2892,234 +2892,9 @@
                     hours: "11:00-22:00",
                     rentTypeText: "僅 APP 承租",
                     floors: [
-                        { floor: "1F-B", code: "YCB", desc: "側門入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false },
-                        { floor: "2F", code: "YCC", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false }
+                        { floor: "1F-B", code: "YCB", desc: "側門入口處", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" },
+                        { floor: "2F", code: "YCC", desc: "樓梯下方", app: true, machine: false, count: false, hourly: true, monthly: true, quarter: false, halfyear: false, year: false, discount_price: "", overdue: "", first_discount: "", easy_card: "", hourly_add: "", daily_add: "" }
                     ]
                 }
             ];
         }
-
-        function initElockerBranches() {
-            let branches = getElockerData();
-            const branchSelect = document.getElementById('branch-select');
-            if (branchSelect) {
-                let html = '<option value="">-- 全部據點 --</option>';
-                branches.forEach(function(b) {
-                    html += '<option value="' + b.name + '">' + b.name + '</option>';
-                });
-                branchSelect.innerHTML = html;
-            }
-            renderBranches();
-        }
-
-        function renderBranches() {
-            let branches = getElockerData();
-            const searchKw = document.getElementById('search-input').value.trim().toLowerCase();
-            const selectedBranch = document.getElementById('branch-select').value;
-            const selectedType = document.getElementById('type-select').value;
-            const selectedTerm = document.getElementById('term-select').value;
-            const container = document.getElementById('branches-container');
-
-            let list = branches;
-            if (selectedBranch) {
-                list = list.filter(function(b) { return b.name === selectedBranch; });
-            }
-
-            if (selectedType || selectedTerm) {
-                list = list.filter(function(b) {
-                    return b.floors.some(function(f) {
-                        let matchType = true;
-                        if (selectedType === 'machine') matchType = f.machine && !f.app;
-                        else if (selectedType === 'app') matchType = f.app && !f.machine;
-                        else if (selectedType === 'both') matchType = f.app && f.machine;
-
-                        let matchTerm = true;
-                        if (selectedTerm === 'count') matchTerm = f.count;
-                        else if (selectedTerm === 'hourly') matchTerm = f.hourly;
-                        else if (selectedTerm === 'monthly') matchTerm = f.monthly;
-                        else if (selectedTerm === 'quarter') matchTerm = f.quarter;
-                        else if (selectedTerm === 'halfyear') matchTerm = f.halfyear;
-                        else if (selectedTerm === 'year') matchTerm = f.year;
-
-                        return matchType && matchTerm;
-                    });
-                });
-            }
-
-            if (searchKw) {
-                list = list.filter(function(b) {
-                    let matchName = b.name && b.name.toLowerCase().includes(searchKw);
-                    let matchCity = b.city && b.city.toLowerCase().includes(searchKw);
-                    let matchCode = b.floors && b.floors.some(function(f) {
-                        return f.code && f.code.toLowerCase().includes(searchKw);
-                    });
-                    return matchName || matchCity || matchCode;
-                });
-            }
-
-            if (list.length === 0) {
-                container.innerHTML = '<div class="empty-state">查無符合條件的快存櫃據點資訊</div>';
-                return;
-            }
-
-            container.innerHTML = list.map(function(b) {
-                let floorsHtml = b.floors.map(function(f) {
-                    let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
-                    let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
-                    return '<tr>' +
-                        '<td style="font-weight:bold; width: 140px;">' + f.floor + ' ' + codeTag + '</td>' +
-                        '<td>' + descDisplay + '</td>' +
-                    '</tr>';
-                }).join('');
-
-                return '<div class="branch-card" onclick="openBranchModal(\'' + b.name + '\')">' +
-                    '<div class="branch-header">' +
-                        '<span class="branch-title">🏢 ' + b.name + '</span>' +
-                        '<span class="branch-badge">' + b.rentTypeText + '</span>' +
-                    '</div>' +
-                    '<div class="branch-body">' +
-                        '<div class="info-row"><strong>📍 地址：</strong><span>' + b.address + '</span></div>' +
-                        '<div class="info-row"><strong>🕒 時間：</strong><span>' + b.hours + '</span></div>' +
-                        '<div style="margin-top: 4px;">' +
-                            '<strong style="font-size: 0.85rem; color: #475569; display: block; margin-bottom: 6px;">📐 樓層與櫃位編碼/位置：</strong>' +
-                            '<table class="floor-table">' +
-                                '<thead><tr><th>樓層 / 編碼</th><th>位置說明</th></tr></thead>' +
-                                '<tbody>' + floorsHtml + '</tbody>' +
-                            '</table>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
-            }).join('');
-        }
-
-        function openBranchModal(branchName) {
-            let branches = getElockerData();
-            let b = branches.find(function(item) { return item.name === branchName; });
-            if (!b) return;
-
-            document.getElementById('modal-title').innerText = '🏢 ' + b.name;
-            
-            let modalFloorsHtml = b.floors.map(function(f) {
-                let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
-                let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
-                return '<tr><td style="font-weight:bold; width: 120px;">' + f.floor + ' ' + codeTag + '</td><td>' + descDisplay + '</td></tr>';
-            }).join('');
-
-            // 💡 取得該據點的價格資料
-            let pricesMap = getElockerPrices();
-            let branchPrices = pricesMap[branchName] || [];
-            
-            let priceTableHtml = '';
-            if (branchPrices.length > 0) {
-                // 💡 針對小巨蛋或有多區域的據點，分兩區塊呈現避免表格過寬擠壓
-                let block1Floors = ['9號出入口', '西側廁所旁', '電梯旁'];
-                
-                let group1 = branchPrices.filter(p => block1Floors.includes(p.floor));
-                let group2 = branchPrices.filter(p => !block1Floors.includes(p.floor));
-
-                function renderTableBlock(items, title) {
-                    if (items.length === 0) return '';
-                    let hasHourly = items.some(p => p.h_orig !== '' || p.h_spec !== '');
-                    let hasDaily = items.some(p => p.d_orig !== '' || p.d_spec !== '');
-                    let hasMonthly = items.some(p => p.m_price !== '');
-                    let hasQuarter = items.some(p => p.q_price !== '');
-                    let hasHalf = items.some(p => p.half_price !== '');
-                    let hasYear = items.some(p => p.year_price !== '');
-                    let hasCount = items.some(p => p.m_count_spec !== '' || p.m_count_orig !== '');
-                    let hasMachineHourly = items.some(p => p.m_h_spec !== '' || p.m_h_orig !== '');
-                    let hasMachineDaily = items.some(p => p.m_d_spec !== '' || p.m_d_orig !== '');
-
-                    let headersHtml = '<th>樓層</th><th>櫃型</th>';
-                    if (hasHourly) headersHtml += '<th>時租(原/特)</th>';
-                    if (hasDaily) headersHtml += '<th>日租(原/特)</th>';
-                    if (hasMonthly) headersHtml += '<th>月租</th>';
-                    if (hasQuarter) headersHtml += '<th>季租</th>';
-                    if (hasHalf) headersHtml += '<th>半年租</th>';
-                    if (hasYear) headersHtml += '<th>年租</th>';
-                    if (hasCount) headersHtml += '<th>機台計次</th>';
-                    if (hasMachineHourly) headersHtml += '<th>機台時租</th>';
-                    if (hasMachineDaily) headersHtml += '<th>機台日租</th>';
-
-                    let rowsHtml = items.map(function(p) {
-                        let rHtml = '<tr><td style="font-weight:bold;">' + (p.floor || '-') + '</td>' +
-                                    '<td style="color: #b45309; font-weight:bold;">' + (p.cat || '-') + '</td>';
-                        
-                        if (hasHourly) {
-                            rHtml += '<td>' + (p.h_orig !== '' ? p.h_orig : '-') + ' / <span style="color:#059669;">' + (p.h_spec !== '' ? p.h_spec : '-') + '</span></td>';
-                        }
-                        if (hasDaily) {
-                            rHtml += '<td>' + (p.d_orig !== '' ? p.d_orig : '-') + ' / <span style="color:#059669;">' + (p.d_spec !== '' ? p.d_spec : '-') + '</span></td>';
-                        }
-                        if (hasMonthly) {
-                            rHtml += '<td>' + (p.m_price !== '' ? 'NT$ ' + Number(p.m_price).toLocaleString() : '-') + '</td>';
-                        }
-                        if (hasQuarter) {
-                            rHtml += '<td>' + (p.q_price !== '' ? 'NT$ ' + Number(p.q_price).toLocaleString() : '-') + '</td>';
-                        }
-                        if (hasHalf) {
-                            rHtml += '<td>' + (p.half_price !== '' ? 'NT$ ' + Number(p.half_price).toLocaleString() : '-') + '</td>';
-                        }
-                        if (hasYear) {
-                            rHtml += '<td>' + (p.year_price !== '' ? 'NT$ ' + Number(p.year_price).toLocaleString() : '-') + '</td>';
-                        }
-                        if (hasCount) {
-                            let cVal = p.m_count_spec !== '' ? p.m_count_spec : p.m_count_orig;
-                            rHtml += '<td>' + (cVal !== '' ? 'NT$ ' + Number(cVal).toLocaleString() : '-') + '</td>';
-                        }
-                        if (hasMachineHourly) {
-                            rHtml += '<td>' + (p.m_h_orig !== '' ? p.m_h_orig : '-') + ' / <span style="color:#059669;">' + (p.m_h_spec !== '' ? p.m_h_spec : '-') + '</span></td>';
-                        }
-                        if (hasMachineDaily) {
-                            rHtml += '<td>' + (p.m_d_orig !== '' ? p.m_d_orig : '-') + ' / <span style="color:#059669;">' + (p.m_d_spec !== '' ? p.m_d_spec : '-') + '</span></td>';
-                        }
-                        rHtml += '</tr>';
-                        return rHtml;
-                    }).join('');
-
-                    let titleTag = title ? '<div style="font-size: 0.9rem; font-weight: bold; color: #0f172a; margin-top: 10px; margin-bottom: 4px;">' + title + '</div>' : '';
-                    return titleTag + '<div style="overflow-x: auto;"><table class="floor-table">' +
-                        '<thead><tr>' + headersHtml + '</tr></thead>' +
-                        '<tbody>' + rowsHtml + '</tbody>' +
-                    '</table></div>';
-                }
-
-                priceTableHtml = '<div style="margin-top: 16px;">' +
-                    '<strong style="font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">💰 各櫃型價格對照表：</strong>';
-
-                if (group1.length > 0 && group2.length > 0) {
-                    priceTableHtml += renderTableBlock(group1, '📍 第一區塊：9號出入口、西側廁所旁、電梯旁') + 
-                                      '<div style="height: 12px;"></div>' + 
-                                      renderTableBlock(group2, '📍 第二區塊：其他區域（長期租賃 / 冰上樂園等）');
-                } else {
-                    priceTableHtml += renderTableBlock(branchPrices, '');
-                }
-
-                priceTableHtml += '</div>';
-            } else {
-                priceTableHtml = '<div style="margin-top: 16px; font-size: 0.85rem; color: #94a3b8;">此據點目前無詳細價格對照資料</div>';
-            }
-
-            let modalBody = document.getElementById('modal-body-content');
-            modalBody.innerHTML = 
-                '<div class="info-row" style="font-size: 1rem;"><strong>📍 完整地址：</strong><span>' + b.address + '</span></div>' +
-                '<div class="info-row" style="font-size: 1rem;"><strong>🕒 進出時間：</strong><span>' + b.hours + '</span></div>' +
-                '<div class="info-row" style="font-size: 1rem;"><strong>📱 承租方式：</strong><span style="color: #059669; font-weight: bold;">' + b.rentTypeText + '</span></div>' +
-                '<div style="margin-top: 8px;">' +
-                    '<strong style="font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">📋 各樓層櫃位編碼與詳細配置：</strong>' +
-                    '<table class="floor-table">' +
-                        '<thead><tr><th>樓層 / 編碼</th><th>位置說明</th></tr></thead>' +
-                        '<tbody>' + modalFloorsHtml + '</tbody>' +
-                    '</table>' +
-                '</div>' +
-                priceTableHtml;
-
-            document.getElementById('branch-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('branch-modal').style.display = 'none';
-        }
-    </script>
-    <script src="sidebar.js"></script>
-</body>
-</html>
