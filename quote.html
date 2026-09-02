@@ -76,6 +76,11 @@
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
         .sidebar-overlay.active { display: block; }
 
+        /* 簡易報價模式：隱藏季繳與半年繳欄位 */
+        body.simple-quote-mode .hide-in-simple {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             aside { transform: translateX(-100%); }
             aside.mobile-open { transform: translateX(0); }
@@ -158,6 +163,10 @@
                         <label>🔍 快速搜尋：</label>
                         <input type="text" id="quote-search-input" oninput="renderQuoteSelectableItems()" placeholder="例如: 0.9 或 75">
                     </div>
+                    <div class="form-group" style="justify-content: flex-end; display: flex; flex-direction: row; align-items: center; gap: 8px; padding-top: 24px;">
+                        <input type="checkbox" id="simple-quote-mode" onchange="toggleSimpleQuoteMode()" style="width: 18px; height: 18px; accent-color: #f59e0b;">
+                        <label for="simple-quote-mode" style="cursor: pointer; font-weight: bold; color: #b45309; margin-bottom: 0;">簡易報價模式（隱藏季繳與半年繳）</label>
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -170,8 +179,8 @@
                                 <th>尺寸 (寬*深*高 m)</th>
                                 <th>材積 (材)</th>
                                 <th>月繳/原價</th>
-                                <th>季繳</th>
-                                <th>半年繳</th>
+                                <th class="hide-in-simple">季繳</th>
+                                <th class="hide-in-simple">半年繳</th>
                                 <th>年繳(85折)</th>
                                 <th>年繳(8折)</th>
                             </tr>
@@ -223,8 +232,8 @@
                             <th style="border: 1px solid #cbd5e1; padding: 10px; width: 12%; text-align: center;">單位<br>(材)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; width: 36%; text-align: center;">倉位尺寸<br>(寬*深*高 m)</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">月繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">季繳/月</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">半年繳/月</th>
+                            <th class="hide-in-simple" style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">季繳/月</th>
+                            <th class="hide-in-simple" style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">半年繳/月</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px; text-align: center; width: 13%;">年繳/月</th>
                         </tr>
                     </thead>
@@ -311,6 +320,16 @@
             renderQuoteSelectableItems();
         }
 
+        function toggleSimpleQuoteMode() {
+            const chk = document.getElementById('simple-quote-mode');
+            if (chk && chk.checked) {
+                document.body.classList.add('simple-quote-mode');
+            } else {
+                document.body.classList.remove('simple-quote-mode');
+            }
+            // If simple quote mode is active and any selected item has term 3 or 6, notify or adjust if necessary
+        }
+
         function renderQuoteSelectableItems() {
             const branchSelect = document.getElementById('quote-branch-select');
             const searchInput = document.getElementById('quote-search-input');
@@ -349,8 +368,8 @@
                     '<td class="size-col">' + item.size + '</td>' +
                     '<td style="color: #64748b;">' + item.unit + '</td>' +
                     '<td style="font-weight: 600; color: #d97706;">NT$ ' + item.price1.toLocaleString() + '</td>' +
-                    '<td>NT$ ' + item.price3.toLocaleString() + '</td>' +
-                    '<td>NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td class="hide-in-simple">NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td class="hide-in-simple">NT$ ' + item.price6.toLocaleString() + '</td>' +
                     '<td style="color: #059669; font-weight: 600;">NT$ ' + p12_85.toLocaleString() + '</td>' +
                     '<td style="color: #047857; font-weight: 600;">NT$ ' + p12_80.toLocaleString() + '</td>' +
                 '</tr>';
@@ -378,6 +397,8 @@
             const keys = Object.keys(selectedQuoteItems);
             if (keys.length === 0) { summaryEl.innerHTML = '<span style="color: #94a3b8;">尚未勾選任何項目</span>'; return; }
             
+            const isSimpleMode = document.getElementById('simple-quote-mode') && document.getElementById('simple-quote-mode').checked;
+
             summaryEl.innerHTML = keys.map(function(idx) {
                 let item = selectedQuoteItems[idx];
                 let currentTerm = item.term || '12_85';
@@ -388,8 +409,8 @@
                         '<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">' +
                             '<select onchange="selectedQuoteItems[' + idx + '].term = this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: #fef3c7; font-weight: bold;">' +
                                 '<option value="1" ' + (currentTerm==='1'?'selected':'') + '>月繳 (1個月)</option>' +
-                                '<option value="3" ' + (currentTerm==='3'?'selected':'') + '>季繳 (95折)</option>' +
-                                '<option value="6" ' + (currentTerm==='6'?'selected':'') + '>半年繳 (9折)</option>' +
+                                '<option value="3" ' + (currentTerm==='3'?'selected':'') + (isSimpleMode ? ' style="display:none;"' : '') + '>季繳 (95折)</option>' +
+                                '<option value="6" ' + (currentTerm==='6'?'selected':'') + (isSimpleMode ? ' style="display:none;"' : '') + '>半年繳 (9折)</option>' +
                                 '<option value="12_85" ' + (currentTerm==='12_85'?'selected':'') + '>年繳 (85折)</option>' +
                                 '<option value="12_80" ' + (currentTerm==='12_80'?'selected':'') + '>年繳 (8折)</option>' +
                                 '<option value="none" ' + (currentTerm==='none'?'selected':'') + '>❌ 不列入試算</option>' +
@@ -450,8 +471,8 @@
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">' + unitText + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; word-break: break-all; line-height: 1.4;">[' + item.branch + '] ' + item.size + extraNote + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price1.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price3.toLocaleString() + '</td>' +
-                    '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price6.toLocaleString() + '</td>' +
+                    '<td class="hide-in-simple" style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price3.toLocaleString() + '</td>' +
+                    '<td class="hide-in-simple" style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; white-space: nowrap;">NT$ ' + item.price6.toLocaleString() + '</td>' +
                     '<td style="border:1px solid #cbd5e1; padding:10px; text-align:center; vertical-align:middle; font-weight:bold; color:#b45309; white-space: nowrap;">NT$ ' + displayAnnualPrice.toLocaleString() + '</td>' +
                 '</tr>';
                 
@@ -476,6 +497,7 @@
             let clientName = document.getElementById('q-client-name').value || '客戶';
             let branchName = document.getElementById('q-branch').value || '分店';
             let dateStr = document.getElementById('quote-date').value;
+            const isSimpleMode = document.getElementById('simple-quote-mode') && document.getElementById('simple-quote-mode').checked;
 
             let wsData = [
                 ["收多易迷你倉庫 - 報價單明細表"],
@@ -484,7 +506,9 @@
                 ["公司抬頭", document.getElementById('q-company').value || '---', "統一編號", document.getElementById('q-taxid').value || '---'],
                 [],
                 ["【報價項目明細】"],
-                ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "季繳/月 (NT$)", "半年繳/月 (NT$)", "年繳/月 (NT$)"]
+                isSimpleMode 
+                    ? ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "年繳/月 (NT$)"]
+                    : ["單位 (材)", "倉位尺寸", "月繳/月 (NT$)", "季繳/月 (NT$)", "半年繳/月 (NT$)", "年繳/月 (NT$)"]
             ];
 
             keys.forEach(function(idx) {
@@ -503,7 +527,12 @@
 
                 let unitText = (item.code && item.code.length >= 2 && item.code.charAt(1).toUpperCase() === 'U') ? '上層' + item.unit : item.unit;
                 let sizeText = "[" + item.branch + "] " + item.size + (item.extraNote ? " (" + item.extraNote + ")" : "") + (term === 'none' ? " [不列入試算]" : "");
-                wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
+                
+                if (isSimpleMode) {
+                    wsData.push([unitText, sizeText, item.price1, tableAnnualPrice]);
+                } else {
+                    wsData.push([unitText, sizeText, item.price1, item.price3, item.price6, tableAnnualPrice]);
+                }
             });
 
             wsData.push(
@@ -517,7 +546,7 @@
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
-            ws['!cols'] = [{wch: 15}, {wch: 35}, {wch: 16}, {wch: 16}, {wch: 16}, {wch: 16}];
+            ws['!cols'] = isSimpleMode ? [{wch: 15}, {wch: 35}, {wch: 16}, {wch: 16}] : [{wch: 15}, {wch: 35}, {wch: 16}, {wch: 16}, {wch: 16}, {wch: 16}];
             XLSX.utils.book_append_sheet(wb, ws, "報價單試算");
             XLSX.writeFile(wb, "報價單_" + clientName + ".xlsx");
         }
