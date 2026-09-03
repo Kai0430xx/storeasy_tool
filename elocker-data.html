@@ -208,6 +208,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="select-all-checkbox" onclick="toggleSelectAll(this)"></th>
                                 <th>狀態</th>
                                 <th>系統編號 (租期)</th>
                                 <th>據點</th>
@@ -216,7 +217,7 @@
                                 <th>電話</th>
                                 <th>承租時間</th>
                                 <th>到期時間</th>
-                                <th style="text-align: right;">操作</th>
+                                <th style="text-align: left;">操作</th>
                             </tr>
                         </thead>
                         <tbody id="data-table-body">
@@ -425,7 +426,7 @@
             }
 
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">查無符合條件的承租資料</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">查無符合條件的承租資料</td></tr>';
                 return;
             }
 
@@ -438,16 +439,17 @@
                 else if (r.status === 'returned') badgeHtml = '<span class="badge badge-returned">已退租</span>';
 
                 return '<tr>' +
+                    '<td><input type="checkbox" class="row-checkbox" value="' + actualIdx + '"></td>' +
                     '<td>' + badgeHtml + '</td>' +
-                    '<td style="font-weight: bold; color: #b45309;">' + r.sysId + '</td>' +
+                    '<td style="font-weight: bold; color: #b45309;">' + (r.sysId || '<span style="color:#94a3b8; font-weight:normal;">未填寫</span>') + '</td>' +
                     '<td>' + r.branch + '</td>' +
                     '<td style="font-weight: bold;">' + r.lockerNo + '</td>' +
                     '<td>' + r.name + '</td>' +
                     '<td>' + r.tel + '</td>' +
                     '<td>' + r.startDate + '</td>' +
                     '<td style="font-weight: 650; color: ' + (r.status === 'expired' ? '#dc2626' : (r.status === 'warning' ? '#d97706' : 'inherit')) + ';">' + r.endDate + '</td>' +
-                    '<td style="text-align: right;">' +
-                        '<div class="action-btns" style="justify-content: flex-end;">' +
+                    '<td style="text-align: left;">' +
+                        '<div class="action-btns">' +
                             (r.status !== 'returned' ? '<button onclick="markAsReturned(' + actualIdx + ')" class="action-btn btn-return">辦理退租</button>' : '<button onclick="revertReturn(' + actualIdx + ')" class="action-btn" style="background:#e0f2fe; color:#0369a1;">恢復合約</button>') +
                             '<button onclick="editRecord(' + actualIdx + ')" class="action-btn btn-edit">編輯</button>' +
                             '<button onclick="deleteRecord(' + actualIdx + ')" class="action-btn btn-delete">刪除</button>' +
@@ -511,6 +513,28 @@
             }
         }
         // 處理 Excel 批次上傳與匯入（自動補電話開頭的 0）
+// Excel 序列號轉為標準日期字串 (YYYY/MM/DD HH:mm:ss)
+function parseExcelDate(serial) {
+    if (!serial) return formatDateTime(new Date());
+    if (typeof serial === 'string') return serial; // 如果本來就是文字格式就直接回傳
+    
+    // Excel 基準日轉換
+    const utc_days = Math.floor(serial - 25569);
+    const utc_value = utc_days * 86400;
+    const date_info = new Date(utc_value * 1000);
+    
+    const fractional_day = serial - Math.floor(serial) + 0.0000001;
+    let total_seconds = Math.floor(86400 * fractional_day);
+    const seconds = total_seconds % 60;
+    total_seconds = Math.floor(total_seconds / 60);
+    const minutes = total_seconds % 60;
+    const hours = Math.floor(total_seconds / 60);
+    
+    date_info.setHours(hours, minutes, seconds);
+    return formatDateTime(date_info);
+}
+
+// 處理 Excel 批次上傳與匯入
 function importExcelData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -531,8 +555,6 @@ function importExcelData(event) {
 
                 let colA = String(row[0] || '').trim();
                 if (!colA) return;
-
-                // 如果第一行剛好是標題且包含「據點」，就自動跳過不匯入
                 if (colA.includes('據點') || colA.includes('系統編號')) return;
 
                 let branch = "";
@@ -555,17 +577,12 @@ function importExcelData(event) {
                     tel = '0' + tel;
                 }
 
-                let startDate = String(row[4] || '').trim();
-                let endDate = String(row[5] || '').trim();
+                // 正確解析 Excel 日期數字
+                let startDate = parseExcelDate(row[4]);
+                let endDate = parseExcelDate(row[5]);
 
-                if (!startDate) startDate = formatDateTime(new Date());
-                if (!endDate) {
-                    let fut = new Date();
-                    fut.setMonth(fut.getMonth() + 1);
-                    endDate = formatDateTime(fut);
-                }
-
-                let sysId = 'IMT-' + Date.now().toString().slice(-6) + '-' + Math.floor(Math.random() * 90 + 10);
+                // 系統編號維持空白讓店長補
+                let sysId = "";
 
                 let record = {
                     sysId: sysId,
@@ -599,6 +616,39 @@ function importExcelData(event) {
         }
     };
     reader.readAsArrayBuffer(file);
+}
+    // 全選 / 取消全選
+function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    checkboxes.forEach(function(cb) {
+        cb.checked = source.checked;
+    });
+}
+
+// 批次刪除所選項目
+function batchDeleteRecords() {
+    const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('請先勾選想要刪除的承租紀錄！');
+        return;
+    }
+
+    if (confirm('確定要永久刪除選取的 ' + checkboxes.length + ' 筆承租紀錄嗎？')) {
+        let indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        indicesToDelete.sort((a, b) => b - a);
+
+        indicesToDelete.forEach(function(idx) {
+            lockerRecords.splice(idx, 1);
+        });
+
+        localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+        loadLockerData();
+        
+        const selectAllCb = document.getElementById('select-all-checkbox');
+        if (selectAllCb) selectAllCb.checked = false;
+
+        alert('已成功刪除選取的紀錄！');
+    }
 }
     </script>
     <script src="sidebar.js"></script>
