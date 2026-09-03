@@ -155,11 +155,11 @@
                         </div>
                         <div class="form-group">
                             <label>承租時間：</label>
-                            <input type="date" id="start-date" required>
+                            <input type="text" id="start-date" required placeholder="例如: 2026/09/03 10:00:00">
                         </div>
                         <div class="form-group">
                             <label>到期時間：</label>
-                            <input type="date" id="end-date" required>
+                            <input type="text" id="end-date" required placeholder="例如: 2026/10/03 10:00:00">
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px;">
@@ -243,11 +243,23 @@
                     verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
                 }
                 
-                // 預設日期帶入今天
-                document.getElementById('start-date').valueAsDate = new Date();
-                let future = new Date();
-                future.setMonth(future.getMonth() + 1);
-                document.getElementById('end-date').valueAsDate = future;
+                // 取得格式化時間字串 (YYYY/MM/DD HH:mm:ss)
+        function formatDateTime(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const h = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            const s = String(date.getSeconds()).padStart(2, '0');
+            return y + '/' + m + '/' + d + ' ' + h + ':' + min + ':' + s;
+        }
+
+        // 預設日期時間帶入文字框
+        const now = new Date();
+        document.getElementById('start-date').value = formatDateTime(now);
+        let future = new Date();
+        future.setMonth(future.getMonth() + 1);
+        document.getElementById('end-date').value = formatDateTime(future);
 
                 initBranchSelect();
                 loadLockerData();
@@ -331,7 +343,8 @@
             if (isReturned) return 'returned';
             const today = new Date();
             today.setHours(0,0,0,0);
-            const endDate = new Date(end);
+            const cleanEndStr = end.replace(/\//g, '-');
+            const endDate = new Date(cleanEndStr);
             endDate.setHours(0,0,0,0);
 
             const diffTime = endDate - today;
