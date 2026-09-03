@@ -250,8 +250,8 @@
         }
 
         // 預設日期時間帶入文字框
-        const now = new Date();
-        document.getElementById('start-date').value = formatDateTime(now);
+        const nowTime = new Date();
+        document.getElementById('start-date').value = formatDateTime(nowTime);
         let future = new Date();
         future.setMonth(future.getMonth() + 1);
         document.getElementById('end-date').value = formatDateTime(future);
