@@ -1271,9 +1271,9 @@
                 }).join('');
 
                 return '<div class="branch-card" onclick="openBranchModal(\'' + b.name + '\')">' +
-                    '<div class="branch-header">' +
-                        '<span class="branch-title">🏢 ' + b.name + '</span>' +
-                        '<div>' + superSmoothCardTag + '<span class="branch-badge">' + b.rentTypeText + '</span></div>' +
+                    '<div class="branch-header" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">' +
+                        '<span class="branch-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🏢 ' + b.name + '</span>' +
+                        '<div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">' + superSmoothCardTag + '<span class="branch-badge">' + b.rentTypeText + '</span></div>' +
                     '</div>' +
                     '<div class="branch-body">' +
                         '<div class="info-row"><strong>📍 地址：</strong><span>' + b.address + '</span></div>' +
