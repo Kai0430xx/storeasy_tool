@@ -64,7 +64,7 @@
         .btn-amber:hover { background-color: #d97706; color: #fff; }
 
         /* 第二區：狀態儀表板卡片 */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
         .stat-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
         .stat-card.active { border-color: #f59e0b; ring: 2px solid #f59e0b; background: #fffbeb; }
@@ -129,7 +129,7 @@
             <div class="card">
                 <div class="card-title">✍️ 承租客資料登錄與管理</div>
                 <form id="locker-form" onsubmit="saveLockerData(event)">
-                    <input type="hidden5" id="edit-index" value="">
+                    <input type="hidden" id="edit-index" value="">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>系統編號 (押金所在租期)：</label>
