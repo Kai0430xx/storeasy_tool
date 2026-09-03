@@ -202,7 +202,10 @@
             <div class="card">
                 <div class="table-toolbar">
                     <div class="card-title" style="margin-bottom: 0; border-bottom: none;">📋 承租明細清單 (<span id="current-filter-label">全部紀錄</span>)</div>
-                    <input type="text" id="table-search" oninput="renderTable()" placeholder="🔍 搜尋編號、姓名、據點、櫃號、電話...">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button type="button" onclick="batchDeleteRecords()" class="action-btn btn-delete" style="padding: 6px 12px; font-size: 0.85rem;">🗑️ 批次刪除所選項目</button>
+                        <input type="text" id="table-search" oninput="renderTable()" placeholder="🔍 搜尋編號、姓名、據點、櫃號、電話...">
+                    </div>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
