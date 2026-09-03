@@ -374,11 +374,17 @@
             let countExpired = lockerRecords.filter(r => r.status === 'expired').length;
             let countReturned = lockerRecords.filter(r => r.status === 'returned').length;
 
-            document.getElementById('stat-all').innerText = countAll;
-            document.getElementById('stat-active').innerText = countActive;
-            document.getElementById('stat-warning').innerText = countWarning;
-            document.getElementById('stat-expired').innerText = countExpired;
-            document.getElementById('stat-returned').innerText = countReturned;
+            const elAll = document.getElementById('stat-all');
+            const elActive = document.getElementById('stat-active');
+            const elWarning = document.getElementById('stat-warning');
+            const elExpired = document.getElementById('stat-expired');
+            const elReturned = document.getElementById('stat-returned');
+
+            if (elAll) elAll.innerText = countAll;
+            if (elActive) elActive.innerText = countActive;
+            if (elWarning) elWarning.innerText = countWarning;
+            if (elExpired) elExpired.innerText = countExpired;
+            if (elReturned) elReturned.innerText = countReturned;
         }
 
         function filterByStatus(status, cardEl) {
