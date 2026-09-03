@@ -2,44 +2,501 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <script src="login.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收多易迷你倉庫 - 管理資料</title>
+    <title>收多易迷你倉庫 - 快存櫃管理資料</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
-        aside { width: 260px; background-color: #0f172a; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 50; }
-        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; }
+        
+        aside { 
+            width: 260px; 
+            background-color: #0f172a; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            z-index: 100; 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: auto;
+        }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
         .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        .mobile-close-btn { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        
         nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
         .menu-group { display: flex; flex-direction: column; gap: 4px; }
         .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
+        
         nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
         nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
         nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; }
-        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; }
+
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        
         .card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .card h3 { font-size: 1.1rem; font-weight: bold; color: #334155; margin-bottom: 8px; }
-        .card p { font-size: 0.85rem; color: #64748b; }
+        .card-title { font-size: 1.05rem; font-weight: bold; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+
+        /* 第一區：表單輸入 */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
+        
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: background 0.2s; }
+        .btn-dark { background-color: #0f172a; color: #fff; }
+        .btn-dark:hover { background-color: #1e293b; }
+        .btn-amber { background-color: #f59e0b; color: #0f172a; }
+        .btn-amber:hover { background-color: #d97706; color: #fff; }
+
+        /* 第二區：狀態儀表板卡片 */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+        .stat-card.active { border-color: #f59e0b; ring: 2px solid #f59e0b; background: #fffbeb; }
+        .stat-card h4 { font-size: 0.85rem; font-weight: 600; color: #64748b; }
+        .stat-card .number { font-size: 1.75rem; font-weight: 900; color: #0f172a; }
+        .stat-card .desc { font-size: 0.75rem; color: #94a3b8; }
+        .stat-indicator { position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+
+        /* 第三區：資料列表 */
+        .table-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .table-toolbar input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; width: 280px; outline: none; }
+        
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .data-table th, .data-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        .data-table tr:hover { background-color: #f8fafc; }
+
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+        .badge-active { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #b45309; }
+        .badge-expired { background: #fee2e2; color: #991b1b; }
+        .badge-returned { background: #f1f5f9; color: #64748b; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; border: none; cursor: pointer; }
+        .btn-edit { background: #e0f2fe; color: #0369a1; }
+        .btn-return { background: #f1f5f9; color: #475569; }
+        .btn-delete { background: #fee2e2; color: #991b1b; }
+
+        .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -260px; top: 0; }
+            aside.mobile-open { left: 0; }
+            .mobile-close-btn { display: block; }
+            .menu-toggle-btn { display: inline-block; }
+            main { margin-left: 0; width: 100%; }
+            header { padding: 12px 16px; }
+            .content-body { padding: 16px; }
+            .version { display: none; }
+        }
     </style>
 </head>
 <body>
+
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
     <aside id="sidebar"></aside>
+
     <main>
-        <header><h2>⚙️ 管理資料</h2><div class="version">系統版本：20260401</div></header>
-        <div class="content-body">
-            <div class="card">
-                <h3>快存櫃資料維護</h3>
-                <p>在此設定與維護快存櫃系統的後台基礎數據。</p>
+        <header>
+            <div class="header-left">
+                <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
+                <h2>📦 快存櫃管理資料</h2>
             </div>
+            <div class="version" id="system-version">系統版本：載入中...</div>
+        </header>
+
+        <div class="content-body">
+            
+            <!-- 第一區：店長輸入與編輯資料 -->
+            <div class="card">
+                <div class="card-title">✍️ 承租客資料登錄與管理</div>
+                <form id="locker-form" onsubmit="saveLockerData(event)">
+                    <input type="hidden5" id="edit-index" value="">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>系統編號 (押金所在租期)：</label>
+                            <input type="text" id="sys-id" required placeholder="例如: 20260401-01 (或合約編號)">
+                        </div>
+                        <div class="form-group">
+                            <label>據點名稱：</label>
+                            <select id="locker-branch" required>
+                                <option value="">-- 請選擇據點 --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>櫃號：</label>
+                            <input type="text" id="locker-no" required placeholder="例如: A01, T2-05">
+                        </div>
+                        <div class="form-group">
+                            <label>承租人姓名：</label>
+                            <input type="text" id="client-name" required placeholder="請輸入姓名">
+                        </div>
+                        <div class="form-group">
+                            <label>聯繫電話：</label>
+                            <input type="text" id="client-tel" required placeholder="請輸入電話">
+                        </div>
+                        <div class="form-group">
+                            <label>承租時間：</label>
+                            <input type="date" id="start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>到期時間：</label>
+                            <input type="date" id="end-date" required>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px;">
+                        <button type="button" id="cancel-edit-btn" onclick="resetForm()" class="btn btn-amber" style="display: none;">取消編輯</button>
+                        <button type="submit" id="submit-btn" class="btn btn-dark">💾 儲存承租資料</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 第二區：狀態儀表板統計區塊 -->
+            <div class="dashboard-grid">
+                <div class="stat-card active" onclick="filterByStatus('all', this)">
+                    <div class="stat-indicator" style="background: #0f172a;"></div>
+                    <h4>全部承租紀錄</h4>
+                    <div class="number" id="stat-all">0</div>
+                    <div class="desc">點擊檢視所有資料</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('active', this)">
+                    <div class="stat-indicator" style="background: #059669;"></div>
+                    <h4>承租中</h4>
+                    <div class="number" id="stat-active" style="color: #059669;">0</div>
+                    <div class="desc">合約有效中的櫃位</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('warning', this)">
+                    <div class="stat-indicator" style="background: #d97706;"></div>
+                    <h4>即將到期 (14天內)</h4>
+                    <div class="number" id="stat-warning" style="color: #d97706;">0</div>
+                    <div class="desc">需提醒客人續約</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('expired', this)">
+                    <div class="stat-indicator" style="background: #dc2626;"></div>
+                    <h4>已逾期</h4>
+                    <div class="number" id="stat-expired" style="color: #dc2626;">0</div>
+                    <div class="desc">超過到期日未續約/退租</div>
+                </div>
+                <div class="stat-card" onclick="filterByStatus('returned', this)">
+                    <div class="stat-indicator" style="background: #64748b;"></div>
+                    <h4>已退租</h4>
+                    <div class="number" id="stat-returned" style="color: #64748b;">0</div>
+                    <div class="desc">已辦理退租歸還</div>
+                </div>
+            </div>
+
+            <!-- 第三區：分類詳細資料列表 -->
+            <div class="card">
+                <div class="table-toolbar">
+                    <div class="card-title" style="margin-bottom: 0; border-bottom: none;">📋 承租明細清單 (<span id="current-filter-label">全部紀錄</span>)</div>
+                    <input type="text" id="table-search" oninput="renderTable()" placeholder="🔍 搜尋編號、姓名、據點、櫃號、電話...">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>狀態</th>
+                                <th>系統編號 (租期)</th>
+                                <th>據點</th>
+                                <th>櫃號</th>
+                                <th>承租人</th>
+                                <th>電話</th>
+                                <th>承租時間</th>
+                                <th>到期時間</th>
+                                <th style="text-align: right;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                            <tr><td colspan="9" class="empty-state">尚無承租資料</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </main>
-    <script src="login.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                const now = new Date();
+                const verEl = document.getElementById('system-version');
+                if (verEl) {
+                    verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
+                }
+                
+                // 預設日期帶入今天
+                document.getElementById('start-date').valueAsDate = new Date();
+                let future = new Date();
+                future.setMonth(future.getMonth() + 1);
+                document.getElementById('end-date').valueAsDate = future;
+
+                initBranchSelect();
+                loadLockerData();
+            } catch(e) {
+                console.error("Initialization error:", e);
+            }
+        });
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
+
+        // 初始化據點下拉選單（抓取 elocker-branches.html 共用據點清單或預設據點）
+        function initBranchSelect() {
+            const select = document.getElementById('locker-branch');
+            // 嘗試從 localStorage 或預設據點清單載入
+            const branches = [
+                "桂林萬家福場", "台北小巨蛋場", "民生松江場", "南港車站場", "南港北流場", 
+                "天母德行場", "台北車站場", "重慶萬家福場", "信義逸仙場", "貓空纜車場", 
+                "兒童新樂園場", "北投會館場", "南港萬家福場", "內湖萬家福場", "三民萬家福場", 
+                "洲子美食街場", "文山興隆場", "南港興華場", "文山萬慶場", "士林劍潭場", 
+                "峨眉停車場", "天母圓環場", "松山新矽谷場", "松山文創場", "南門場", 
+                "台北京站場", "大安場", "中和威力場", "三重湯城場", "林口萬家福場", 
+                "新店萬家福場", "汐科萬家福場", "蘆洲萬家福場", "淡新萬家福場", "新店安康場", 
+                "海洋都心場", "板橋第一運動場", "耕莘專校場", "新莊民安場", "土城萬家福場", 
+                "板橋愛買場", "桃園中壢場", "桃園經國場", "桃園內壢場", "樂天桃園棒球場", 
+                "桃園春日場", "新竹中華場", "台中青海場", "台中豐原場", "台中文心場", 
+                "台中德安場", "台中洲際棒球場", "台中文心洛陽場", "台中廣3SOGO場", 
+                "台南民生場", "台南仁德場", "高雄鼎山場", "基隆南站場", "基隆北站場", "基隆好食城場"
+            ];
+            
+            let html = '<option value="">-- 請選擇據點 --</option>';
+            branches.forEach(function(b) {
+                html += '<option value="' + b + '">' + b + '</option>';
+            });
+            select.innerHTML = html;
+        }
+
+        let lockerRecords = JSON.parse(localStorage.getItem('storeasy_locker_records')) || [];
+        let currentFilterStatus = 'all';
+
+        function saveLockerData(e) {
+            e.preventDefault();
+            const editIdx = document.getElementById('edit-index').value;
+            
+            const record = {
+                sysId: document.getElementById('sys-id').value.trim(),
+                branch: document.getElementById('locker-branch').value,
+                lockerNo: document.getElementById('locker-no').value.trim(),
+                name: document.getElementById('client-name').value.trim(),
+                tel: document.getElementById('client-tel').value.trim(),
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                status: 'active' // 預設新登錄為有效承租中
+            };
+
+            // 檢查到期日狀態
+            record.status = calculateStatus(record.startDate, record.endDate, false);
+
+            if (editIdx !== "") {
+                // 保留原本的退租狀態若手動改過
+                if (lockerRecords[editIdx].status === 'returned') {
+                    record.status = 'returned';
+                }
+                lockerRecords[editIdx] = record;
+                alert('承租資料已更新成功！');
+            } else {
+                lockerRecords.unshift(record);
+                alert('承租資料已成功登錄！');
+            }
+
+            localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+            resetForm();
+            loadLockerData();
+        }
+
+        function calculateStatus(start, end, isReturned) {
+            if (isReturned) return 'returned';
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const endDate = new Date(end);
+            endDate.setHours(0,0,0,0);
+
+            const diffTime = endDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return 'expired'; // 已逾期
+            } else if (diffDays <= 14) {
+                return 'warning'; // 即將到期（14天內）
+            } else {
+                return 'active'; // 承租中
+            }
+        }
+
+        function loadLockerData() {
+            // 自動重新計算所有未退租合約的狀態（避免日期過期未更新）
+            lockerRecords.forEach(function(r) {
+                if (r.status !== 'returned') {
+                    r.status = calculateStatus(r.startDate, r.endDate, false);
+                }
+            });
+            localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+
+            updateDashboardStats();
+            renderTable();
+        }
+
+        function updateDashboardStats() {
+            let countAll = lockerRecords.length;
+            let countActive = lockerRecords.filter(r => r.status === 'active').length;
+            let countWarning = lockerRecords.filter(r => r.status === 'warning').length;
+            let countExpired = lockerRecords.filter(r => r.status === 'expired').length;
+            let countReturned = lockerRecords.filter(r => r.status === 'returned').length;
+
+            document.getElementById('stat-all').innerText = countAll;
+            document.getElementById('stat-active').innerText = countActive;
+            document.getElementById('stat-warning').innerText = countWarning;
+            document.getElementById('stat-expired').innerText = countExpired;
+            document.getElementById('stat-returned').innerText = countReturned;
+        }
+
+        function filterByStatus(status, cardEl) {
+            currentFilterStatus = status;
+            
+            // 切換卡片 active 樣式
+            document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+            if (cardEl) cardEl.classList.add('active');
+
+            const labels = {
+                'all': '全部紀錄',
+                'active': '承租中',
+                'warning': '即將到期 (14天內)',
+                'expired': '已逾期',
+                'returned': '已退租'
+            };
+            document.getElementById('current-filter-label').innerText = labels[status] || '全部紀錄';
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('data-table-body');
+            const searchKw = document.getElementById('table-search').value.trim().toLowerCase();
+
+            let list = lockerRecords;
+            if (currentFilterStatus !== 'all') {
+                list = list.filter(r => r.status === currentFilterStatus);
+            }
+
+            if (searchKw) {
+                list = list.filter(r => 
+                    (r.sysId && r.sysId.toLowerCase().includes(searchKw)) ||
+                    (r.branch && r.branch.toLowerCase().includes(searchKw)) ||
+                    (r.lockerNo && r.lockerNo.toLowerCase().includes(searchKw)) ||
+                    (r.name && r.name.toLowerCase().includes(searchKw)) ||
+                    (r.tel && r.tel.toLowerCase().includes(searchKw))
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">查無符合條件的承租資料</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(function(r) {
+                let actualIdx = lockerRecords.indexOf(r);
+                let badgeHtml = '';
+                if (r.status === 'active') badgeHtml = '<span class="badge badge-active">承租中</span>';
+                else if (r.status === 'warning') badgeHtml = '<span class="badge badge-warning">即將到期</span>';
+                else if (r.status === 'expired') badgeHtml = '<span class="badge badge-expired">已逾期</span>';
+                else if (r.status === 'returned') badgeHtml = '<span class="badge badge-returned">已退租</span>';
+
+                return '<tr>' +
+                    '<td>' + badgeHtml + '</td>' +
+                    '<td style="font-weight: bold; color: #b45309;">' + r.sysId + '</td>' +
+                    '<td>' + r.branch + '</td>' +
+                    '<td style="font-weight: bold;">' + r.lockerNo + '</td>' +
+                    '<td>' + r.name + '</td>' +
+                    '<td>' + r.tel + '</td>' +
+                    '<td>' + r.startDate + '</td>' +
+                    '<td style="font-weight: 650; color: ' + (r.status === 'expired' ? '#dc2626' : (r.status === 'warning' ? '#d97706' : 'inherit')) + ';">' + r.endDate + '</td>' +
+                    '<td style="text-align: right;">' +
+                        '<div class="action-btns" style="justify-content: flex-end;">' +
+                            (r.status !== 'returned' ? '<button onclick="markAsReturned(' + actualIdx + ')" class="action-btn btn-return">辦理退租</button>' : '<button onclick="revertReturn(' + actualIdx + ')" class="action-btn" style="background:#e0f2fe; color:#0369a1;">恢復合約</button>') +
+                            '<button onclick="editRecord(' + actualIdx + ')" class="action-btn btn-edit">編輯</button>' +
+                            '<button onclick="deleteRecord(' + actualIdx + ')" class="action-btn btn-delete">刪除</button>' +
+                        '</div>' +
+                    '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        function editRecord(idx) {
+            let r = lockerRecords[idx];
+            if (!r) return;
+            document.getElementById('edit-index').value = idx;
+            document.getElementById('sys-id').value = r.sysId;
+            document.getElementById('locker-branch').value = r.branch;
+            document.getElementById('locker-no').value = r.lockerNo;
+            document.getElementById('client-name').value = r.name;
+            document.getElementById('client-tel').value = r.tel;
+            document.getElementById('start-date').value = r.startDate;
+            document.getElementById('end-date').value = r.endDate;
+
+            document.getElementById('submit-btn').innerText = '💾 更新承租資料';
+            document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+            
+            // 捲動至表單頂部方便編輯
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('locker-form').reset();
+            document.getElementById('edit-index').value = "";
+            document.getElementById('submit-btn').innerText = '💾 儲存承租資料';
+            document.getElementById('cancel-edit-btn').style.display = 'none';
+            document.getElementById('start-date').valueAsDate = new Date();
+            let future = new Date();
+            future.setMonth(future.getMonth() + 1);
+            document.getElementById('end-date').valueAsDate = future;
+        }
+
+        function markAsReturned(idx) {
+            if (confirm('確定要為此筆合約辦理退租嗎？')) {
+                lockerRecords[idx].status = 'returned';
+                localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+                loadLockerData();
+            }
+        }
+
+        function revertReturn(idx) {
+            if (confirm('確定要恢復此筆合約嗎？')) {
+                lockerRecords[idx].status = calculateStatus(lockerRecords[idx].startDate, lockerRecords[idx].endDate, false);
+                localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+                loadLockerData();
+            }
+        }
+
+        function deleteRecord(idx) {
+            if (confirm('確定要永久刪除這筆承租紀錄嗎？')) {
+                lockerRecords.splice(idx, 1);
+                localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+                loadLockerData();
+            }
+        }
+    </script>
     <script src="sidebar.js"></script>
 </body>
 </html>
