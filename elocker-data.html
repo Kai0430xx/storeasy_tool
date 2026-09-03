@@ -454,7 +454,7 @@
                     '<td style="font-weight: 650; color: ' + (r.status === 'expired' ? '#dc2626' : (r.status === 'warning' ? '#d97706' : 'inherit')) + ';">' + r.endDate + '</td>' +
                     '<td style="text-align: left;">' +
                         '<div class="action-btns">' +
-                            (r.status !== 'returned' ? '<button onclick="markAsReturned(' + actualIdx + ')" class="action-btn btn-return">辦理退租</button>' : '<button onclick="revertReturn(' + actualIdx + ')" class="action-btn" style="background:#e0f2fe; color:#0369a1;">恢復合約</button>') +
+                            (r.status !== 'returned' ? '<button onclick="markAsReturned(' + actualIdx + ')" class="action-btn btn-return">已退租</button>' : '<button onclick="revertReturn(' + actualIdx + ')" class="action-btn" style="background:#e0f2fe; color:#0369a1;">恢復合約</button>') +
                             '<button onclick="editRecord(' + actualIdx + ')" class="action-btn btn-edit">編輯</button>' +
                             '<button onclick="deleteRecord(' + actualIdx + ')" class="action-btn btn-delete">刪除</button>' +
                         '</div>' +
