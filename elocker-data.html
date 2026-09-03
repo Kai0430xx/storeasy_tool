@@ -517,16 +517,17 @@ function importExcelData(event) {
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             
-            // 讀取為二維陣列
             const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             
             let count = 0;
             rows.forEach(function(row) {
                 if (!row || row.length < 3) return;
 
-                // 欄位 A: 據點與櫃號 (例如 "新莊民安場,B1,25")
                 let colA = String(row[0] || '').trim();
-                if (!colA || colA.includes('據點')) return; // 略過標題行
+                if (!colA) return;
+
+                // 如果第一行剛好是標題且包含「據點」，就自動跳過不匯入
+                if (colA.includes('據點') || colA.includes('系統編號')) return;
 
                 let branch = "";
                 let lockerNo = "";
@@ -539,30 +540,25 @@ function importExcelData(event) {
                     lockerNo = "未指定";
                 }
 
-                // 欄位 B: 姓名
                 let name = String(row[1] || '').trim();
                 if (!name) return;
 
-                // 欄位 C: 電話（自動檢查並補上開頭的 0）
+                // 自動幫電話補第一個 0
                 let tel = String(row[2] || '').trim().replace(/[^0-9]/g, '');
                 if (tel.length > 0 && !tel.startsWith('0')) {
                     tel = '0' + tel;
                 }
 
-                // 欄位 E & F: 承租時間與到期時間
                 let startDate = String(row[4] || '').trim();
                 let endDate = String(row[5] || '').trim();
 
-                if (!startDate) {
-                    startDate = formatDateTime(new Date());
-                }
+                if (!startDate) startDate = formatDateTime(new Date());
                 if (!endDate) {
                     let fut = new Date();
                     fut.setMonth(fut.getMonth() + 1);
                     endDate = formatDateTime(fut);
                 }
 
-                // 產生系統編號
                 let sysId = 'IMT-' + Date.now().toString().slice(-6) + '-' + Math.floor(Math.random() * 90 + 10);
 
                 let record = {
@@ -586,14 +582,14 @@ function importExcelData(event) {
                 loadLockerData();
                 alert('成功批次匯入 ' + count + ' 筆承租客資料！');
             } else {
-                alert('未能成功解析任何有效資料，請確認 Excel 格式是否正確。');
+                alert('Excel 內沒有讀取到有效的資料行。');
             }
 
             event.target.value = '';
 
         } catch (err) {
-            console.error("Excel 解析失敗:", err);
-            alert('解析 Excel 檔案發生錯誤，請確認檔案格式是否正確。');
+            console.error("Excel 解析失敗詳細錯誤:", err);
+            alert('解析 Excel 發生錯誤：' + err.message);
         }
     };
     reader.readAsArrayBuffer(file);
