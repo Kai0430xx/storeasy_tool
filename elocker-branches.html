@@ -1258,6 +1258,9 @@
             }
 
             container.innerHTML = list.map(function(b) {
+                let superSmoothList = ["松山文創場", "峨眉停車場", "樂天桃園棒球場"];
+                let superSmoothCardTag = superSmoothList.includes(b.name) ? '<span class="branch-badge" style="background: #8b5cf6; margin-left: 6px;">⚡ 超順</span>' : '';
+                
                 let floorsHtml = b.floors.map(function(f) {
                     let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
                     let descDisplay = (f.desc && f.desc.trim() !== '') ? f.desc : '';
@@ -1270,7 +1273,7 @@
                 return '<div class="branch-card" onclick="openBranchModal(\'' + b.name + '\')">' +
                     '<div class="branch-header">' +
                         '<span class="branch-title">🏢 ' + b.name + '</span>' +
-                        '<span class="branch-badge">' + b.rentTypeText + '</span>' +
+                        '<div>' + superSmoothCardTag + '<span class="branch-badge">' + b.rentTypeText + '</span></div>' +
                     '</div>' +
                     '<div class="branch-body">' +
                         '<div class="info-row"><strong>📍 地址：</strong><span>' + b.address + '</span></div>' +
@@ -1351,7 +1354,9 @@
             let b = branches.find(function(item) { return item.name === branchName; });
             if (!b) return;
 
-            document.getElementById('modal-title').innerText = '🏢 ' + b.name;
+            let superSmoothList = ["松山文創場", "峨眉停車場", "樂天桃園棒球場"];
+            let superSmoothModalTag = superSmoothList.includes(b.name) ? '<span class="branch-badge" style="background: #8b5cf6; margin-left: 8px; vertical-align: middle;">⚡ 超順</span>' : '';
+            document.getElementById('modal-title').innerHTML = '🏢 ' + b.name + superSmoothModalTag;
             
             let modalFloorsHtml = b.floors.map(function(f) {
                 let codeTag = (f.code && f.code.trim() !== '') ? '<span class="code-tag">' + f.code + '</span>' : '';
