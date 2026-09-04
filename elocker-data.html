@@ -172,11 +172,11 @@
 
             <!-- 第二區：狀態儀表板統計區塊 -->
             <div class="dashboard-grid">
-                <div class="stat-card" onclick="filterByStatus('active', this)">
+                <div class="stat-card active" onclick="filterByStatus('active', this)">
                     <div class="stat-indicator" style="background: #059669;"></div>
-                    <h4>承租中</h4>
+                    <h4>承租中 (含到期/逾期)</h4>
                     <div class="number" id="stat-active" style="color: #059669;">0</div>
-                    <div class="desc">合約有效中的櫃位</div>
+                    <div class="desc">合約未退租總數</div>
                 </div>
                 <div class="stat-card" onclick="filterByStatus('warning', this)">
                     <div class="stat-indicator" style="background: #d97706;"></div>
@@ -201,7 +201,7 @@
             <!-- 第三區：分類詳細資料列表 -->
             <div class="card">
                 <div class="table-toolbar">
-                    <div class="card-title" style="margin-bottom: 0; border-bottom: none;">📋 承租明細清單 (<span id="current-filter-label">全部紀錄</span>)</div>
+                    <div class="card-title" style="margin-bottom: 0; border-bottom: none;">📋 承租明細清單 (<span id="current-filter-label">承租中</span>)</div>
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <button type="button" onclick="batchDeleteRecords()" class="action-btn btn-delete" style="padding: 6px 12px; font-size: 0.85rem;">🗑️ 批次刪除所選項目</button>
                         <input type="text" id="table-search" oninput="renderTable()" placeholder="🔍 搜尋編號、姓名、據點、櫃號、電話...">
@@ -224,7 +224,7 @@
                             </tr>
                         </thead>
                         <tbody id="data-table-body">
-                            <tr><td colspan="9" class="empty-state">尚無承租資料</td></tr>
+                            <tr><td colspan="10" class="empty-state">尚無承租資料</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -251,6 +251,9 @@
             if (aside) aside.classList.toggle('mobile-open');
         }
         
+        let lockerRecords = JSON.parse(localStorage.getItem('storeasy_locker_records')) || [];
+        let currentFilterStatus = 'active'; // 預設顯示承租中
+
         document.addEventListener("DOMContentLoaded", function() {
             try {
                 const now = new Date();
@@ -259,14 +262,11 @@
                     verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
                 }
                 
-                // 取得格式化時間字串 (YYYY/MM/DD HH:mm:ss)
-        
-        // 預設日期時間帶入文字框
-        const nowTime = new Date();
-        document.getElementById('start-date').value = formatDateTime(nowTime);
-        let future = new Date();
-        future.setMonth(future.getMonth() + 1);
-        document.getElementById('end-date').value = formatDateTime(future);
+                const nowTime = new Date();
+                document.getElementById('start-date').value = formatDateTime(nowTime);
+                let future = new Date();
+                future.setMonth(future.getMonth() + 1);
+                document.getElementById('end-date').value = formatDateTime(future);
 
                 initBranchSelect();
                 loadLockerData();
@@ -274,13 +274,6 @@
                 console.error("Initialization error:", e);
             }
         });
-
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-        }
         
         function formatDateTime(date) {
             const y = date.getFullYear();
@@ -292,10 +285,8 @@
             return y + '/' + m + '/' + d + ' ' + h + ':' + min + ':' + s;
         }
 
-        // 初始化據點下拉選單（抓取 elocker-branches.html 共用據點清單或預設據點）
         function initBranchSelect() {
             const select = document.getElementById('locker-branch');
-            // 嘗試從 localStorage 或預設據點清單載入
             const branches = [
                 "桂林萬家福場", "台北小巨蛋場", "民生松江場", "南港車站場", "南港北流場", 
                 "天母德行場", "台北車站場", "重慶萬家福場", "信義逸仙場", "貓空纜車場", 
@@ -318,9 +309,6 @@
             select.innerHTML = html;
         }
 
-        let lockerRecords = JSON.parse(localStorage.getItem('storeasy_locker_records')) || [];
-        let currentFilterStatus = 'all';
-
         function saveLockerData(e) {
             e.preventDefault();
             const editIdx = document.getElementById('edit-index').value;
@@ -333,14 +321,12 @@
                 tel: document.getElementById('client-tel').value.trim(),
                 startDate: document.getElementById('start-date').value,
                 endDate: document.getElementById('end-date').value,
-                status: 'active' // 預設新登錄為有效承租中
+                status: 'active'
             };
 
-            // 檢查到期日狀態
             record.status = calculateStatus(record.startDate, record.endDate, false);
 
             if (editIdx !== "") {
-                // 保留原本的退租狀態若手動改過
                 if (lockerRecords[editIdx].status === 'returned') {
                     record.status = 'returned';
                 }
@@ -353,7 +339,7 @@
 
             localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
             resetForm();
-            loadLockerData();
+            loadLockerData(); // 儲存後立即更新介面與清單
         }
 
         function calculateStatus(start, end, isReturned) {
@@ -377,7 +363,6 @@
         }
 
         function loadLockerData() {
-            // 自動重新計算所有未退租合約的狀態（避免日期過期未更新）
             lockerRecords.forEach(function(r) {
                 if (r.status !== 'returned') {
                     r.status = calculateStatus(r.startDate, r.endDate, false);
@@ -390,19 +375,17 @@
         }
 
         function updateDashboardStats() {
-            let countAll = lockerRecords.length;
-            let countActive = lockerRecords.filter(r => r.status === 'active').length;
+            // 承租中總數包含：正常承租中 + 即將到期 + 已逾期（即所有未退租的合約）
+            let countActive = lockerRecords.filter(r => r.status !== 'returned').length;
             let countWarning = lockerRecords.filter(r => r.status === 'warning').length;
             let countExpired = lockerRecords.filter(r => r.status === 'expired').length;
             let countReturned = lockerRecords.filter(r => r.status === 'returned').length;
 
-            const elAll = document.getElementById('stat-all');
             const elActive = document.getElementById('stat-active');
             const elWarning = document.getElementById('stat-warning');
             const elExpired = document.getElementById('stat-expired');
             const elReturned = document.getElementById('stat-returned');
 
-            if (elAll) elAll.innerText = countAll;
             if (elActive) elActive.innerText = countActive;
             if (elWarning) elWarning.innerText = countWarning;
             if (elExpired) elExpired.innerText = countExpired;
@@ -412,18 +395,16 @@
         function filterByStatus(status, cardEl) {
             currentFilterStatus = status;
             
-            // 切換卡片 active 樣式
             document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
             if (cardEl) cardEl.classList.add('active');
 
             const labels = {
-                'all': '全部紀錄',
-                'active': '承租中',
+                'active': '承租中 (含到期/逾期)',
                 'warning': '即將到期 (14天內)',
                 'expired': '已逾期',
                 'returned': '已退租'
             };
-            document.getElementById('current-filter-label').innerText = labels[status] || '全部紀錄';
+            document.getElementById('current-filter-label').innerText = labels[status] || '承租中';
             renderTable();
         }
 
@@ -432,7 +413,11 @@
             const searchKw = document.getElementById('table-search').value.trim().toLowerCase();
 
             let list = lockerRecords;
-            if (currentFilterStatus !== 'all') {
+            
+            // 點擊「承租中」時顯示所有未退租的合約
+            if (currentFilterStatus === 'active') {
+                list = list.filter(r => r.status !== 'returned');
+            } else {
                 list = list.filter(r => r.status === currentFilterStatus);
             }
 
@@ -495,7 +480,6 @@
             document.getElementById('submit-btn').innerText = '💾 更新承租資料';
             document.getElementById('cancel-edit-btn').style.display = 'inline-block';
             
-            // 捲動至表單頂部方便編輯
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -504,17 +488,17 @@
             document.getElementById('edit-index').value = "";
             document.getElementById('submit-btn').innerText = '💾 儲存承租資料';
             document.getElementById('cancel-edit-btn').style.display = 'none';
-            document.getElementById('start-date').valueAsDate = new Date();
+            document.getElementById('start-date').value = formatDateTime(new Date());
             let future = new Date();
             future.setMonth(future.getMonth() + 1);
-            document.getElementById('end-date').valueAsDate = future;
+            document.getElementById('end-date').value = formatDateTime(future);
         }
 
         function markAsReturned(idx) {
             if (confirm('確定要為此筆合約辦理退租嗎？')) {
                 lockerRecords[idx].status = 'returned';
                 localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
-                loadLockerData();
+                loadLockerData(); // 立即重新整理介面
             }
         }
 
@@ -522,7 +506,7 @@
             if (confirm('確定要恢復此筆合約嗎？')) {
                 lockerRecords[idx].status = calculateStatus(lockerRecords[idx].startDate, lockerRecords[idx].endDate, false);
                 localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
-                loadLockerData();
+                loadLockerData(); // 立即重新整理介面
             }
         }
 
@@ -530,147 +514,139 @@
             if (confirm('確定要永久刪除這筆承租紀錄嗎？')) {
                 lockerRecords.splice(idx, 1);
                 localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
-                loadLockerData();
+                loadLockerData(); // 立即重新整理介面
             }
         }
-        // 處理 Excel 批次上傳與匯入（自動補電話開頭的 0）
-// Excel 序列號轉為標準日期字串 (YYYY/MM/DD HH:mm:ss)
-function parseExcelDate(serial) {
-    if (!serial) return formatDateTime(new Date());
-    if (typeof serial === 'string') return serial; // 如果本來就是文字格式就直接回傳
-    
-    // Excel 基準日轉換
-    const utc_days = Math.floor(serial - 25569);
-    const utc_value = utc_days * 86400;
-    const date_info = new Date(utc_value * 1000);
-    
-    const fractional_day = serial - Math.floor(serial) + 0.0000001;
-    let total_seconds = Math.floor(86400 * fractional_day);
-    const seconds = total_seconds % 60;
-    total_seconds = Math.floor(total_seconds / 60);
-    const minutes = total_seconds % 60;
-    const hours = Math.floor(total_seconds / 60);
-    
-    date_info.setHours(hours, minutes, seconds);
-    return formatDateTime(date_info);
-}
 
-// 處理 Excel 批次上傳與匯入
-function importExcelData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
+        function parseExcelDate(serial) {
+            if (!serial) return formatDateTime(new Date());
+            if (typeof serial === 'string') return serial;
             
-            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            const utc_days = Math.floor(serial - 25569);
+            const utc_value = utc_days * 86400;
+            const date_info = new Date(utc_value * 1000);
             
-            let count = 0;
-            rows.forEach(function(row) {
-                if (!row || row.length < 3) return;
+            const fractional_day = serial - Math.floor(serial) + 0.0000001;
+            let total_seconds = Math.floor(86400 * fractional_day);
+            const seconds = total_seconds % 60;
+            total_seconds = Math.floor(total_seconds / 60);
+            const minutes = total_seconds % 60;
+            const hours = Math.floor(total_seconds / 60);
+            
+            date_info.setHours(hours, minutes, seconds);
+            return formatDateTime(date_info);
+        }
 
-                let colA = String(row[0] || '').trim();
-                if (!colA) return;
-                if (colA.includes('據點') || colA.includes('系統編號')) return;
+        function importExcelData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-                let branch = "";
-                let lockerNo = "";
-                if (colA.includes(',')) {
-                    let parts = colA.split(',');
-                    branch = parts[0].trim();
-                    lockerNo = parts.slice(1).join(',').trim();
-                } else {
-                    branch = colA;
-                    lockerNo = "未指定";
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    
+                    let count = 0;
+                    rows.forEach(function(row) {
+                        if (!row || row.length < 3) return;
+
+                        let colA = String(row[0] || '').trim();
+                        if (!colA) return;
+                        if (colA.includes('據點') || colA.includes('系統編號')) return;
+
+                        let branch = "";
+                        let lockerNo = "";
+                        if (colA.includes(',')) {
+                            let parts = colA.split(',');
+                            branch = parts[0].trim();
+                            lockerNo = parts.slice(1).join(',').trim();
+                        } else {
+                            branch = colA;
+                            lockerNo = "未指定";
+                        }
+
+                        let name = String(row[1] || '').trim();
+                        if (!name) return;
+
+                        let tel = String(row[2] || '').trim().replace(/[^0-9]/g, '');
+                        if (tel.length > 0 && !tel.startsWith('0')) {
+                            tel = '0' + tel;
+                        }
+
+                        let startDate = parseExcelDate(row[4]);
+                        let endDate = parseExcelDate(row[5]);
+                        let sysId = "";
+
+                        let record = {
+                            sysId: sysId,
+                            branch: branch,
+                            lockerNo: lockerNo,
+                            name: name,
+                            tel: tel,
+                            startDate: startDate,
+                            endDate: endDate,
+                            status: 'active'
+                        };
+
+                        record.status = calculateStatus(record.startDate, record.endDate, false);
+                        lockerRecords.unshift(record);
+                        count++;
+                    });
+
+                    if (count > 0) {
+                        localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+                        loadLockerData(); // 匯入後立即更新介面
+                        alert('成功批次匯入 ' + count + ' 筆承租客資料！');
+                    } else {
+                        alert('Excel 內沒有讀取到有效的資料行。');
+                    }
+
+                    event.target.value = '';
+
+                } catch (err) {
+                    console.error("Excel 解析失敗詳細錯誤:", err);
+                    alert('解析 Excel 發生錯誤：' + err.message);
                 }
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
-                let name = String(row[1] || '').trim();
-                if (!name) return;
-
-                // 自動幫電話補第一個 0
-                let tel = String(row[2] || '').trim().replace(/[^0-9]/g, '');
-                if (tel.length > 0 && !tel.startsWith('0')) {
-                    tel = '0' + tel;
-                }
-
-                // 正確解析 Excel 日期數字
-                let startDate = parseExcelDate(row[4]);
-                let endDate = parseExcelDate(row[5]);
-
-                // 系統編號維持空白讓店長補
-                let sysId = "";
-
-                let record = {
-                    sysId: sysId,
-                    branch: branch,
-                    lockerNo: lockerNo,
-                    name: name,
-                    tel: tel,
-                    startDate: startDate,
-                    endDate: endDate,
-                    status: 'active'
-                };
-
-                record.status = calculateStatus(record.startDate, record.endDate, false);
-                lockerRecords.unshift(record);
-                count++;
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(function(cb) {
+                cb.checked = source.checked;
             });
+        }
 
-            if (count > 0) {
-                localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
-                loadLockerData();
-                alert('成功批次匯入 ' + count + ' 筆承租客資料！');
-            } else {
-                alert('Excel 內沒有讀取到有效的資料行。');
+        function batchDeleteRecords() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('請先勾選想要刪除的承租紀錄！');
+                return;
             }
 
-            event.target.value = '';
+            if (confirm('確定要永久刪除選取的 ' + checkboxes.length + ' 筆承租紀錄嗎？')) {
+                let indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                indicesToDelete.sort((a, b) => b - a);
 
-        } catch (err) {
-            console.error("Excel 解析失敗詳細錯誤:", err);
-            alert('解析 Excel 發生錯誤：' + err.message);
+                indicesToDelete.forEach(function(idx) {
+                    lockerRecords.splice(idx, 1);
+                });
+
+                localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
+                loadLockerData(); // 刪除後立即更新介面
+                
+                const selectAllCb = document.getElementById('select-all-checkbox');
+                if (selectAllCb) selectAllCb.checked = false;
+
+                alert('已成功刪除選取的紀錄！');
+            }
         }
-    };
-    reader.readAsArrayBuffer(file);
-}
-    // 全選 / 取消全選
-function toggleSelectAll(source) {
-    const checkboxes = document.querySelectorAll('.row-checkbox');
-    checkboxes.forEach(function(cb) {
-        cb.checked = source.checked;
-    });
-}
-
-// 批次刪除所選項目
-function batchDeleteRecords() {
-    const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-    if (checkboxes.length === 0) {
-        alert('請先勾選想要刪除的承租紀錄！');
-        return;
-    }
-
-    if (confirm('確定要永久刪除選取的 ' + checkboxes.length + ' 筆承租紀錄嗎？')) {
-        let indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
-        indicesToDelete.sort((a, b) => b - a);
-
-        indicesToDelete.forEach(function(idx) {
-            lockerRecords.splice(idx, 1);
-        });
-
-        localStorage.setItem('storeasy_locker_records', JSON.stringify(lockerRecords));
-        loadLockerData();
-        
-        const selectAllCb = document.getElementById('select-all-checkbox');
-        if (selectAllCb) selectAllCb.checked = false;
-
-        alert('已成功刪除選取的紀錄！');
-    }
-}
     </script>
     <script src="sidebar.js"></script>
 </body>
