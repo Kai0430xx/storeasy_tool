@@ -60,8 +60,11 @@
         input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         input:focus, select:focus { border-color: #0f172a; }
         
-        .btn-primary { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 16px; }
+        .form-btn-group { display: flex; gap: 10px; margin-top: 16px; }
+        .btn-primary { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-primary:hover { background: #1e293b; }
+        .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: none; }
+        .btn-secondary:hover { background: #cbd5e1; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
         .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; border-left: 5px solid #cbd5e1; }
@@ -84,9 +87,11 @@
         .badge-expired { background: #fee2e2; color: #991b1b; }
         .badge-terminated { background: #f1f5f9; color: #475569; }
 
-        .action-btns { display: flex; gap: 8px; align-items: center; }
-        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; }
+        .action-btns { display: flex; gap: 6px; align-items: center; }
+        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; }
         .btn-notify.notified { background: #059669; color: white; border-color: #059669; }
+        .btn-edit { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+        .btn-edit:hover { background: #f59e0b; color: white; }
         .btn-terminate { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .btn-terminate:hover { background: #dc2626; color: white; }
         .btn-restore { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
@@ -134,12 +139,12 @@
 
     <div class="content-body">
         
-        <!-- 第一區：店長資料輸入區 -->
-        <div class="card">
+        <!-- 第一區：店長資料輸入/編輯區 -->
+        <div class="card" id="form-card">
             <div class="card-title">
-                <span><i class="fa-solid fa-pen-to-square"></i> 1. 新增借址登記資料</span>
+                <span id="form-title"><i class="fa-solid fa-pen-to-square"></i> 1. 新增借址登記資料</span>
             </div>
-            <form id="addressForm" onsubmit="addRecord(event)">
+            <form id="addressForm" onsubmit="handleFormSubmit(event)">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>據點名稱：</label>
@@ -184,7 +189,10 @@
                         <input type="number" id="totalFee" placeholder="例如: 12000" required>
                     </div>
                 </div>
-                <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> 確認新增登記</button>
+                <div class="form-btn-group">
+                    <button type="submit" id="submit-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> 確認新增登記</button>
+                    <button type="button" id="cancel-btn" class="btn-secondary" onclick="cancelEdit()">取消編輯</button>
+                </div>
             </form>
         </div>
 
@@ -240,6 +248,8 @@
 </main>
 
 <script>
+    let editingId = null; // 記錄目前正在編輯的 ID
+
     document.addEventListener("DOMContentLoaded", function() {
         try {
             const now = new Date();
@@ -306,26 +316,82 @@
         }
     }
 
-    function addRecord(event) {
+    // 處理表單送出（新增或儲存修改）
+    function handleFormSubmit(event) {
         event.preventDefault();
 
-        const newRecord = {
-            id: Date.now(),
-            branch: document.getElementById('branch').value,
-            recordId: document.getElementById('recordId').value,
-            companyName: document.getElementById('companyName').value,
-            phone: document.getElementById('phone').value,
-            term: document.getElementById('term').value.trim(),
-            totalFee: parseFloat(document.getElementById('totalFee').value) || 0,
-            notified: false,
-            terminated: false
-        };
+        const branch = document.getElementById('branch').value;
+        const recordId = document.getElementById('recordId').value;
+        const companyName = document.getElementById('companyName').value;
+        const phone = document.getElementById('phone').value;
+        const term = document.getElementById('term').value.trim();
+        const totalFee = parseFloat(document.getElementById('totalFee').value) || 0;
 
         const records = getRecords();
-        records.push(newRecord);
-        saveRecords(records);
 
+        if (editingId !== null) {
+            // 編輯模式：更新現有資料
+            const index = records.findIndex(r => r.id === editingId);
+            if (index !== -1) {
+                records[index].branch = branch;
+                records[index].recordId = recordId;
+                records[index].companyName = companyName;
+                records[index].phone = phone;
+                records[index].term = term;
+                records[index].totalFee = totalFee;
+            }
+            alert('借址登記資料已更新成功！');
+            cancelEdit();
+        } else {
+            // 新增模式
+            const newRecord = {
+                id: Date.now(),
+                branch: branch,
+                recordId: recordId,
+                companyName: companyName,
+                phone: phone,
+                term: term,
+                totalFee: totalFee,
+                notified: false,
+                terminated: false
+            };
+            records.push(newRecord);
+        }
+
+        saveRecords(records);
         document.getElementById('addressForm').reset();
+    }
+
+    // 點擊編輯按鈕：將資料帶入上方表單
+    function editRecord(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (!record) return;
+
+        editingId = id;
+        document.getElementById('branch').value = record.branch;
+        document.getElementById('recordId').value = record.recordId;
+        document.getElementById('companyName').value = record.companyName;
+        document.getElementById('phone').value = record.phone;
+        document.getElementById('term').value = record.term;
+        document.getElementById('totalFee').value = record.totalFee;
+
+        // 變更表單標題與按鈕狀態
+        document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 修改借址登記資料 (ID: ${id}) 👉 續約修改`;
+        document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> 儲存修改`;
+        document.getElementById('cancel-btn').style.display = 'inline-block';
+
+        // 捲動到上方表單讓店長看見
+        document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 取消編輯
+    function cancelEdit() {
+        editingId = null;
+        document.getElementById('addressForm').reset();
+        document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 新增借址登記資料`;
+        document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-plus"></i> 確認新增登記`;
+        document.getElementById('cancel-btn').style.display = 'none';
     }
 
     function toggleNotify(id) {
@@ -431,6 +497,7 @@
                         <button class="btn-sm btn-notify ${r.notified ? 'notified' : ''}" onclick="toggleNotify(${r.id})">
                             ${r.notified ? '✓ 已通知' : '已通知'}
                         </button>
+                        <button class="btn-sm btn-edit" onclick="editRecord(${r.id})"><i class="fa-solid fa-pen"></i> 編輯</button>
                         ${!r.terminated ? 
                             `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已退租</button>` : 
                             `<button class="btn-sm btn-restore" onclick="restoreRecord(${r.id})">恢復承租</button>`
