@@ -8,6 +8,8 @@
         { username: 'storeasy', password: '666' },
         { username: 'canny4545', password: '121qwe' },
         { username: 'bear', password: '809105' },
+        { username: 'emmy', password: '123' },
+        { username: 'yoko', password: '123' },
         { username: 'joyce', password: '123' }
     ];
 
