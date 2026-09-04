@@ -81,17 +81,9 @@
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; }
-        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; white-space: nowrap; }
-        
-        .data-table th:nth-child(4), .data-table td:nth-child(4) { 
-            white-space: normal; 
-            word-break: break-all; 
-            min-width: 160px; 
-        }
-        .data-table th:last-child, .data-table td:last-child { width: 260px; }
-
-        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
+        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; white-space: nowrap; }
         .data-table tr:hover { background-color: #f8fafc; }
 
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
@@ -172,25 +164,7 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>據點名稱：</label>
-                        <select id="branch">
-                            <option value="">-- 請選擇據點 (選填) --</option>
-                            <option value="台北車站店">台北車站店</option>
-                            <option value="士林店">士林店</option>
-                            <option value="松山店">松山店</option>
-                            <option value="民生松江店">民生松江店</option>
-                            <option value="板橋府中店">板橋府中店</option>
-                            <option value="中和二店">中和二店</option>
-                            <option value="三重光復店">三重光復店</option>
-                            <option value="中和環球店">中和環球店</option>
-                            <option value="新店店">新店店</option>
-                            <option value="海洋都心店">海洋都心店</option>
-                            <option value="桃園中正店">桃園中正店</option>
-                            <option value="新竹中華店">新竹中華店</option>
-                            <option value="台中中港店">台中中港店</option>
-                            <option value="台中文心店">台中文心店</option>
-                            <option value="高雄博愛店">高雄博愛店</option>
-                            <option value="高雄九如店">高雄九如店</option>
-                        </select>
+                        <input type="text" id="branch" placeholder="例如: 台北車站店 (選填)">
                     </div>
                     <div class="form-group">
                         <label>分類 (可下拉選擇或直接輸入新增)：</label>
@@ -263,15 +237,15 @@
                     <thead>
                         <tr>
                             <th style="width: 45px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                            <th style="width: 100px;">據點</th>
-                            <th style="width: 110px;">分類</th>
+                            <th>據點</th>
+                            <th>分類</th>
                             <th>事項內容</th>
-                            <th style="width: 90px;">姓名</th>
-                            <th style="width: 110px;">聯繫電話</th>
-                            <th style="width: 180px;">租期區間</th>
-                            <th style="width: 90px;">費用</th>
-                            <th style="width: 120px;">狀態判定</th>
-                            <th style="width: 260px;">操作管理</th>
+                            <th>姓名</th>
+                            <th>聯繫電話</th>
+                            <th>租期區間</th>
+                            <th>費用</th>
+                            <th>狀態判定</th>
+                            <th>操作管理</th>
                         </tr>
                     </thead>
                     <tbody id="recordTableBody">
@@ -303,7 +277,7 @@
 <script>
     let editingId = null; 
     let currentFilter = 'active_all'; 
-    let activeNoteId = null; // 當前正在編輯備註的 ID
+    let activeNoteId = null; 
     let customCategories = JSON.parse(localStorage.getItem('storeasy_notes_categories')) || [];
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -320,10 +294,8 @@
         renderRecords();
     });
 
-    // 初始化自訂分類下拉選單
     function initCategoryDropdown() {
         const select = document.getElementById('categorySelect');
-        // 保留預設選項與新增按鈕
         let html = `
             <option value="">-- 請選擇或自訂分類 --</option>
             <option value="合約交辦">合約交辦</option>
@@ -338,7 +310,6 @@
         select.innerHTML = html;
     }
 
-    // 檢查是否選擇了自訂新分類
     function checkCategoryInput(select) {
         const customInput = document.getElementById('categoryCustom');
         if (select.value === 'NEW_CUSTOM') {
@@ -378,7 +349,6 @@
         renderRecords();
     }
 
-    // 計算租期狀態（14天內即將到期）
     function calculateStatus(termStr, isTerminated) {
         if (isTerminated) return 'terminated';
         if (!termStr || !termStr.includes('-')) return 'active';
@@ -395,15 +365,14 @@
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays < 0) {
-            return 'expired'; // 已逾期
+            return 'expired'; 
         } else if (diffDays <= 14) {
-            return 'warning'; // 14天內即將到期
+            return 'warning'; 
         } else {
-            return 'active'; // 承租中
+            return 'active'; 
         }
     }
 
-    // 切換篩選條件
     function setFilter(filterType) {
         currentFilter = filterType;
         
@@ -422,11 +391,10 @@
         renderRecords();
     }
 
-    // 處理表單送出（新增或儲存修改）
     function handleFormSubmit(event) {
         event.preventDefault();
 
-        const branch = document.getElementById('branch').value;
+        const branch = document.getElementById('branch').value.trim();
         const selectCat = document.getElementById('categorySelect').value;
         const customCatInput = document.getElementById('categoryCustom').value.trim();
         
@@ -489,7 +457,7 @@
         if (!record) return;
 
         editingId = id;
-        document.getElementById('branch').value = record.branch;
+        document.getElementById('branch').value = record.branch || '';
         
         const catSelect = document.getElementById('categorySelect');
         if ([...catSelect.options].some(o => o.value === record.category)) {
@@ -502,10 +470,10 @@
             customInput.value = record.category;
         }
 
-        document.getElementById('subject').value = record.subject;
-        document.getElementById('clientName').value = record.clientName;
-        document.getElementById('phone').value = record.phone;
-        document.getElementById('term').value = record.term;
+        document.getElementById('subject').value = record.subject || '';
+        document.getElementById('clientName').value = record.clientName || '';
+        document.getElementById('phone').value = record.phone || '';
+        document.getElementById('term').value = record.term || '';
         document.getElementById('totalFee').value = record.totalFee || '';
 
         document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 修改其他事項紀錄 (ID: ${id})`;
@@ -524,7 +492,6 @@
         document.getElementById('cancel-btn').style.display = 'none';
     }
 
-    // 切換已處理狀態
     function toggleProcessed(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -534,7 +501,6 @@
         }
     }
 
-    // 辦理退租
     function terminateRecord(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -544,7 +510,6 @@
         }
     }
 
-    // 恢復承租
     function restoreRecord(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -554,7 +519,6 @@
         }
     }
 
-    // 備註彈跳視窗控制
     function openNoteModal(id) {
         activeNoteId = id;
         const records = getRecords();
@@ -626,7 +590,7 @@
             if (r.terminated) {
                 countTerminated++;
             } else {
-                countActiveAll++; // 承租中包含一般、即將到期、已逾期
+                countActiveAll++; 
                 if (status === 'warning') countWarning++;
                 if (status === 'expired') countExpired++;
             }
