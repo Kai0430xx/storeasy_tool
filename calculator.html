@@ -153,7 +153,7 @@
 
             <table class="result-table">
                 <tr>
-                    <th>原始每月金額 (原本租期方案)</th>
+                    <th>原始方案金額 (原本租期方案)</th>
                     <td id="t1-res-standard-monthly" style="color: #64748b; font-size: 1rem;">$0 元</td>
                 </tr>
                 <tr>
@@ -305,9 +305,14 @@
             return;
         }
 
-        // 原始方案每月金額 (原本租期方案)
+        // 原始方案每月金額與總額計算
         let standardMonthly = roundToTen(fee * baseRate);
-        document.getElementById('t1-res-standard-monthly').innerText = '$' + standardMonthly.toLocaleString() + ' 元';
+        if (!isNaN(months) && months > 0) {
+            let standardTotal = standardMonthly * months;
+            document.getElementById('t1-res-standard-monthly').innerText = '$' + standardMonthly.toLocaleString() + ' 元 × ' + months + '個月 = $' + standardTotal.toLocaleString() + '元';
+        } else {
+            document.getElementById('t1-res-standard-monthly').innerText = '$' + standardMonthly.toLocaleString() + ' 元/月 (未填寫月數)';
+        }
 
         // 實際套用折扣
         let effectiveRate = (!isNaN(customDiscVal) && customDiscVal > 0) ? customDiscVal : baseRate;
