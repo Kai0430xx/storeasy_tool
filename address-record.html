@@ -66,12 +66,18 @@
         .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: none; }
         .btn-secondary:hover { background: #cbd5e1; }
 
+        /* 第二區：狀態儀表板互動卡片 */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; border-left: 5px solid #cbd5e1; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; border-left: 5px solid #cbd5e1; cursor: pointer; transition: all 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .stat-card.active { border-left-color: #059669; }
         .stat-card.warning { border-left-color: #d97706; }
         .stat-card.expired { border-left-color: #dc2626; }
         .stat-card.terminated { border-left-color: #64748b; }
+        
+        /* 被選中的篩選卡片樣式 */
+        .stat-card.selected-filter { box-shadow: 0 0 0 2px #0f172a; background-color: #f8fafc; }
+
         .stat-label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
 
@@ -196,21 +202,21 @@
             </form>
         </div>
 
-        <!-- 第二區：狀態儀表板 -->
+        <!-- 第二區：狀態儀表板 (點擊可篩選下方清單) -->
         <div class="stats-grid">
-            <div class="stat-card active">
-                <span class="stat-label">承租中</span>
+            <div class="stat-card active selected-filter" filter-type="active_all" onclick="setFilter('active_all')">
+                <span class="stat-label">承租中 (含到期/逾期)</span>
                 <span class="stat-value" id="stat-active">0</span>
             </div>
-            <div class="stat-card warning">
+            <div class="stat-card warning" filter-type="warning" onclick="setFilter('warning')">
                 <span class="stat-label">即將到期 (30天內)</span>
                 <span class="stat-value" id="stat-warning">0</span>
             </div>
-            <div class="stat-card expired">
+            <div class="stat-card expired" filter-type="expired" onclick="setFilter('expired')">
                 <span class="stat-label">已逾期</span>
                 <span class="stat-value" id="stat-expired">0</span>
             </div>
-            <div class="stat-card terminated">
+            <div class="stat-card terminated" filter-type="terminated" onclick="setFilter('terminated')">
                 <span class="stat-label">已退租</span>
                 <span class="stat-value" id="stat-terminated">0</span>
             </div>
@@ -219,7 +225,7 @@
         <!-- 第三區：詳細資料清單 -->
         <div class="card">
             <div class="card-title">
-                <span><i class="fa-solid fa-table-list"></i> 2. 借址登記清單與管理</span>
+                <span id="table-title"><i class="fa-solid fa-table-list"></i> 2. 借址登記清單與管理 (目前顯示：承租中)</span>
                 <button class="batch-del-btn" onclick="deleteSelectedRecords()"><i class="fa-solid fa-trash-can"></i> 刪除所選項目</button>
             </div>
             <div class="table-responsive">
@@ -249,6 +255,7 @@
 
 <script>
     let editingId = null; // 記錄目前正在編輯的 ID
+    let currentFilter = 'active_all'; // 預設篩選：承租中（未退租）
 
     document.addEventListener("DOMContentLoaded", function() {
         try {
@@ -316,6 +323,27 @@
         }
     }
 
+    // 切換篩選條件
+    function setFilter(filterType) {
+        currentFilter = filterType;
+        
+        // 更新卡片外框高亮樣式
+        document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('selected-filter'));
+        const selectedCard = document.querySelector(`[filter-type="${filterType}"]`);
+        if (selectedCard) selectedCard.classList.add('selected-filter');
+
+        // 更新表格標題文字
+        const titles = {
+            'active_all': '承租中 (含到期/逾期)',
+            'warning': '即將到期 (30天內)',
+            'expired': '已逾期',
+            'terminated': '已退租'
+        };
+        document.getElementById('table-title').innerHTML = `<i class="fa-solid fa-table-list"></i> 2. 借址登記清單與管理 (目前顯示：${titles[filterType]})`;
+
+        renderRecords();
+    }
+
     // 處理表單送出（新增或儲存修改）
     function handleFormSubmit(event) {
         event.preventDefault();
@@ -330,7 +358,6 @@
         const records = getRecords();
 
         if (editingId !== null) {
-            // 編輯模式：更新現有資料
             const index = records.findIndex(r => r.id === editingId);
             if (index !== -1) {
                 records[index].branch = branch;
@@ -343,7 +370,6 @@
             alert('借址登記資料已更新成功！');
             cancelEdit();
         } else {
-            // 新增模式
             const newRecord = {
                 id: Date.now(),
                 branch: branch,
@@ -362,7 +388,6 @@
         document.getElementById('addressForm').reset();
     }
 
-    // 點擊編輯按鈕：將資料帶入上方表單
     function editRecord(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -376,16 +401,13 @@
         document.getElementById('term').value = record.term;
         document.getElementById('totalFee').value = record.totalFee;
 
-        // 變更表單標題與按鈕狀態
         document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 修改借址登記資料 (ID: ${id}) 👉 續約修改`;
         document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> 儲存修改`;
         document.getElementById('cancel-btn').style.display = 'inline-block';
 
-        // 捲動到上方表單讓店長看見
         document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 取消編輯
     function cancelEdit() {
         editingId = null;
         document.getElementById('addressForm').reset();
@@ -455,21 +477,40 @@
         const tbody = document.getElementById('recordTableBody');
         tbody.innerHTML = '';
 
-        let countActive = 0;
+        let countActiveAll = 0;
         let countWarning = 0;
         let countExpired = 0;
         let countTerminated = 0;
 
+        // 計算各狀態總數（卡片上的數字保持全域總計）
         records.forEach(r => {
             const status = calculateStatus(r.term, r.terminated);
-
             if (r.terminated) {
                 countTerminated++;
             } else {
-                countActive++; // 只要未退租，無論是一般、即將到期或已逾期，皆計入承租中總數
+                countActiveAll++;
                 if (status === 'warning') countWarning++;
                 if (status === 'expired') countExpired++;
             }
+        });
+
+        document.getElementById('stat-active').innerText = countActiveAll;
+        document.getElementById('stat-warning').innerText = countWarning;
+        document.getElementById('stat-expired').innerText = countExpired;
+        document.getElementById('stat-terminated').innerText = countTerminated;
+
+        // 根據目前點選的卡片過濾表格資料
+        const filteredRecords = records.filter(r => {
+            const status = calculateStatus(r.term, r.terminated);
+            if (currentFilter === 'active_all') return !r.terminated;
+            if (currentFilter === 'warning') return !r.terminated && status === 'warning';
+            if (currentFilter === 'expired') return !r.terminated && status === 'expired';
+            if (currentFilter === 'terminated') return r.terminated;
+            return true;
+        });
+
+        filteredRecords.forEach(r => {
+            const status = calculateStatus(r.term, r.terminated);
 
             let badgeHtml = '';
             if (r.terminated) {
@@ -508,11 +549,6 @@
             `;
             tbody.appendChild(tr);
         });
-
-        document.getElementById('stat-active').innerText = countActive;
-        document.getElementById('stat-warning').innerText = countWarning;
-        document.getElementById('stat-expired').innerText = countExpired;
-        document.getElementById('stat-terminated').innerText = countTerminated;
     }
 </script>
 <script src="sidebar.js"></script>
