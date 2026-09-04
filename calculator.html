@@ -48,12 +48,26 @@
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .nav-bar { background: #fff; border-radius: 12px; padding: 16px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        /* 讓快速導覽列具有黏性定位並固定在頂部 */
+        .nav-bar { 
+            background: #fff; 
+            border-radius: 12px; 
+            padding: 14px 24px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+            border: 1px solid #e2e8f0; 
+            display: flex; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            position: sticky; 
+            top: 73px; /* 剛好貼在主標題 header 的下方 */
+            z-index: 30; 
+        }
         .nav-bar span { font-weight: bold; color: #0f172a; margin-right: 8px; }
         .nav-link { background: #f1f5f9; color: #0f172a; padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
         .nav-link:hover { background: #b45309; color: white; }
 
-        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; scroll-margin-top: 90px; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; scroll-margin-top: 140px; }
         .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         
         .form-group { margin-bottom: 16px; }
@@ -75,6 +89,7 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .version { display: none; }
+            .nav-bar { top: 60px; }
         }
     </style>
 </head>
@@ -94,7 +109,7 @@
     </header>
 
     <div class="content-body">
-        <!-- 快捷錨點導覽列 -->
+        <!-- 快捷錨點導覽列 (已設定隨頁面捲動釘選於上方) -->
         <div class="nav-bar">
             <span>📌 快速導航：</span>
             <a href="#tool-1" class="nav-link">租金與押金計算</a>
