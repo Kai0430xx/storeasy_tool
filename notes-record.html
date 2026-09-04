@@ -56,7 +56,6 @@
         
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group-full { grid-column: span 3; }
         label { font-weight: 600; font-size: 0.85rem; color: #475569; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         input:focus, select:focus, textarea:focus { border-color: #0f172a; }
@@ -87,8 +86,8 @@
 
         .table-responsive { width: 100%; overflow-x: auto; }
         
-        /* 表格排版：強制單行顯示、文字過長自動省略 */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; min-width: 1100px; }
+        /* 表格精準排版：鎖定各欄位寬度與省略號，確保格子不變形亂跑 */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; min-width: 1150px; }
         .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         .data-table tr:hover { background-color: #f8fafc; }
@@ -130,7 +129,6 @@
 
         @media (max-width: 1024px) {
             .form-grid { grid-template-columns: 1fr 1fr; }
-            .form-group-full { grid-column: span 2; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
@@ -142,7 +140,6 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .form-grid { grid-template-columns: 1fr; }
-            .form-group-full { grid-column: span 1; }
             .stats-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
@@ -207,9 +204,9 @@
                         <label>費用總額 (NTD)：</label>
                         <input type="number" id="totalFee" placeholder="例如: 3500">
                     </div>
-                    <div class="form-group form-group-full">
+                    <div class="form-group">
                         <label>備註 (初始備註內容)：</label>
-                        <textarea id="initialNote" placeholder="請輸入初始備註紀錄 (選填)" style="height: 70px; resize: vertical;"></textarea>
+                        <input type="text" id="initialNote" placeholder="請輸入初始備註紀錄 (選填)">
                     </div>
                 </div>
                 <div class="form-btn-group">
@@ -256,15 +253,15 @@
                     <thead>
                         <tr>
                             <th style="width: 45px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                            <th style="width: 100px;">據點</th>
-                            <th style="width: 110px;">分類</th>
-                            <th>事項內容</th>
-                            <th style="width: 90px;">姓名</th>
-                            <th style="width: 110px;">聯繫電話</th>
-                            <th style="width: 180px;">租期區間</th>
-                            <th style="width: 100px;">費用</th>
-                            <th style="width: 130px;">狀態判定</th>
-                            <th style="width: 260px;">操作管理</th>
+                            <th style="width: 95px;">據點</th>
+                            <th style="width: 105px;">分類</th>
+                            <th style="width: 130px;">事項內容</th>
+                            <th style="width: 85px;">姓名</th>
+                            <th style="width: 105px;">聯繫電話</th>
+                            <th style="width: 175px;">租期區間</th>
+                            <th style="width: 95px;">費用</th>
+                            <th style="width: 125px;">狀態判定</th>
+                            <th style="width: 255px;">操作管理</th>
                         </tr>
                     </thead>
                     <tbody id="recordTableBody">
@@ -450,7 +447,6 @@
                 records[index].phone = phone;
                 records[index].term = term;
                 records[index].totalFee = totalFee;
-                // 若編輯時有重新輸入備註且原本為空或直接覆蓋，可更新；若保留原本備註則不強制覆蓋
                 if (initialNote) {
                     records[index].note = initialNote;
                 }
