@@ -49,9 +49,9 @@
         .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
         .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
-        .content-body { padding: 32px; max-width: 1400px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .content-body { padding: 32px; max-width: 100%; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; width: 100%; overflow: hidden; }
         .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -85,33 +85,25 @@
         .toolbar-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .toolbar-group select, .toolbar-group input { padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem; outline: none; background: #fff; width: auto; }
 
-        .table-responsive { width: 100%; overflow-x: hidden; }
+        .table-responsive { width: 100%; overflow-x: auto; }
         
-        /* 表格嚴格鎖定在容器內，絕不超出畫面 */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; table-layout: fixed; }
-        .data-table th, .data-table td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
+        /* 表格排版：讓欄位自動撐開、絕不溢出框線 */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; }
+        .data-table th, .data-table td { padding: 10px 6px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; white-space: nowrap; }
         .data-table tr:hover { background-color: #f8fafc; }
 
-        /* 各欄位精準寬度分配 (總和 100%) */
-        .col-chk { width: 4%; text-align: center; white-space: nowrap; }
-        .col-branch { width: 11%; white-space: nowrap; }
-        .col-cat { width: 11%; white-space: nowrap; }
-        .col-subject { width: 18%; word-break: break-all; white-space: normal; line-height: 1.2; max-height: 2.6em; } /* 事項內容支援換行 */
-        .col-name { width: 9%; white-space: nowrap; }
-        .col-phone { width: 12%; white-space: nowrap; }
-        .col-term { width: 13%; white-space: nowrap; }
-        .col-status { width: 11%; white-space: nowrap; }
-        .col-actions { width: 14%; white-space: nowrap; text-align: right; }
+        .col-chk { width: 35px; text-align: center; white-space: nowrap; }
+        .col-subject { word-break: break-all; white-space: normal; line-height: 1.2; }
 
-        .badge { padding: 2px 4px; border-radius: 4px; font-size: 0.62rem; font-weight: bold; display: inline-block; white-space: nowrap; }
+        .badge { padding: 2px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; display: inline-block; white-space: nowrap; }
         .badge-active { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #b45309; }
         .badge-expired { background: #fee2e2; color: #991b1b; }
         .badge-terminated { background: #f1f5f9; color: #64748b; }
 
-        .action-btns { display: inline-flex; gap: 2px; align-items: center; justify-content: flex-end; white-space: nowrap; }
-        .btn-sm { padding: 3px 4px; border-radius: 3px; font-size: 0.65rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; white-space: nowrap; }
+        .action-btns { display: flex; gap: 3px; align-items: center; white-space: nowrap; }
+        .btn-sm { padding: 3px 5px; border-radius: 3px; font-size: 0.65rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; white-space: nowrap; }
         .btn-processed.processed { background: #059669; color: white; border-color: #059669; }
         .btn-note { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
         .btn-note:hover { background: #0284c7; color: white; }
@@ -261,14 +253,14 @@
                     <thead>
                         <tr>
                             <th class="col-chk"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                            <th class="col-branch">據點</th>
-                            <th class="col-cat">分類</th>
+                            <th>據點</th>
+                            <th>分類</th>
                             <th class="col-subject">事項內容</th>
-                            <th class="col-name">姓名</th>
-                            <th class="col-phone">聯繫電話</th>
-                            <th class="col-term">租期區間</th>
-                            <th class="col-status">狀態判定</th>
-                            <th class="col-actions">操作管理</th>
+                            <th>姓名</th>
+                            <th>聯繫電話</th>
+                            <th>租期區間</th>
+                            <th>狀態判定</th>
+                            <th style="text-align: right; white-space: nowrap;">操作管理</th>
                         </tr>
                     </thead>
                     <tbody id="recordTableBody">
@@ -684,22 +676,22 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="col-chk"><input type="checkbox" class="row-checkbox" data-id="${r.id}"></td>
-                <td class="col-branch" title="${r.branch || ''}"><strong>${r.branch || '-'}</strong></td>
-                <td class="col-cat" title="${r.category || ''}"><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${r.category || '未分類'}</span></td>
+                <td title="${r.branch || ''}"><strong>${r.branch || '-'}</strong></td>
+                <td title="${r.category || ''}"><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${r.category || '未分類'}</span></td>
                 <td class="col-subject" title="${r.subject || ''}">${r.subject || '-'}</td>
-                <td class="col-name" title="${r.clientName || ''}">${r.clientName || '-'}</td>
-                <td class="col-phone" title="${r.phone || ''}">${r.phone || '-'}</td>
-                <td class="col-term" title="${r.term || ''}">${r.term || '-'}</td>
-                <td class="col-status">${badgeHtml}</td>
-                <td class="col-actions">
-                    <div class="action-btns">
+                <td title="${r.clientName || ''}">${r.clientName || '-'}</td>
+                <td title="${r.phone || ''}">${r.phone || '-'}</td>
+                <td title="${r.term || ''}">${r.term || '-'}</td>
+                <td>${badgeHtml}</td>
+                <td style="text-align: right; white-space: nowrap;">
+                    <div class="action-btns" style="justify-content: flex-end;">
                         <button class="btn-sm btn-processed ${r.processed ? 'processed' : ''}" onclick="toggleProcessed(${r.id})">
-                            ${r.processed ? '✓ 已處理' : '是否處理'}
+                            ${r.processed ? '✓ 處理' : '是否處理'}
                         </button>
                         <button class="btn-sm btn-note" onclick="openNoteModal(${r.id})">
                             <i class="fa-solid fa-note-sticky"></i> ${r.note ? '備註(有)' : '備註'}
                         </button>
-                        <button class="btn-sm btn-edit" onclick="editRecord(${r.id})"><i class="fa-solid fa-pen"></i> 編輯</button>
+                        <button class="btn-sm btn-edit" onclick="editRecord(${r.id})"><i class="fa-solid fa-pen"></i></button>
                         ${!r.terminated ? 
                             `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已完成</button>` : 
                             `<button class="btn-sm btn-restore" onclick="restoreRecord(${r.id})">恢復</button>`
