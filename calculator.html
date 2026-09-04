@@ -48,40 +48,24 @@
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .filter-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; align-items: center; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; }
-        .filter-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        .filter-group input, .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
+        .nav-bar { background: #fff; border-radius: 12px; padding: 16px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .nav-bar span { font-weight: bold; color: #0f172a; margin-right: 8px; }
+        .nav-link { background: #f1f5f9; color: #0f172a; padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
+        .nav-link:hover { background: #b45309; color: white; }
 
-        .branches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .branch-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-        .branch-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); border-color: #cbd5e1; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; scroll-margin-top: 90px; }
+        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         
-        .branch-header { background: #0f172a; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .branch-title { font-size: 1.1rem; font-weight: bold; color: #fbbf24; }
-        .branch-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; background: #059669; color: #fff; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; color: #475569; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; }
+        input:focus, select:focus { border-color: #0f172a; }
 
-        .branch-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-        .info-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9rem; color: #475569; }
-        .info-row strong { color: #1e293b; min-width: 70px; flex-shrink: 0; }
-
-        .code-tag { background: #fef3c7; color: #b45309; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #fde68a; display: inline-block; }
-
-        .floor-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
-        .floor-table th, .floor-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        .floor-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
-        .floor-table tr:last-child td { border-bottom: none; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: #fff; width: 100%; max-width: 900px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; animation: modalIn 0.2s ease-out; max-height: 90vh; }
-        @keyframes modalIn { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header { background: #0f172a; color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { font-size: 1.25rem; color: #fbbf24; font-weight: bold; }
-        .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; font-weight: bold; }
-        .modal-close:hover { color: #fff; }
-        .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-
-        .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 0.95rem; grid-column: 1 / -1; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .result-table { width: 100%; border-collapse: collapse; margin-top: 16px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+        .result-table th, .result-table td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 0.9rem; }
+        .result-table th { background-color: #f8fafc; font-weight: 600; color: #475569; width: 40%; }
+        .result-table td { background: #ffffff; font-weight: 600; color: #b45309; }
+        .result-table tr:last-child td { border-bottom: none; }
 
         @media (max-width: 768px) {
             aside { position: fixed; left: -260px; top: 0; }
@@ -90,8 +74,6 @@
             .menu-toggle-btn { display: inline-block; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
-            .filter-card { grid-template-columns: 1fr; }
-            .branches-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
     </style>
@@ -101,87 +83,118 @@
 <!-- 共用側邊欄容器 -->
 <aside id="sidebar"></aside>
 
-<div class="main-content">
-    <!-- 快捷錨點導覽列 -->
-    <div class="nav-bar">
-        <span>📌 快速導航：</span>
-        <a href="#tool-1" class="nav-link">租金與押金計算</a>
-        <a href="#tool-2" class="nav-link">天數與日租試算</a>
+<!-- 主畫面內容 -->
+<main>
+    <header>
+        <div class="header-left">
+            <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰</button>
+            <h2>🧮 費用計算與管理小工具</h2>
+        </div>
+        <div class="version">Storeasy Storage</div>
+    </header>
+
+    <div class="content-body">
+        <!-- 快捷錨點導覽列 -->
+        <div class="nav-bar">
+            <span>📌 快速導航：</span>
+            <a href="#tool-1" class="nav-link">租金與押金計算</a>
+            <a href="#tool-2" class="nav-link">合約到期日試算</a>
+        </div>
+
+        <!-- 小工具 1：租金與押金計算 -->
+        <div class="card" id="tool-1">
+            <div class="card-title">
+                <i class="fa-solid fa-calculator"></i> 1. 租金與押金總額試算
+            </div>
+            
+            <div class="form-group">
+                <label>每月租金 (NTD)：</label>
+                <input type="number" id="t1-fee" placeholder="例如: 3500" oninput="calcTool1()">
+            </div>
+
+            <div class="form-group">
+                <label>承租月數：</label>
+                <input type="number" id="t1-months" value="1" min="1" oninput="calcTool1()">
+            </div>
+
+            <div class="form-group">
+                <label>押金月數：</label>
+                <input type="number" id="t1-deposit-months" value="1" min="0" oninput="calcTool1()">
+            </div>
+
+            <table class="result-table">
+                <tr>
+                    <th>租金小計</th>
+                    <td id="t1-res-rent">$0 元</td>
+                </tr>
+                <tr>
+                    <th>押金小計</th>
+                    <td id="t1-res-deposit">$0 元</td>
+                </tr>
+                <tr>
+                    <th>首付總金額 (含押租金)</th>
+                    <td id="t1-res-total" style="font-size: 1.1rem; color: #dc2626;">$0 元</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 小工具 2：天數與合約到期預估 -->
+        <div class="card" id="tool-2">
+            <div class="card-title">
+                <i class="fa-solid fa-calendar-days"></i> 2. 合約到期日與天數試算
+            </div>
+            
+            <div class="form-group">
+                <label>合約起始日：</label>
+                <input type="date" id="t2-start" onchange="calcTool2()">
+            </div>
+
+            <div class="form-group">
+                <label>承租幾個月：</label>
+                <input type="number" id="t2-months" value="1" min="1" oninput="calcTool2()">
+            </div>
+
+            <table class="result-table">
+                <tr>
+                    <th>預估到期日</th>
+                    <td id="t2-res-end">-</td>
+                </tr>
+                <tr>
+                    <th>總承租天數</th>
+                    <td id="t2-res-days">-</td>
+                </tr>
+            </table>
+        </div>
     </div>
-
-    <!-- 小工具 1：租金與押金計算 -->
-    <div class="card" id="tool-1">
-        <div class="card-title">
-            <i class="fa-solid fa-calculator"></i> 1. 租金與押金總額試算
-        </div>
-        
-        <div class="form-group">
-            <label>每月租金 (NTD)：</label>
-            <input type="number" id="t1-fee" placeholder="例如: 3500" oninput="calcTool1()">
-        </div>
-
-        <div class="form-group">
-            <label>承租月數：</label>
-            <input type="number" id="t1-months" value="1" min="1" oninput="calcTool1()">
-        </div>
-
-        <div class="form-group">
-            <label>押金月數：</label>
-            <input type="number" id="t1-deposit-months" value="1" min="0" oninput="calcTool1()">
-        </div>
-
-        <table class="result-table">
-            <tr>
-                <th>租金小計</th>
-                <td id="t1-res-rent">$0 元</td>
-            </tr>
-            <tr>
-                <th>押金小計</th>
-                <td id="t1-res-deposit">$0 元</td>
-            </tr>
-            <tr>
-                <th>首付總金額 (含押租金)</th>
-                <td id="t1-res-total" style="font-size: 1.1rem; color: #dc2626;">$0 元</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- 小工具 2：天數與合約到期預估 -->
-    <div class="card" id="tool-2">
-        <div class="card-title">
-            <i class="fa-solid fa-calendar-days"></i> 2. 合約到期日與天數試算
-        </div>
-        
-        <div class="form-group">
-            <label>合約起始日：</label>
-            <input type="date" id="t2-start" onchange="calcTool2()">
-        </div>
-
-        <div class="form-group">
-            <label>承租幾個月：</label>
-            <input type="number" id="t2-months" value="1" min="1" oninput="calcTool2()">
-        </div>
-
-        <table class="result-table">
-            <tr>
-                <th>預估到期日</th>
-                <td id="t2-res-end">-</td>
-            </tr>
-            <tr>
-                <th>總承租天數</th>
-                <td id="t2-res-days">-</td>
-            </tr>
-        </table>
-    </div>
-</div>
+</main>
 
 <!-- 引入側邊欄共用腳本 -->
 <script src="sidebar.js"></script>
 <script>
+    // 側邊欄展開/收合控制
+    function toggleMenu(btn) {
+        const items = btn.nextElementSibling;
+        if (items) {
+            const isHidden = items.style.display === 'none' || !items.style.display;
+            items.style.display = isHidden ? 'flex' : 'none';
+            const arrow = btn.querySelector('.arrow');
+            if (arrow) arrow.innerText = isHidden ? '▼' : '▶';
+        }
+    }
+
+    // 手機版側邊欄開關
+    function toggleMobileSidebar() {
+        const aside = document.querySelector('aside');
+        if (aside) aside.classList.toggle('mobile-open');
+    }
+
     // 初始化填入今天的日期給工具2
     document.addEventListener("DOMContentLoaded", function() {
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('t2-start').value = today;
+        const t2StartInput = document.getElementById('t2-start');
+        if (t2StartInput && !t2StartInput.value) {
+            t2StartInput.value = today;
+        }
         calcTool1();
         calcTool2();
     });
