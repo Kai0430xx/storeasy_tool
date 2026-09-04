@@ -56,6 +56,7 @@
         
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group-full { grid-column: span 3; }
         label { font-weight: 600; font-size: 0.85rem; color: #475569; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         input:focus, select:focus, textarea:focus { border-color: #0f172a; }
@@ -87,22 +88,21 @@
         .table-responsive { width: 100%; overflow-x: auto; }
         
         /* 表格精準排版：固定各欄位寬度，確保內容不跑版、不擠壓 */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.82rem; table-layout: fixed; min-width: 1100px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.82rem; table-layout: fixed; min-width: 1000px; }
         .data-table th, .data-table td { padding: 12px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; white-space: nowrap; }
         .data-table tr:hover { background-color: #f8fafc; }
 
-        /* 各欄位精準寬度與換行設定 */
+        /* 各欄位精準寬度與換行設定 (移除費用後重新分配) */
         .col-chk { width: 40px; text-align: center; white-space: nowrap; }
-        .col-branch { width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-cat { width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-subject { width: 170px; word-break: break-all; white-space: normal; line-height: 1.3; } /* 事項內容允許換行 */
-        .col-name { width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-phone { width: 105px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-term { width: 155px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-fee { width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-status { width: 110px; white-space: nowrap; }
-        .col-actions { width: 235px; white-space: nowrap; }
+        .col-branch { width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-cat { width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-subject { width: 190px; word-break: break-all; white-space: normal; line-height: 1.3; } /* 事項內容允許換行 */
+        .col-name { width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-phone { width: 115px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-term { width: 175px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-status { width: 120px; white-space: nowrap; }
+        .col-actions { width: 245px; white-space: nowrap; }
 
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; white-space: nowrap; }
         .badge-active { background: #d1fae5; color: #065f46; }
@@ -141,6 +141,7 @@
 
         @media (max-width: 1024px) {
             .form-grid { grid-template-columns: 1fr 1fr; }
+            .form-group-full { grid-column: span 2; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
@@ -152,6 +153,7 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .form-grid { grid-template-columns: 1fr; }
+            .form-group-full { grid-column: span 1; }
             .stats-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
@@ -212,13 +214,9 @@
                         <label>租期 (區間或單一到期日)：</label>
                         <input type="text" id="term" placeholder="例如: 2026/04/19-2027/04/18 或 2026/10/04">
                     </div>
-                    <div class="form-group">
-                        <label>費用總額 (NTD)：</label>
-                        <input type="number" id="totalFee" placeholder="例如: 3500">
-                    </div>
-                    <div class="form-group">
-                        <label>備註 (初始備註內容)：</label>
-                        <input type="text" id="initialNote" placeholder="請輸入初始備註紀錄">
+                    <div class="form-group form-group-full">
+                        <label>備註 (可輸入費用、詳細說明等)：</label>
+                        <input type="text" id="initialNote" placeholder="例如: 租金 $3500，需提醒客戶提前匯款">
                     </div>
                 </div>
                 <div class="form-btn-group">
@@ -271,7 +269,6 @@
                             <th class="col-name">姓名</th>
                             <th class="col-phone">聯繫電話</th>
                             <th class="col-term">租期區間</th>
-                            <th class="col-fee">費用</th>
                             <th class="col-status">狀態判定</th>
                             <th class="col-actions">操作管理</th>
                         </tr>
@@ -381,7 +378,6 @@
         renderRecords();
     }
 
-    // 支援區間 (YYYY/MM/DD-YYYY/MM/DD) 或單一到期日 (YYYY/MM/DD) 判定
     function calculateStatus(termStr, isTerminated) {
         if (isTerminated) return 'terminated';
         if (!termStr || termStr.trim() === '') return 'active';
@@ -391,7 +387,6 @@
             const parts = termStr.split('-');
             endDateStr = parts[1].trim();
         } else {
-            // 如果只打一個時間，默認是到期日
             endDateStr = termStr.trim();
         }
 
@@ -452,7 +447,6 @@
         const clientName = document.getElementById('clientName').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const term = document.getElementById('term').value.trim();
-        const totalFee = parseFloat(document.getElementById('totalFee').value) || 0;
         const initialNote = document.getElementById('initialNote').value.trim();
 
         const records = getRecords();
@@ -466,7 +460,6 @@
                 records[index].clientName = clientName;
                 records[index].phone = phone;
                 records[index].term = term;
-                records[index].totalFee = totalFee;
                 if (initialNote) {
                     records[index].note = initialNote;
                 }
@@ -482,7 +475,6 @@
                 clientName: clientName,
                 phone: phone,
                 term: term,
-                totalFee: totalFee,
                 processed: false,
                 terminated: false,
                 note: initialNote
@@ -518,7 +510,6 @@
         document.getElementById('clientName').value = record.clientName || '';
         document.getElementById('phone').value = record.phone || '';
         document.getElementById('term').value = record.term || '';
-        document.getElementById('totalFee').value = record.totalFee || '';
         document.getElementById('initialNote').value = record.note || '';
 
         document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 修改其他事項紀錄 (ID: ${id})`;
@@ -674,7 +665,7 @@
         });
 
         if (filteredRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 30px;">尚無相關紀錄</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 30px;">尚無相關紀錄</td></tr>';
             return;
         }
 
@@ -701,7 +692,6 @@
                 <td class="col-name" title="${r.clientName || ''}">${r.clientName || '-'}</td>
                 <td class="col-phone" title="${r.phone || ''}">${r.phone || '-'}</td>
                 <td class="col-term" title="${r.term || ''}">${r.term || '-'}</td>
-                <td class="col-fee" title="${r.totalFee ? '$' + r.totalFee.toLocaleString() + ' 元' : ''}">${r.totalFee ? '$' + r.totalFee.toLocaleString() + ' 元' : '-'}</td>
                 <td class="col-status">${badgeHtml}</td>
                 <td class="col-actions">
                     <div class="action-btns">
