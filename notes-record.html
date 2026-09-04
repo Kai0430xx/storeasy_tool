@@ -86,29 +86,29 @@
 
         .table-responsive { width: 100%; overflow-x: auto; }
         
-        /* 表格精準排版：寬度合適、完全不跑版 */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.82rem; min-width: 1100px; }
-        .data-table th, .data-table td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
+        /* 表格精準排版：固定各欄位寬度，確保內容不跑版、不擠壓 */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.82rem; table-layout: fixed; min-width: 1100px; }
+        .data-table th, .data-table td { padding: 12px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; white-space: nowrap; }
         .data-table tr:hover { background-color: #f8fafc; }
 
-        /* 各欄位寬度控制 */
-        .col-chk { width: 40px; text-align: center; }
-        .col-branch { width: 90px; white-space: nowrap; }
-        .col-cat { width: 100px; white-space: nowrap; }
-        .col-subject { width: 160px; word-break: break-all; } /* 事項內容允許換行 */
-        .col-name { width: 80px; white-space: nowrap; }
-        .col-phone { width: 105px; white-space: nowrap; }
-        .col-term { width: 165px; white-space: nowrap; }
-        .col-fee { width: 90px; white-space: nowrap; }
-        .col-status { width: 115px; white-space: nowrap; }
-        .col-actions { width: 245px; white-space: nowrap; }
+        /* 各欄位精準寬度與換行設定 */
+        .col-chk { width: 40px; text-align: center; white-space: nowrap; }
+        .col-branch { width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-cat { width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-subject { width: 170px; word-break: break-all; white-space: normal; line-height: 1.3; } /* 事項內容允許換行 */
+        .col-name { width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-phone { width: 105px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-term { width: 155px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-fee { width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-status { width: 110px; white-space: nowrap; }
+        .col-actions { width: 235px; white-space: nowrap; }
 
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; white-space: nowrap; }
         .badge-active { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #b45309; }
         .badge-expired { background: #fee2e2; color: #991b1b; }
-        .badge-terminated { background: #f1f5f9; color: #475569; }
+        .badge-terminated { background: #f1f5f9; color: #64748b; }
 
         .action-btns { display: flex; gap: 4px; align-items: center; white-space: nowrap; }
         .btn-sm { padding: 5px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; white-space: nowrap; }
@@ -209,8 +209,8 @@
                         <input type="text" id="phone" placeholder="例如: 0912345678">
                     </div>
                     <div class="form-group">
-                        <label>租期 (格式: YYYY/MM/DD-YYYY/MM/DD)：</label>
-                        <input type="text" id="term" placeholder="例如: 2026/04/19-2027/04/18">
+                        <label>租期 (區間或單一到期日)：</label>
+                        <input type="text" id="term" placeholder="例如: 2026/04/19-2027/04/18 或 2026/10/04">
                     </div>
                     <div class="form-group">
                         <label>費用總額 (NTD)：</label>
@@ -381,12 +381,20 @@
         renderRecords();
     }
 
+    // 支援區間 (YYYY/MM/DD-YYYY/MM/DD) 或單一到期日 (YYYY/MM/DD) 判定
     function calculateStatus(termStr, isTerminated) {
         if (isTerminated) return 'terminated';
-        if (!termStr || !termStr.includes('-')) return 'active';
+        if (!termStr || termStr.trim() === '') return 'active';
 
-        const parts = termStr.split('-');
-        const endDateStr = parts[1].trim();
+        let endDateStr = '';
+        if (termStr.includes('-')) {
+            const parts = termStr.split('-');
+            endDateStr = parts[1].trim();
+        } else {
+            // 如果只打一個時間，默認是到期日
+            endDateStr = termStr.trim();
+        }
+
         const endDate = new Date(endDateStr);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
