@@ -52,13 +52,14 @@
         .content-body { padding: 32px; max-width: 1300px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
         .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group-full { grid-column: span 3; }
         label { font-weight: 600; font-size: 0.85rem; color: #475569; }
-        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
-        input:focus, select:focus { border-color: #0f172a; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
+        input:focus, select:focus, textarea:focus { border-color: #0f172a; }
         
         .form-btn-group { display: flex; gap: 10px; margin-top: 16px; }
         .btn-primary { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
@@ -80,10 +81,16 @@
         .stat-label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
 
+        /* 篩選與搜尋工具列 */
+        .toolbar-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .toolbar-group select, .toolbar-group input { padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem; outline: none; background: #fff; width: auto; }
+
         .table-responsive { width: 100%; overflow-x: auto; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
-        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; white-space: nowrap; }
+        
+        /* 表格排版：強制單行顯示、文字過長自動省略 */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; min-width: 1100px; }
+        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         .data-table tr:hover { background-color: #f8fafc; }
 
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
@@ -123,6 +130,7 @@
 
         @media (max-width: 1024px) {
             .form-grid { grid-template-columns: 1fr 1fr; }
+            .form-group-full { grid-column: span 2; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
@@ -134,6 +142,7 @@
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .form-grid { grid-template-columns: 1fr; }
+            .form-group-full { grid-column: span 1; }
             .stats-grid { grid-template-columns: 1fr; }
             .version { display: none; }
         }
@@ -198,6 +207,10 @@
                         <label>費用總額 (NTD)：</label>
                         <input type="number" id="totalFee" placeholder="例如: 3500">
                     </div>
+                    <div class="form-group form-group-full">
+                        <label>備註 (初始備註內容)：</label>
+                        <textarea id="initialNote" placeholder="請輸入初始備註紀錄 (選填)" style="height: 70px; resize: vertical;"></textarea>
+                    </div>
                 </div>
                 <div class="form-btn-group">
                     <button type="submit" id="submit-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> 確認新增紀錄</button>
@@ -230,22 +243,28 @@
         <div class="card">
             <div class="card-title">
                 <span id="table-title"><i class="fa-solid fa-table-list"></i> 2. 其他事項紀錄清單 (目前顯示：承租中)</span>
-                <button class="batch-del-btn" onclick="deleteSelectedRecords()"><i class="fa-solid fa-trash-can"></i> 刪除所選項目</button>
+                <div class="toolbar-group">
+                    <select id="filterCategory" onchange="renderRecords()">
+                        <option value="">📂 所有分類</option>
+                    </select>
+                    <input type="text" id="searchKeyword" oninput="renderRecords()" placeholder="🔍 搜尋姓名、電話、據點、事項...">
+                    <button class="batch-del-btn" onclick="deleteSelectedRecords()"><i class="fa-solid fa-trash-can"></i> 刪除所選項目</button>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th style="width: 45px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                            <th>據點</th>
-                            <th>分類</th>
+                            <th style="width: 100px;">據點</th>
+                            <th style="width: 110px;">分類</th>
                             <th>事項內容</th>
-                            <th>姓名</th>
-                            <th>聯繫電話</th>
-                            <th>租期區間</th>
-                            <th>費用</th>
-                            <th>狀態判定</th>
-                            <th>操作管理</th>
+                            <th style="width: 90px;">姓名</th>
+                            <th style="width: 110px;">聯繫電話</th>
+                            <th style="width: 180px;">租期區間</th>
+                            <th style="width: 100px;">費用</th>
+                            <th style="width: 130px;">狀態判定</th>
+                            <th style="width: 260px;">操作管理</th>
                         </tr>
                     </thead>
                     <tbody id="recordTableBody">
@@ -296,18 +315,22 @@
 
     function initCategoryDropdown() {
         const select = document.getElementById('categorySelect');
-        let html = `
-            <option value="">-- 請選擇或自訂分類 --</option>
-            <option value="合約交辦">合約交辦</option>
-            <option value="設備維修">設備維修</option>
-            <option value="客戶特殊需求">客戶特殊需求</option>
-            <option value="其他雜項">其他雜項</option>
-        `;
-        customCategories.forEach(cat => {
+        const filterSelect = document.getElementById('filterCategory');
+        
+        let defaultCats = ['合約交辦', '設備維修', '客戶特殊需求', '其他雜項'];
+        let allCatsSet = new Set([...defaultCats, ...customCategories]);
+        
+        let html = `<option value="">-- 請選擇或自訂分類 --</option>`;
+        let filterHtml = `<option value="">📂 所有分類</option>`;
+
+        allCatsSet.forEach(cat => {
             html += `<option value="${cat}">${cat}</option>`;
+            filterHtml += `<option value="${cat}">${cat}</option>`;
         });
         html += `<option value="NEW_CUSTOM">➕ 自訂新分類...</option>`;
+
         select.innerHTML = html;
+        filterSelect.innerHTML = filterHtml;
     }
 
     function checkCategoryInput(select) {
@@ -413,6 +436,7 @@
         const phone = document.getElementById('phone').value.trim();
         const term = document.getElementById('term').value.trim();
         const totalFee = parseFloat(document.getElementById('totalFee').value) || 0;
+        const initialNote = document.getElementById('initialNote').value.trim();
 
         const records = getRecords();
 
@@ -426,6 +450,10 @@
                 records[index].phone = phone;
                 records[index].term = term;
                 records[index].totalFee = totalFee;
+                // 若編輯時有重新輸入備註且原本為空或直接覆蓋，可更新；若保留原本備註則不強制覆蓋
+                if (initialNote) {
+                    records[index].note = initialNote;
+                }
             }
             alert('其他事項紀錄已更新成功！');
             cancelEdit();
@@ -441,7 +469,7 @@
                 totalFee: totalFee,
                 processed: false,
                 terminated: false,
-                note: ''
+                note: initialNote
             };
             records.push(newRecord);
         }
@@ -475,6 +503,7 @@
         document.getElementById('phone').value = record.phone || '';
         document.getElementById('term').value = record.term || '';
         document.getElementById('totalFee').value = record.totalFee || '';
+        document.getElementById('initialNote').value = record.note || '';
 
         document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 修改其他事項紀錄 (ID: ${id})`;
         document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> 儲存修改`;
@@ -601,12 +630,30 @@
         document.getElementById('stat-expired').innerText = countExpired;
         document.getElementById('stat-terminated').innerText = countTerminated;
 
+        const filterCat = document.getElementById('filterCategory').value;
+        const searchKw = document.getElementById('searchKeyword').value.trim().toLowerCase();
+
         const filteredRecords = records.filter(r => {
             const status = calculateStatus(r.term, r.terminated);
-            if (currentFilter === 'active_all') return !r.terminated;
-            if (currentFilter === 'warning') return !r.terminated && status === 'warning';
-            if (currentFilter === 'expired') return !r.terminated && status === 'expired';
-            if (currentFilter === 'terminated') return r.terminated;
+            
+            let passStatus = true;
+            if (currentFilter === 'active_all') passStatus = !r.terminated;
+            else if (currentFilter === 'warning') passStatus = !r.terminated && status === 'warning';
+            else if (currentFilter === 'expired') passStatus = !r.terminated && status === 'expired';
+            else if (currentFilter === 'terminated') passStatus = r.terminated;
+
+            if (!passStatus) return false;
+
+            if (filterCat && r.category !== filterCat) return false;
+
+            if (searchKw) {
+                const matchName = (r.clientName || '').toLowerCase().includes(searchKw);
+                const matchPhone = (r.phone || '').toLowerCase().includes(searchKw);
+                const matchBranch = (r.branch || '').toLowerCase().includes(searchKw);
+                const matchSubject = (r.subject || '').toLowerCase().includes(searchKw);
+                if (!matchName && !matchPhone && !matchBranch && !matchSubject) return false;
+            }
+
             return true;
         });
 
@@ -632,13 +679,13 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="checkbox" class="row-checkbox" data-id="${r.id}"></td>
-                <td><strong>${r.branch || '-'}</strong></td>
-                <td><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${r.category || '未分類'}</span></td>
-                <td>${r.subject || '-'}</td>
-                <td>${r.clientName || '-'}</td>
-                <td>${r.phone || '-'}</td>
-                <td>${r.term || '-'}</td>
-                <td>${r.totalFee ? '$' + r.totalFee.toLocaleString() + ' 元' : '-'}</td>
+                <td title="${r.branch || ''}"><strong>${r.branch || '-'}</strong></td>
+                <td title="${r.category || ''}"><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${r.category || '未分類'}</span></td>
+                <td title="${r.subject || ''}">${r.subject || '-'}</td>
+                <td title="${r.clientName || ''}">${r.clientName || '-'}</td>
+                <td title="${r.phone || ''}">${r.phone || '-'}</td>
+                <td title="${r.term || ''}">${r.term || '-'}</td>
+                <td title="${r.totalFee ? '$' + r.totalFee.toLocaleString() + ' 元' : ''}">${r.totalFee ? '$' + r.totalFee.toLocaleString() + ' 元' : '-'}</td>
                 <td>${badgeHtml}</td>
                 <td>
                     <div class="action-btns">
