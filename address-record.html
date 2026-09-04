@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <script src="login.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>借址登記紀錄管理 - 迷你倉庫</title>
+    <title>借址登記紀錄管理 - 收多易迷你倉庫</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
         
         aside { 
             width: 260px; 
@@ -17,11 +18,13 @@
             flex-direction: column; 
             flex-shrink: 0; 
             box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
-            z-index: 100; 
-            position: sticky; 
+            z-index: 1000; 
+            position: fixed; 
             top: 0; 
+            left: 0;
             height: 100vh; 
             overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
         }
         .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
@@ -39,7 +42,7 @@
 
         .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
 
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
         header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
         header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -94,15 +97,19 @@
         .batch-del-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
         .batch-del-btn:hover { background: #b91c1c; }
 
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
+        .sidebar-overlay.active { display: block; }
+
         @media (max-width: 1024px) {
             .form-grid { grid-template-columns: 1fr 1fr; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
-            aside { position: fixed; left: -260px; top: 0; }
-            aside.mobile-open { left: 0; }
+            aside { transform: translateX(-100%); }
+            aside.mobile-open { transform: translateX(0); }
             .mobile-close-btn { display: block; }
             .menu-toggle-btn { display: inline-block; }
+            main { margin-left: 0; width: 100%; }
             header { padding: 12px 16px; }
             .content-body { padding: 16px; }
             .form-grid { grid-template-columns: 1fr; }
@@ -113,17 +120,16 @@
 </head>
 <body>
 
-<!-- 共用側邊欄容器 -->
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 <aside id="sidebar"></aside>
 
-<!-- 主畫面內容 -->
 <main>
     <header>
         <div class="header-left">
-            <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰</button>
+            <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
             <h2>🏢 借址登記紀錄管理</h2>
         </div>
-        <div class="version">Storeasy Storage</div>
+        <div class="version" id="system-version">系統版本：載入中...</div>
     </header>
 
     <div class="content-body">
@@ -233,27 +239,39 @@
     </div>
 </main>
 
-<!-- 引入側邊欄共用腳本 -->
-<script src="sidebar.js"></script>
 <script>
-    // 側邊欄展開/收合控制
+    document.addEventListener("DOMContentLoaded", function() {
+        try {
+            const now = new Date();
+            const verEl = document.getElementById('system-version');
+            if (verEl) {
+                verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
+            }
+        } catch(e) {
+            console.error("Initialization error:", e);
+        }
+        renderRecords();
+    });
+
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('active');
+    }
+
     function toggleMenu(btn) {
         const items = btn.nextElementSibling;
-        if (items) {
-            const isHidden = items.style.display === 'none' || !items.style.display;
-            items.style.display = isHidden ? 'flex' : 'none';
-            const arrow = btn.querySelector('.arrow');
-            if (arrow) arrow.innerText = isHidden ? '▼' : '▶';
+        const arrow = btn.querySelector('.arrow');
+        if (items.style.display === 'none' || !items.style.display) {
+            items.style.display = 'flex';
+            if(arrow) arrow.innerText = '▼';
+        } else {
+            items.style.display = 'none';
+            if(arrow) arrow.innerText = '▶';
         }
     }
 
-    // 手機版側邊欄開關
-    function toggleMobileSidebar() {
-        const aside = document.querySelector('aside');
-        if (aside) aside.classList.toggle('mobile-open');
-    }
-
-    // 取得儲存的資料
     function getRecords() {
         return JSON.parse(localStorage.getItem('storeasy_address_records')) || [];
     }
@@ -263,7 +281,6 @@
         renderRecords();
     }
 
-    // 自動計算租期狀態
     function calculateStatus(termStr, isTerminated) {
         if (isTerminated) return 'terminated';
 
@@ -281,15 +298,14 @@
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays < 0) {
-            return 'expired'; // 已逾期
+            return 'expired';
         } else if (diffDays <= 30) {
-            return 'warning'; // 30天內即將到期
+            return 'warning';
         } else {
-            return 'active'; // 承租中
+            return 'active';
         }
     }
 
-    // 新增紀錄
     function addRecord(event) {
         event.preventDefault();
 
@@ -312,7 +328,6 @@
         document.getElementById('addressForm').reset();
     }
 
-    // 切換已通知狀態
     function toggleNotify(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -322,7 +337,6 @@
         }
     }
 
-    // 辦理退租
     function terminateRecord(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -332,7 +346,6 @@
         }
     }
 
-    // 恢復承租狀態（點錯退租時可還原）
     function restoreRecord(id) {
         const records = getRecords();
         const record = records.find(r => r.id === id);
@@ -342,7 +355,6 @@
         }
     }
 
-    // 單筆刪除紀錄
     function deleteRecord(id) {
         if (confirm('確定要永久刪除這筆登記資料嗎？')) {
             let records = getRecords();
@@ -351,13 +363,11 @@
         }
     }
 
-    // 全選/取消全選核取方塊
     function toggleSelectAll(source) {
         const checkboxes = document.querySelectorAll('.row-checkbox');
         checkboxes.forEach(cb => cb.checked = source.checked);
     }
 
-    // 批量刪除所選項目
     function deleteSelectedRecords() {
         const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
         if (selectedCheckboxes.length === 0) {
@@ -374,7 +384,6 @@
         }
     }
 
-    // 渲染表格與儀表板
     function renderRecords() {
         const records = getRecords();
         const tbody = document.getElementById('recordTableBody');
@@ -438,11 +447,8 @@
         document.getElementById('stat-expired').innerText = countExpired;
         document.getElementById('stat-terminated').innerText = countTerminated;
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        renderRecords();
-    });
 </script>
+<script src="sidebar.js"></script>
 
 </body>
 </html>
