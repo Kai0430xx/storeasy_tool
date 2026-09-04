@@ -234,6 +234,23 @@
     </main>
 
     <script>
+        // 側邊欄分類展開/收合控制
+        function toggleMenu(btn) {
+            const items = btn.nextElementSibling;
+            if (items) {
+                const isHidden = items.style.display === 'none' || !items.style.display;
+                items.style.display = isHidden ? 'flex' : 'none';
+                const arrow = btn.querySelector('.arrow');
+                if (arrow) arrow.innerText = isHidden ? '▼' : '▶';
+            }
+        }
+
+        // 手機版側邊欄開關
+        function toggleMobileSidebar() {
+            const aside = document.querySelector('aside');
+            if (aside) aside.classList.toggle('mobile-open');
+        }
+        
         document.addEventListener("DOMContentLoaded", function() {
             try {
                 const now = new Date();
