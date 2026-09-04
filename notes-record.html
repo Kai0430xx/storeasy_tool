@@ -102,7 +102,7 @@
         .col-phone { width: 12%; white-space: nowrap; }
         .col-term { width: 13%; white-space: nowrap; }
         .col-status { width: 11%; white-space: nowrap; }
-        .col-actions { width: 11%; white-space: nowrap; }
+        .col-actions { width: 14%; white-space: nowrap; text-align: right; }
 
         .badge { padding: 2px 4px; border-radius: 4px; font-size: 0.62rem; font-weight: bold; display: inline-block; white-space: nowrap; }
         .badge-active { background: #d1fae5; color: #065f46; }
@@ -110,8 +110,8 @@
         .badge-expired { background: #fee2e2; color: #991b1b; }
         .badge-terminated { background: #f1f5f9; color: #64748b; }
 
-        .action-btns { display: flex; gap: 2px; align-items: center; white-space: nowrap; }
-        .btn-sm { padding: 3px 5px; border-radius: 3px; font-size: 0.65rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; white-space: nowrap; }
+        .action-btns { display: inline-flex; gap: 2px; align-items: center; justify-content: flex-end; white-space: nowrap; }
+        .btn-sm { padding: 3px 4px; border-radius: 3px; font-size: 0.65rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; white-space: nowrap; }
         .btn-processed.processed { background: #059669; color: white; border-color: #059669; }
         .btn-note { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
         .btn-note:hover { background: #0284c7; color: white; }
@@ -227,7 +227,7 @@
         <!-- 第二區：狀態儀表板 (點擊可篩選) -->
         <div class="stats-grid">
             <div class="stat-card active selected-filter" filter-type="active_all" onclick="setFilter('active_all')">
-                <span class="stat-label">承租中 (含到期/逾期)</span>
+                <span class="stat-label">租期內 (含到期/逾期)</span>
                 <span class="stat-value" id="stat-active">0</span>
             </div>
             <div class="stat-card warning" filter-type="warning" onclick="setFilter('warning')">
@@ -239,7 +239,7 @@
                 <span class="stat-value" id="stat-expired">0</span>
             </div>
             <div class="stat-card terminated" filter-type="terminated" onclick="setFilter('terminated')">
-                <span class="stat-label">已退租</span>
+                <span class="stat-label">已完成</span>
                 <span class="stat-value" id="stat-terminated">0</span>
             </div>
         </div>
@@ -247,7 +247,7 @@
         <!-- 第三區：詳細資料清單 -->
         <div class="card">
             <div class="card-title">
-                <span id="table-title"><i class="fa-solid fa-table-list"></i> 2. 其他事項紀錄清單 (目前顯示：承租中)</span>
+                <span id="table-title"><i class="fa-solid fa-table-list"></i> 2. 其他事項紀錄清單 (目前顯示：租期內)</span>
                 <div class="toolbar-group">
                     <select id="filterCategory" onchange="renderRecords()">
                         <option value="">📂 所有分類</option>
@@ -414,10 +414,10 @@
         if (selectedCard) selectedCard.classList.add('selected-filter');
 
         const titles = {
-            'active_all': '承租中 (含到期/逾期)',
+            'active_all': '租期內 (含到期/逾期)',
             'warning': '即將到期 (14天內)',
             'expired': '已逾期',
-            'terminated': '已退租'
+            'terminated': '已完成'
         };
         document.getElementById('table-title').innerHTML = `<i class="fa-solid fa-table-list"></i> 2. 其他事項紀錄清單 (目前顯示：${titles[filterType]})`;
 
@@ -672,9 +672,9 @@
 
             let badgeHtml = '';
             if (r.terminated) {
-                badgeHtml = '<span class="badge badge-terminated">已退租</span>';
+                badgeHtml = '<span class="badge badge-terminated">已完成</span>';
             } else if (status === 'active') {
-                badgeHtml = '<span class="badge badge-active">承租中</span>';
+                badgeHtml = '<span class="badge badge-active">租期內</span>';
             } else if (status === 'warning') {
                 badgeHtml = '<span class="badge badge-warning">即將到期 (14天內)</span>';
             } else if (status === 'expired') {
@@ -694,14 +694,14 @@
                 <td class="col-actions">
                     <div class="action-btns">
                         <button class="btn-sm btn-processed ${r.processed ? 'processed' : ''}" onclick="toggleProcessed(${r.id})">
-                            ${r.processed ? '✓ 已處理' : '已處理'}
+                            ${r.processed ? '✓ 已處理' : '是否處理'}
                         </button>
                         <button class="btn-sm btn-note" onclick="openNoteModal(${r.id})">
                             <i class="fa-solid fa-note-sticky"></i> ${r.note ? '備註(有)' : '備註'}
                         </button>
                         <button class="btn-sm btn-edit" onclick="editRecord(${r.id})"><i class="fa-solid fa-pen"></i> 編輯</button>
                         ${!r.terminated ? 
-                            `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已退租</button>` : 
+                            `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已完成</button>` : 
                             `<button class="btn-sm btn-restore" onclick="restoreRecord(${r.id})">恢復</button>`
                         }
                         <button class="btn-sm btn-delete" onclick="deleteRecord(${r.id})"><i class="fa-solid fa-trash"></i></button>
