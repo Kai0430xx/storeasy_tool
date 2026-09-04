@@ -87,16 +87,16 @@
 
         .table-responsive { width: 100%; overflow-x: auto; }
         
-        /* 表格排版：讓欄位自動撐開、絕不溢出框線 */
+        /* 表格排版：讓事項內容欄位加寬並允許自然換行 */
         .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; }
         .data-table th, .data-table td { padding: 10px 6px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; white-space: nowrap; }
         .data-table tr:hover { background-color: #f8fafc; }
 
         .col-chk { width: 35px; text-align: center; white-space: nowrap; }
-        .col-subject { word-break: break-all; white-space: normal; line-height: 1.2; }
+        .col-subject { min-width: 180px; word-break: break-all; white-space: normal; line-height: 1.3; }
 
-        .badge { padding: 2px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; display: inline-block; white-space: nowrap; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; display: inline-block; white-space: nowrap; }
         .badge-active { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #b45309; }
         .badge-expired { background: #fee2e2; color: #991b1b; }
@@ -668,7 +668,7 @@
             } else if (status === 'active') {
                 badgeHtml = '<span class="badge badge-active">租期內</span>';
             } else if (status === 'warning') {
-                badgeHtml = '<span class="badge badge-warning">即將到期 (14天內)</span>';
+                badgeHtml = '<span class="badge badge-warning">即將到期</span>';
             } else if (status === 'expired') {
                 badgeHtml = '<span class="badge badge-expired">已逾期</span>';
             }
