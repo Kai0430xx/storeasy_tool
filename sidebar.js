@@ -37,6 +37,8 @@ function initSidebar() {
                     <a href="quote.html" class="sub-btn ${pageName === 'quote.html' ? 'active' : ''}">📄 生成報價單</a>
                     <a href="invoice.html" class="sub-btn ${pageName === 'invoice.html' ? 'active' : ''}">💰 生成請款單</a>
                     <a href="calculator.html" class="sub-btn ${pageName === 'calculator.html' ? 'active' : ''}">🧮 費用計算小工具</a>
+                    <a href="address-record.html" class="sub-btn ${pageName === 'address-record.html' ? 'active' : ''}">🏢 借址登記紀錄</a>
+                    <a href="notes-record.html" class="sub-btn ${pageName === 'notes-record.html' ? 'active' : ''}">📝 其他事項紀錄</a>
                 </div>
             </div>
             <div class="menu-group" style="margin-top: 8px;">
