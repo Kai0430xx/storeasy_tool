@@ -127,13 +127,13 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>原價每月租金 (NTD)：</label>
-                    <input type="number" id="t1-fee" placeholder="例如: 3500" oninput="calcTool1()">
+                    <input type="number" id="t1-fee" placeholder="例如: 5000" oninput="calcTool1()">
                 </div>
                 <div class="form-group">
-                    <label>期別折扣選擇：</label>
+                    <label>期別方案折扣 (預設方案)：</label>
                     <select id="t1-discount" onchange="calcTool1()">
                         <option value="0.95">季繳 (95折)</option>
-                        <option value="0.90">半年繳 (9折)</option>
+                        <option value="0.90" selected>半年繳 (9折)</option>
                         <option value="0.85">年繳 (85折)</option>
                         <option value="0.80">年繳 (8折)</option>
                     </select>
@@ -142,8 +142,8 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>原本折扣 (選填，如直接給特定折數或金額)：</label>
-                    <input type="number" id="t1-custom-discount" placeholder="例如: 輸入 0.9 或指定折扣" oninput="calcTool1()">
+                    <label>原本折扣/活動改用折數 (選填，如 0.8)：</label>
+                    <input type="number" id="t1-custom-discount" placeholder="例如: 0.8" step="0.01" oninput="calcTool1()">
                 </div>
                 <div class="form-group">
                     <label>承租月數 (選填)：</label>
@@ -157,7 +157,7 @@
                     <td id="t1-res-monthly" style="color: #0284c7; font-size: 1.05rem;">$0 元</td>
                 </tr>
                 <tr>
-                    <th>原本折扣省下的金額</th>
+                    <th>活動額外幫客人折價的金額 (相比方案原折數)</th>
                     <td id="t1-res-saved">-</td>
                 </tr>
                 <tr>
@@ -165,11 +165,11 @@
                     <td id="t1-res-rent">-</td>
                 </tr>
                 <tr>
-                    <th>保險文書處理費 (固定 $200)</th>
+                    <th>保險文書處理費 ( $\ge$3000收150/月，$\le$2999收80/月 )</th>
                     <td id="t1-res-doc">-</td>
                 </tr>
                 <tr>
-                    <th>保證金 (1個月折後租金)</th>
+                    <th>保證金 ( $\ge$3個月收1個月原價，$\le$2個月收2個月原價 )</th>
                     <td id="t1-res-deposit">-</td>
                 </tr>
                 <tr>
@@ -188,7 +188,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>原價每月租金 (NTD)：</label>
-                    <input type="number" id="t2-fee" placeholder="例如: 3500" oninput="calcTool2()">
+                    <input type="number" id="t2-fee" placeholder="例如: 5000" oninput="calcTool2()">
                 </div>
                 <div class="form-group">
                     <label>承租月數：</label>
@@ -201,14 +201,14 @@
                     <label>期別折扣選擇：</label>
                     <select id="t2-discount" onchange="calcTool2()">
                         <option value="0.95">季繳 (95折)</option>
-                        <option value="0.90">半年繳 (9折)</option>
+                        <option value="0.90" selected>半年繳 (9折)</option>
                         <option value="0.85">年繳 (85折)</option>
                         <option value="0.80">年繳 (8折)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>額外折扣 (僅折租金，例: 0.9 或折價金額)：</label>
-                    <input type="number" id="t2-extra-discount" placeholder="例如: 0.95 或輸入折減金額" oninput="calcTool2()">
+                    <label>額外折扣 (僅折租金，如 0.9 或折價金額)：</label>
+                    <input type="number" id="t2-extra-discount" placeholder="例如: 0.9 或輸入折減金額" step="0.01" oninput="calcTool2()">
                 </div>
             </div>
 
@@ -226,11 +226,11 @@
                     <td id="t2-res-rent">$0 元</td>
                 </tr>
                 <tr>
-                    <th>保險文書處理費 ($200)</th>
-                    <td id="t2-res-doc">$200 元</td>
+                    <th>保險文書處理費</th>
+                    <td id="t2-res-doc">$0 元</td>
                 </tr>
                 <tr>
-                    <th>保證金 (1個月折後租金)</th>
+                    <th>保證金</th>
                     <td id="t2-res-deposit">$0 元</td>
                 </tr>
                 <tr>
@@ -262,9 +262,24 @@
         if (aside) aside.classList.toggle('mobile-open');
     }
 
-    // 金額個位數四捨五入至 0 (例如 342 -> 340, 346 -> 350)
+    // 金額個位數四捨五入至 0
     function roundToTen(num) {
         return Math.round(num / 10) * 10;
+    }
+
+    // 計算保險文書處理費：原價3000以上收150/月，2999以下收80/月
+    function getDocFee(fee, months) {
+        let monthlyDoc = fee >= 3000 ? 150 : 80;
+        return monthlyDoc * months;
+    }
+
+    // 計算保證金：承租3個月(含)以上收1個月原價，1或2個月收2個月原價
+    function getDeposit(fee, months) {
+        if (months >= 3) {
+            return fee * 1; // 1個月原價租金
+        } else {
+            return fee * 2; // 2個月原價租金
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -275,7 +290,7 @@
     // 小工具 1 邏輯：租金折扣
     function calcTool1() {
         const fee = parseFloat(document.getElementById('t1-fee').value) || 0;
-        const baseRate = parseFloat(document.getElementById('t1-discount').value) || 0.95;
+        const baseRate = parseFloat(document.getElementById('t1-discount').value) || 0.90;
         const customDiscVal = parseFloat(document.getElementById('t1-custom-discount').value);
         const months = parseInt(document.getElementById('t1-months').value);
 
@@ -289,38 +304,36 @@
             return;
         }
 
-        // 計算折後每月租金 (套用下拉選單或自訂折扣，個位數四捨五入到十位)
-        let effectiveRate = baseRate;
-        if (!isNaN(customDiscVal)) {
-            if (customDiscVal < 1) {
-                effectiveRate = customDiscVal; // 若輸入如 0.9
-            } else if (customDiscVal < fee) {
-                // 若直接輸入折價後的金額或特定邏輯
-                effectiveRate = customDiscVal / fee;
-            }
-        }
+        // 方案原本租金 (對應下拉選單)
+        let standardMonthly = roundToTen(fee * baseRate);
 
+        // 實際套用折扣 (若有填活動自訂折扣則優先使用)
+        let effectiveRate = baseRate;
+        if (!isNaN(customDiscVal) && customDiscVal > 0) {
+            effectiveRate = customDiscVal;
+        }
         let monthlyFinal = roundToTen(fee * effectiveRate);
         document.getElementById('t1-res-monthly').innerText = '$' + monthlyFinal.toLocaleString() + ' 元';
 
-        // 原本折扣省下的金額 (若有填原價與折扣)
-        let standardMonthly = roundToTen(fee * baseRate);
-        let savedPerMonth = fee - standardMonthly;
-        if (!isNaN(customDiscVal) && customDiscVal < fee) {
-            savedPerMonth = fee - monthlyFinal;
+        // 計算店長幫客人多折價了多少 (原本方案金額 - 活動改用金額)
+        if (!isNaN(customDiscVal) && customDiscVal > 0 && months > 0) {
+            let diffPerMonth = standardMonthly - monthlyFinal;
+            let totalDiff = diffPerMonth * months;
+            document.getElementById('t1-res-saved').innerText = totalDiff > 0 ? '$' + totalDiff.toLocaleString() + ' 元 (共折價)' : '無額外折價';
+        } else {
+            document.getElementById('t1-res-saved').innerText = '-';
         }
-        document.getElementById('t1-res-saved').innerText = savedPerMonth > 0 ? '$' + (savedPerMonth * (months || 1)).toLocaleString() + ' 元 (共)' : '無';
 
         // 若有填寫承租月數，計算總額
         if (!isNaN(months) && months > 0) {
             const rentTotal = monthlyFinal * months;
-            const docFee = 200; // 固定保險文書處理費
-            const deposit = monthlyFinal; // 1個月保證金
+            const docFee = getDocFee(fee, months);
+            const deposit = getDeposit(fee, months);
             const grandTotal = rentTotal + docFee + deposit;
 
             document.getElementById('t1-res-rent').innerText = '$' + rentTotal.toLocaleString() + ' 元 (' + months + '個月)';
-            document.getElementById('t1-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元';
-            document.getElementById('t1-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元 (1個月)';
+            document.getElementById('t1-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元 (' + (fee >= 3000 ? 150 : 80) + '/月)';
+            document.getElementById('t1-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元 (' + (months >= 3 ? '1' : '2') + '個月原價)';
             document.getElementById('t1-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
         } else {
             document.getElementById('t1-res-rent').innerText = '未填寫承租月數';
@@ -334,20 +347,20 @@
     function calcTool2() {
         const fee = parseFloat(document.getElementById('t2-fee').value) || 0;
         const months = parseInt(document.getElementById('t2-months').value) || 1;
-        const baseRate = parseFloat(document.getElementById('t2-discount').value) || 0.95;
+        const baseRate = parseFloat(document.getElementById('t2-discount').value) || 0.90;
         const extraDisc = parseFloat(document.getElementById('t2-extra-discount').value) || 0;
 
         if (fee <= 0) {
             document.getElementById('t2-res-monthly').innerText = '$0 元';
             document.getElementById('t2-res-saved').innerText = '$0 元';
             document.getElementById('t2-res-rent').innerText = '$0 元';
-            document.getElementById('t2-res-doc').innerText = '$200 元';
+            document.getElementById('t2-res-doc').innerText = '$0 元';
             document.getElementById('t2-res-deposit').innerText = '$0 元';
             document.getElementById('t2-res-total').innerText = '$0 元';
             return;
         }
 
-        // 先算期別折扣，再疊加額外折扣 (僅折租金)
+        // 先算期別折扣，再疊加額外折扣
         let monthlyBase = fee * baseRate;
         let monthlyFinal = monthlyBase;
 
@@ -363,15 +376,15 @@
         // 總折價金額 (與原價相比)
         const totalSaved = (fee - monthlyFinal) * months;
         const rentTotal = monthlyFinal * months;
-        const docFee = 200;
-        const deposit = monthlyFinal;
+        const docFee = getDocFee(fee, months);
+        const deposit = getDeposit(fee, months);
         const grandTotal = rentTotal + docFee + deposit;
 
         document.getElementById('t2-res-monthly').innerText = '$' + monthlyFinal.toLocaleString() + ' 元';
         document.getElementById('t2-res-saved').innerText = '$' + totalSaved.toLocaleString() + ' 元';
         document.getElementById('t2-res-rent').innerText = '$' + rentTotal.toLocaleString() + ' 元 (' + months + '個月)';
         document.getElementById('t2-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元';
-        document.getElementById('t2-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元';
+        document.getElementById('t2-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元 (' + (months >= 3 ? '1' : '2') + '個月原價)';
         document.getElementById('t2-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
     }
 </script>
