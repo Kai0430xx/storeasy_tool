@@ -7,7 +7,7 @@
         { username: 'kai', password: '123' },
         { username: 'storeasy', password: '666' },
         { username: 'canny4545', password: '121qwe' },
-        { username: 'bear', password: '809105' }
+        { username: 'bear', password: '809105' },
         { username: 'joyce', password: '123' }
     ];
 
