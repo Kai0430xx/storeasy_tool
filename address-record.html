@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>借址登記紀錄管理 - 迷你倉庫</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        aside { 
+            width: 260px; 
+            background-color: #0f172a; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            z-index: 100; 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: auto;
+        }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
+        .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        .mobile-close-btn { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        
+        nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .menu-group { display: flex; flex-direction: column; gap: 4px; }
+        .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
+        
+        nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
+        nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
+        nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+
+        .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
+
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1300px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        
+        /* 卡片與表單樣式 */
+        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-weight: 600; font-size: 0.85rem; color: #475569; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95ln; outline: none; background: #fff; font-size: 0.9rem; }
+        input:focus, select:focus { border-color: #0f172a; }
+        
+        .btn-primary { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 16px; }
+        .btn-primary:hover { background: #1e293b; }
+
+        /* 第二區：狀態儀表板 */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; border-left: 5px solid #cbd5e1; }
+        .stat-card.active { border-left-color: #059669; }
+        .stat-card.warning { border-left-color: #d97706; }
+        .stat-card.expired { border-left-color: #dc2626; }
+        .stat-card.terminated { border-left-color: #64748b; }
+        .stat-label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
+
+        /* 第三區：資料表格 */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        .data-table tr:hover { background-color: #f8fafc; }
+
+        /* 狀態標籤 */
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .badge-active { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #b45309; }
+        .badge-expired { background: #fee2e2; color: #991b1b; }
+        .badge-terminated { background: #f1f5f9; color: #475569; }
+
+        /* 操作按鈕 */
+        .action-btns { display: flex; gap: 8px; }
+        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; }
+        .btn-notify.notified { background: #059669; color: white; border-color: #059669; }
+        .btn-terminate { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .btn-terminate:hover { background: #dc2626; color: white; }
+        .btn-delete { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+        .btn-delete:hover { background: #e2e8f0; color: #0f172a; }
+
+        @media (max-width: 1024px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -260px; top: 0; }
+            aside.mobile-open { left: 0; }
+            .mobile-close-btn { display: block; }
+            .menu-toggle-btn { display: inline-block; }
+            header { padding: 12px 16px; }
+            .content-body { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .version { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 共用側邊欄容器 -->
+<aside id="sidebar"></aside>
+
+<!-- 主畫面內容 -->
+<main>
+    <header>
+        <div class="header-left">
+            <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰</button>
+            <h2>🏢 借址登記紀錄管理</h2>
+        </div>
+        <div class="version">Storeasy Storage</div>
+    </header>
+
+    <div class="content-body">
+        
+        <!-- 第一區：店長資料輸入區 -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fa-solid fa-pen-to-square"></i> 1. 新增借址登記資料
+            </div>
+            <form id="addressForm" onsubmit="addRecord(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>據點名稱：</label>
+                        <select id="branch" required>
+                            <option value="">-- 請選擇據點 --</option>
+                            <option value="台北車站店">台北車站店</option>
+                            <option value="士林店">士林店</option>
+                            <option value="松山店">松山店</option>
+                            <option value="民生松江店">民生松江店</option>
+                            <option value="板橋府中店">板橋府中店</option>
+                            <option value="中和二店">中和二店</option>
+                            <option value="三重光復店">三重光復店</option>
+                            <option value="中和環球店">中和環球店</option>
+                            <option value="新店店">新店店</option>
+                            <option value="海洋都心店">海洋都心店</option>
+                            <option value="桃園中正店">桃園中正店</option>
+                            <option value="新竹中華店">新竹中華店</option>
+                            <option value="台中中港店">台中中港店</option>
+                            <option value="台中文心店">台中文心店</option>
+                            <option value="高雄博愛店">高雄博愛店</option>
+                            <option value="高雄九如店">高雄九如店</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>編號：</label>
+                        <input type="text" id="recordId" placeholder="例如: A01-01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>公司名稱：</label>
+                        <input type="text" id="companyName" placeholder="例如: 某某股份有限公司" required>
+                    </div>
+                    <div class="form-group">
+                        <label>聯繫電話：</label>
+                        <input type="text" id="phone" placeholder="例如: 0912345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label>租期 (格式: YYYY/MM/DD-YYYY/MM/DD)：</label>
+                        <input type="text" id="term" placeholder="例如: 2025/09/05-2026/09/04" required>
+                    </div>
+                    <div class="form-group">
+                        <label>費用總額 (NTD)：</label>
+                        <input type="number" id="totalFee" placeholder="例如: 12000" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> 確認新增登記</button>
+            </form>
+        </div>
+
+        <!-- 第二區：狀態儀表板 -->
+        <div class="stats-grid">
+            <div class="stat-card active">
+                <span class="stat-label">承租中</span>
+                <span class="stat-value" id="stat-active">0</span>
+            </div>
+            <div class="stat-card warning">
+                <span class="stat-label">即將到期 (30天內)</span>
+                <span class="stat-value" id="stat-warning">0</span>
+            </div>
+            <div class="stat-card expired">
+                <span class="stat-label">已逾期</span>
+                <span class="stat-value" id="stat-expired">0</span>
+            </div>
+            <div class="stat-card terminated">
+                <span class="stat-label">已退租</span>
+                <span class="stat-value" id="stat-terminated">0</span>
+            </div>
+        </div>
+
+        <!-- 第三區：詳細資料清單 -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fa-solid fa-table-list"></i> 2. 借址登記清單與管理
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>據點</th>
+                            <th>編號</th>
+                            <th>公司名稱</th>
+                            <th>聯繫電話</th>
+                            <th>租期區間</th>
+                            <th>費用總額</th>
+                            <th>狀態判定</th>
+                            <th>操作管理</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordTableBody">
+                        <!-- 動態渲染 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- 引入側邊欄共用腳本 -->
+<script src="sidebar.js"></script>
+<script>
+    // 側邊欄展開/收合控制
+    function toggleMenu(btn) {
+        const items = btn.nextElementSibling;
+        if (items) {
+            const isHidden = items.style.display === 'none' || !items.style.display;
+            items.style.display = isHidden ? 'flex' : 'none';
+            const arrow = btn.querySelector('.arrow');
+            if (arrow) arrow.innerText = isHidden ? '▼' : '▶';
+        }
+    }
+
+    // 手機版側邊欄開關
+    function toggleMobileSidebar() {
+        const aside = document.querySelector('aside');
+        if (aside) aside.classList.toggle('mobile-open');
+    }
+
+    // 取得儲存的資料
+    function getRecords() {
+        return JSON.parse(localStorage.getItem('storeasy_address_records')) || [];
+    }
+
+    function saveRecords(records) {
+        localStorage.setItem('storeasy_address_records', JSON.stringify(records));
+        renderRecords();
+    }
+
+    // 自動計算租期狀態
+    // 傳入格式 "2025/09/05-2026/09/04" 或含空白
+    function calculateStatus(termStr, isTerminated) {
+        if (isTerminated) return 'terminated';
+
+        parts = termStr.split('-');
+        if (parts.length < 2) return 'active';
+
+        const endDateStr = parts[1].trim();
+        const endDate = new Date(endDateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (isNaN(endDate.getTime())) return 'active';
+
+        const diffTime = endDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) {
+            return 'expired'; // 已逾期
+        } else if (diffDays <= 30) {
+            return 'warning'; // 30天內即將到期
+        } else {
+            return 'active'; // 承租中
+        }
+    }
+
+    // 新增紀錄
+    function addRecord(event) {
+        event.preventDefault();
+
+        const newRecord = {
+            id: Date.now(),
+            branch: document.getElementById('branch').value,
+            recordId: document.getElementById('recordId').value,
+            companyName: document.getElementById('companyName').value,
+            phone: document.getElementById('phone').value,
+            term: document.getElementById('term').value.trim(),
+            totalFee: parseFloat(document.getElementById('totalFee').value) || 0,
+            notified: false,
+            terminated: false
+        };
+
+        const records = getRecords();
+        records.push(newRecord);
+        saveRecords(records);
+
+        document.getElementById('addressForm').reset();
+    }
+
+    // 切換已通知狀態
+    function toggleNotify(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            record.notified = !record.notified;
+            saveRecords(records);
+        }
+    }
+
+    // 辦理退租
+    function terminateRecord(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            record.terminated = true;
+            saveRecords(records);
+        }
+    }
+
+    // 刪除紀錄
+    function deleteRecord(id) {
+        if (confirm('確定要永久刪除這筆登記資料嗎？')) {
+            let records = getRecords();
+            records = records.filter(r => r.id !== id);
+            saveRecords(records);
+        }
+    }
+
+    // 渲染表格與儀表板
+    function renderRecords() {
+        const records = getRecords();
+        const tbody = document.getElementById('recordTableBody');
+        tbody.innerHTML = '';
+
+        let countActive = 0;
+        let countWarning = 0;
+        let countExpired = 0;
+        let countTerminated = 0;
+
+        records.forEach(r => {
+            const status = calculateStatus(r.term, r.terminated);
+
+            // 統計數據 (若已退租，不計入承租中/到期/逾期，只算在已退租)
+            if (r.terminated) {
+                countTerminated++;
+            } else {
+                if (status === 'active') countActive++;
+                if (status === 'warning') countWarning++;
+                if (status === 'expired') countExpired++;
+            }
+
+            // 組合狀態標籤與樣式
+            let badgeHtml = '';
+            if (r.terminated) {
+                badgeHtml = '<span class="badge badge-terminated">已退租</span>';
+            } else if (status === 'active') {
+                badgeHtml = '<span class="badge badge-active">承租中</span>';
+            } else if (status === 'warning') {
+                badgeHtml = '<span class="badge badge-warning">即將到期 (30天內)</span>';
+            } else if (status === 'expired') {
+                badgeHtml = '<span class="badge badge-expired">已逾期</span>';
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${r.branch}</strong></td>
+                <td>${r.recordId}</td>
+                <td>${r.companyName}</td>
+                <td>${r.phone}</td>
+                <td>${r.term}</td>
+                <td>$${r.totalFee.toLocaleString()} 元</td>
+                <td>${badgeHtml}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-sm btn-notify ${r.notified ? 'notified' : ''}" onclick="toggleNotify(${r.id})">
+                            ${r.notified ? '✓ 已通知' : '已通知'}
+                        </button>
+                        ${!r.terminated ? `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已退租</button>` : ''}
+                        <button class="btn-sm btn-delete" onclick="deleteRecord(${r.id})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // 更新統計數據
+        document.getElementById('stat-active').innerText = countActive;
+        document.getElementById('stat-warning').innerText = countWarning;
+        document.getElementById('stat-expired').innerText = countExpired;
+        document.getElementById('stat-terminated').innerText = countTerminated;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        renderRecords();
+    });
+</script>
+
+</body>
+</html>
