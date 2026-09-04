@@ -8,6 +8,7 @@
         { username: 'storeasy', password: '666' },
         { username: 'canny4545', password: '121qwe' },
         { username: 'bear', password: '809105' }
+        { username: 'joyce', password: '123' }
     ];
 
     // 檢查目前是否已登入
