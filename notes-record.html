@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <script src="login.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>其他事項紀錄管理 - 收多易迷你倉庫</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
+        
+        aside { 
+            width: 260px; 
+            background-color: #0f172a; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            z-index: 1000; 
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            height: 100vh; 
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header h1 { font-size: 1.2rem; font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
+        .sidebar-header p { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        .mobile-close-btn { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        
+        nav { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .menu-group { display: flex; flex-direction: column; gap: 4px; }
+        .menu-category { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: none; background: #1e293b; color: #f8fafc; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .menu-items { display: flex; flex-direction: column; gap: 4px; padding-left: 12px; margin-top: 4px; }
+        
+        nav a.sub-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; text-decoration: none; background: transparent; color: #cbd5e1; font-size: 0.9rem; font-weight: 600; display: block; transition: all 0.2s; }
+        nav a.sub-btn:hover { background-color: #1e293b; color: #fff; }
+        nav a.sub-btn.active { background-color: #f59e0b; color: #0f172a; }
+
+        .sidebar-footer { padding: 16px; border-top: 1px solid #1e293b; font-size: 0.75rem; color: #64748b; text-align: center; margin-top: auto; }
+
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: 260px; width: calc(100% - 260px); }
+        header { background: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
+        header h2 { font-size: 1.25rem; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { display: none; background: #0f172a; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .version { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+        .content-body { padding: 32px; max-width: 1300px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        
+        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-weight: 600; font-size: 0.85rem; color: #475569; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
+        input:focus, select:focus { border-color: #0f172a; }
+        
+        .form-btn-group { display: flex; gap: 10px; margin-top: 16px; }
+        .btn-primary { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-primary:hover { background: #1e293b; }
+        .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: none; }
+        .btn-secondary:hover { background: #cbd5e1; }
+
+        /* 第二區：狀態儀表板互動卡片 */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; border-left: 5px solid #cbd5e1; cursor: pointer; transition: all 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .stat-card.active { border-left-color: #059669; }
+        .stat-card.warning { border-left-color: #d97706; }
+        .stat-card.expired { border-left-color: #dc2626; }
+        .stat-card.terminated { border-left-color: #64748b; }
+        
+        .stat-card.selected-filter { box-shadow: 0 0 0 2px #0f172a; background-color: #f8fafc; }
+
+        .stat-label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
+
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; }
+        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; white-space: nowrap; }
+        
+        .data-table th:nth-child(4), .data-table td:nth-child(4) { 
+            white-space: normal; 
+            word-break: break-all; 
+            min-width: 160px; 
+        }
+        .data-table th:last-child, .data-table td:last-child { width: 260px; }
+
+        .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        .data-table tr:hover { background-color: #f8fafc; }
+
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .badge-active { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #b45309; }
+        .badge-expired { background: #fee2e2; color: #991b1b; }
+        .badge-terminated { background: #f1f5f9; color: #475569; }
+
+        .action-btns { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; white-space: nowrap; }
+        .btn-processed.processed { background: #059669; color: white; border-color: #059669; }
+        .btn-note { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .btn-note:hover { background: #0284c7; color: white; }
+        .btn-edit { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+        .btn-edit:hover { background: #f59e0b; color: white; }
+        .btn-terminate { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .btn-terminate:hover { background: #dc2626; color: white; }
+        .btn-restore { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .btn-restore:hover { background: #0284c7; color: white; }
+        .btn-delete { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+        .btn-delete:hover { background: #e2e8f0; color: #0f172a; }
+
+        .batch-del-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .batch-del-btn:hover { background: #b91c1c; }
+
+        /* 備註彈跳視窗 Modal 樣式 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; padding: 24px; border-radius: 12px; width: 450px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 16px; }
+        .modal-header { font-size: 1.1rem; font-weight: bold; color: #0f172a; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; }
+        .modal-body textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; resize: vertical; outline: none; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 900; }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 1024px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            aside { transform: translateX(-100%); }
+            aside.mobile-open { transform: translateX(0); }
+            .mobile-close-btn { display: block; }
+            .menu-toggle-btn { display: inline-block; }
+            main { margin-left: 0; width: 100%; }
+            header { padding: 12px 16px; }
+            .content-body { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .version { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<aside id="sidebar"></aside>
+
+<main>
+    <header>
+        <div class="header-left">
+            <button class="menu-toggle-btn" onclick="toggleMobileSidebar()">☰ 選單</button>
+            <h2>📝 其他事項紀錄管理</h2>
+        </div>
+        <div class="version" id="system-version">系統版本：載入中...</div>
+    </header>
+
+    <div class="content-body">
+        
+        <!-- 第一區：店長資料輸入/編輯區 (全部選填) -->
+        <div class="card" id="form-card">
+            <div class="card-title">
+                <span id="form-title"><i class="fa-solid fa-pen-to-square"></i> 1. 新增其他事項紀錄</span>
+            </div>
+            <form id="notesForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>據點名稱：</label>
+                        <select id="branch">
+                            <option value="">-- 請選擇據點 (選填) --</option>
+                            <option value="台北車站店">台北車站店</option>
+                            <option value="士林店">士林店</option>
+                            <option value="松山店">松山店</option>
+                            <option value="民生松江店">民生松江店</option>
+                            <option value="板橋府中店">板橋府中店</option>
+                            <option value="中和二店">中和二店</option>
+                            <option value="三重光復店">三重光復店</option>
+                            <option value="中和環球店">中和環球店</option>
+                            <option value="新店店">新店店</option>
+                            <option value="海洋都心店">海洋都心店</option>
+                            <option value="桃園中正店">桃園中正店</option>
+                            <option value="新竹中華店">新竹中華店</option>
+                            <option value="台中中港店">台中中港店</option>
+                            <option value="台中文心店">台中文心店</option>
+                            <option value="高雄博愛店">高雄博愛店</option>
+                            <option value="高雄九如店">高雄九如店</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分類 (可下拉選擇或直接輸入新增)：</label>
+                        <select id="categorySelect" onchange="checkCategoryInput(this)">
+                            <option value="">-- 請選擇或自訂分類 --</option>
+                            <option value="合約交辦">合約交辦</option>
+                            <option value="設備維修">設備維修</option>
+                            <option value="客戶特殊需求">客戶特殊需求</option>
+                            <option value="其他雜項">其他雜項</option>
+                            <option value="NEW_CUSTOM">➕ 自訂新分類...</option>
+                        </select>
+                        <input type="text" id="categoryCustom" placeholder="請輸入新分類名稱" style="display: none; margin-top: 6px;">
+                    </div>
+                    <div class="form-group">
+                        <label>事項內容：</label>
+                        <input type="text" id="subject" placeholder="例如: 補簽合約、維修門禁卡">
+                    </div>
+                    <div class="form-group">
+                        <label>姓名：</label>
+                        <input type="text" id="clientName" placeholder="例如: 王小明">
+                    </div>
+                    <div class="form-group">
+                        <label>聯繫電話：</label>
+                        <input type="text" id="phone" placeholder="例如: 0912345678">
+                    </div>
+                    <div class="form-group">
+                        <label>租期 (格式: YYYY/MM/DD-YYYY/MM/DD)：</label>
+                        <input type="text" id="term" placeholder="例如: 2026/04/19-2027/04/18">
+                    </div>
+                    <div class="form-group">
+                        <label>費用總額 (NTD)：</label>
+                        <input type="number" id="totalFee" placeholder="例如: 3500">
+                    </div>
+                </div>
+                <div class="form-btn-group">
+                    <button type="submit" id="submit-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> 確認新增紀錄</button>
+                    <button type="button" id="cancel-btn" class="btn-secondary" onclick="cancelEdit()">取消編輯</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 第二區：狀態儀表板 (點擊可篩選) -->
+        <div class="stats-grid">
+            <div class="stat-card active selected-filter" filter-type="active_all" onclick="setFilter('active_all')">
+                <span class="stat-label">承租中 (含到期/逾期)</span>
+                <span class="stat-value" id="stat-active">0</span>
+            </div>
+            <div class="stat-card warning" filter-type="warning" onclick="setFilter('warning')">
+                <span class="stat-label">即將到期 (14天內)</span>
+                <span class="stat-value" id="stat-warning">0</span>
+            </div>
+            <div class="stat-card expired" filter-type="expired" onclick="setFilter('expired')">
+                <span class="stat-label">已逾期</span>
+                <span class="stat-value" id="stat-expired">0</span>
+            </div>
+            <div class="stat-card terminated" filter-type="terminated" onclick="setFilter('terminated')">
+                <span class="stat-label">已退租</span>
+                <span class="stat-value" id="stat-terminated">0</span>
+            </div>
+        </div>
+
+        <!-- 第三區：詳細資料清單 -->
+        <div class="card">
+            <div class="card-title">
+                <span id="table-title"><i class="fa-solid fa-table-list"></i> 2. 其他事項紀錄清單 (目前顯示：承租中)</span>
+                <button class="batch-del-btn" onclick="deleteSelectedRecords()"><i class="fa-solid fa-trash-can"></i> 刪除所選項目</button>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                            <th style="width: 100px;">據點</th>
+                            <th style="width: 110px;">分類</th>
+                            <th>事項內容</th>
+                            <th style="width: 90px;">姓名</th>
+                            <th style="width: 110px;">聯繫電話</th>
+                            <th style="width: 180px;">租期區間</th>
+                            <th style="width: 90px;">費用</th>
+                            <th style="width: 120px;">狀態判定</th>
+                            <th style="width: 260px;">操作管理</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordTableBody">
+                        <!-- 動態渲染 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- 備註彈跳視窗 Modal -->
+<div class="modal" id="noteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span><i class="fa-solid fa-note-sticky"></i> 編輯事項備註</span>
+            <button class="modal-close" onclick="closeNoteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="modalNoteText" placeholder="請在此輸入詳細備註紀錄..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" onclick="saveModalNote()" style="margin-top: 0; padding: 8px 16px;">儲存備註</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let editingId = null; 
+    let currentFilter = 'active_all'; 
+    let activeNoteId = null; // 當前正在編輯備註的 ID
+    let customCategories = JSON.parse(localStorage.getItem('storeasy_notes_categories')) || [];
+
+    document.addEventListener("DOMContentLoaded", function() {
+        try {
+            const now = new Date();
+            const verEl = document.getElementById('system-version');
+            if (verEl) {
+                verEl.innerText = '系統版本：' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_1';
+            }
+        } catch(e) {
+            console.error("Initialization error:", e);
+        }
+        initCategoryDropdown();
+        renderRecords();
+    });
+
+    // 初始化自訂分類下拉選單
+    function initCategoryDropdown() {
+        const select = document.getElementById('categorySelect');
+        // 保留預設選項與新增按鈕
+        let html = `
+            <option value="">-- 請選擇或自訂分類 --</option>
+            <option value="合約交辦">合約交辦</option>
+            <option value="設備維修">設備維修</option>
+            <option value="客戶特殊需求">客戶特殊需求</option>
+            <option value="其他雜項">其他雜項</option>
+        `;
+        customCategories.forEach(cat => {
+            html += `<option value="${cat}">${cat}</option>`;
+        });
+        html += `<option value="NEW_CUSTOM">➕ 自訂新分類...</option>`;
+        select.innerHTML = html;
+    }
+
+    // 檢查是否選擇了自訂新分類
+    function checkCategoryInput(select) {
+        const customInput = document.getElementById('categoryCustom');
+        if (select.value === 'NEW_CUSTOM') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    }
+
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('active');
+    }
+
+    function toggleMenu(btn) {
+        const items = btn.nextElementSibling;
+        const arrow = btn.querySelector('.arrow');
+        if (items.style.display === 'none' || !items.style.display) {
+            items.style.display = 'flex';
+            if(arrow) arrow.innerText = '▼';
+        } else {
+            items.style.display = 'none';
+            if(arrow) arrow.innerText = '▶';
+        }
+    }
+
+    function getRecords() {
+        return JSON.parse(localStorage.getItem('storeasy_notes_records')) || [];
+    }
+
+    function saveRecords(records) {
+        localStorage.setItem('storeasy_notes_records', JSON.stringify(records));
+        renderRecords();
+    }
+
+    // 計算租期狀態（14天內即將到期）
+    function calculateStatus(termStr, isTerminated) {
+        if (isTerminated) return 'terminated';
+        if (!termStr || !termStr.includes('-')) return 'active';
+
+        const parts = termStr.split('-');
+        const endDateStr = parts[1].trim();
+        const endDate = new Date(endDateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (isNaN(endDate.getTime())) return 'active';
+
+        const diffTime = endDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) {
+            return 'expired'; // 已逾期
+        } else if (diffDays <= 14) {
+            return 'warning'; // 14天內即將到期
+        } else {
+            return 'active'; // 承租中
+        }
+    }
+
+    // 切換篩選條件
+    function setFilter(filterType) {
+        currentFilter = filterType;
+        
+        document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('selected-filter'));
+        const selectedCard = document.querySelector(`[filter-type="${filterType}"]`);
+        if (selectedCard) selectedCard.classList.add('selected-filter');
+
+        const titles = {
+            'active_all': '承租中 (含到期/逾期)',
+            'warning': '即將到期 (14天內)',
+            'expired': '已逾期',
+            'terminated': '已退租'
+        };
+        document.getElementById('table-title').innerHTML = `<i class="fa-solid fa-table-list"></i> 2. 其他事項紀錄清單 (目前顯示：${titles[filterType]})`;
+
+        renderRecords();
+    }
+
+    // 處理表單送出（新增或儲存修改）
+    function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const branch = document.getElementById('branch').value;
+        const selectCat = document.getElementById('categorySelect').value;
+        const customCatInput = document.getElementById('categoryCustom').value.trim();
+        
+        let category = selectCat;
+        if (selectCat === 'NEW_CUSTOM' && customCatInput) {
+            category = customCatInput;
+            if (!customCategories.includes(category)) {
+                customCategories.push(category);
+                localStorage.setItem('storeasy_notes_categories', JSON.stringify(customCategories));
+                initCategoryDropdown();
+            }
+        }
+
+        const subject = document.getElementById('subject').value.trim();
+        const clientName = document.getElementById('clientName').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const term = document.getElementById('term').value.trim();
+        const totalFee = parseFloat(document.getElementById('totalFee').value) || 0;
+
+        const records = getRecords();
+
+        if (editingId !== null) {
+            const index = records.findIndex(r => r.id === editingId);
+            if (index !== -1) {
+                records[index].branch = branch;
+                records[index].category = category;
+                records[index].subject = subject;
+                records[index].clientName = clientName;
+                records[index].phone = phone;
+                records[index].term = term;
+                records[index].totalFee = totalFee;
+            }
+            alert('其他事項紀錄已更新成功！');
+            cancelEdit();
+        } else {
+            const newRecord = {
+                id: Date.now(),
+                branch: branch,
+                category: category,
+                subject: subject,
+                clientName: clientName,
+                phone: phone,
+                term: term,
+                totalFee: totalFee,
+                processed: false,
+                terminated: false,
+                note: ''
+            };
+            records.push(newRecord);
+        }
+
+        saveRecords(records);
+        document.getElementById('notesForm').reset();
+        document.getElementById('categoryCustom').style.display = 'none';
+    }
+
+    function editRecord(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (!record) return;
+
+        editingId = id;
+        document.getElementById('branch').value = record.branch;
+        
+        const catSelect = document.getElementById('categorySelect');
+        if ([...catSelect.options].some(o => o.value === record.category)) {
+            catSelect.value = record.category;
+            document.getElementById('categoryCustom').style.display = 'none';
+        } else {
+            catSelect.value = 'NEW_CUSTOM';
+            const customInput = document.getElementById('categoryCustom');
+            customInput.style.display = 'block';
+            customInput.value = record.category;
+        }
+
+        document.getElementById('subject').value = record.subject;
+        document.getElementById('clientName').value = record.clientName;
+        document.getElementById('phone').value = record.phone;
+        document.getElementById('term').value = record.term;
+        document.getElementById('totalFee').value = record.totalFee || '';
+
+        document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 修改其他事項紀錄 (ID: ${id})`;
+        document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> 儲存修改`;
+        document.getElementById('cancel-btn').style.display = 'inline-block';
+
+        document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        editingId = null;
+        document.getElementById('notesForm').reset();
+        document.getElementById('categoryCustom').style.display = 'none';
+        document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 新增其他事項紀錄`;
+        document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-plus"></i> 確認新增紀錄`;
+        document.getElementById('cancel-btn').style.display = 'none';
+    }
+
+    // 切換已處理狀態
+    function toggleProcessed(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            record.processed = !record.processed;
+            saveRecords(records);
+        }
+    }
+
+    // 辦理退租
+    function terminateRecord(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            record.terminated = true;
+            saveRecords(records);
+        }
+    }
+
+    // 恢復承租
+    function restoreRecord(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            record.terminated = false;
+            saveRecords(records);
+        }
+    }
+
+    // 備註彈跳視窗控制
+    function openNoteModal(id) {
+        activeNoteId = id;
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            document.getElementById('modalNoteText').value = record.note || '';
+            document.getElementById('noteModal').classList.add('active');
+        }
+    }
+
+    function closeNoteModal() {
+        activeNoteId = null;
+        document.getElementById('noteModal').classList.remove('active');
+    }
+
+    function saveModalNote() {
+        if (activeNoteId !== null) {
+            const records = getRecords();
+            const record = records.find(r => r.id === activeNoteId);
+            if (record) {
+                record.note = document.getElementById('modalNoteText').value.trim();
+                saveRecords(records);
+            }
+        }
+        closeNoteModal();
+    }
+
+    function deleteRecord(id) {
+        if (confirm('確定要永久刪除這筆事項紀錄嗎？')) {
+            let records = getRecords();
+            records = records.filter(r => r.id !== id);
+            saveRecords(records);
+        }
+    }
+
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function deleteSelectedRecords() {
+        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('請先勾選要刪除的項目！');
+            return;
+        }
+
+        if (confirm(`確定要刪除選中的 ${selectedCheckboxes.length} 筆紀錄嗎？`)) {
+            const idsToDelete = Array.from(selectedCheckboxes).map(cb => parseInt(cb.dataset.id));
+            let records = getRecords();
+            records = records.filter(r => !idsToDelete.includes(r.id));
+            saveRecords(records);
+            document.getElementById('selectAll').checked = false;
+        }
+    }
+
+    function renderRecords() {
+        const records = getRecords();
+        const tbody = document.getElementById('recordTableBody');
+        tbody.innerHTML = '';
+
+        let countActiveAll = 0;
+        let countWarning = 0;
+        let countExpired = 0;
+        let countTerminated = 0;
+
+        records.forEach(r => {
+            const status = calculateStatus(r.term, r.terminated);
+            if (r.terminated) {
+                countTerminated++;
+            } else {
+                countActiveAll++; // 承租中包含一般、即將到期、已逾期
+                if (status === 'warning') countWarning++;
+                if (status === 'expired') countExpired++;
+            }
+        });
+
+        document.getElementById('stat-active').innerText = countActiveAll;
+        document.getElementById('stat-warning').innerText = countWarning;
+        document.getElementById('stat-expired').innerText = countExpired;
+        document.getElementById('stat-terminated').innerText = countTerminated;
+
+        const filteredRecords = records.filter(r => {
+            const status = calculateStatus(r.term, r.terminated);
+            if (currentFilter === 'active_all') return !r.terminated;
+            if (currentFilter === 'warning') return !r.terminated && status === 'warning';
+            if (currentFilter === 'expired') return !r.terminated && status === 'expired';
+            if (currentFilter === 'terminated') return r.terminated;
+            return true;
+        });
+
+        if (filteredRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 30px;">尚無相關紀錄</td></tr>';
+            return;
+        }
+
+        filteredRecords.forEach(r => {
+            const status = calculateStatus(r.term, r.terminated);
+
+            let badgeHtml = '';
+            if (r.terminated) {
+                badgeHtml = '<span class="badge badge-terminated">已退租</span>';
+            } else if (status === 'active') {
+                badgeHtml = '<span class="badge badge-active">承租中</span>';
+            } else if (status === 'warning') {
+                badgeHtml = '<span class="badge badge-warning">即將到期 (14天內)</span>';
+            } else if (status === 'expired') {
+                badgeHtml = '<span class="badge badge-expired">已逾期</span>';
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="checkbox" class="row-checkbox" data-id="${r.id}"></td>
+                <td><strong>${r.branch || '-'}</strong></td>
+                <td><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${r.category || '未分類'}</span></td>
+                <td>${r.subject || '-'}</td>
+                <td>${r.clientName || '-'}</td>
+                <td>${r.phone || '-'}</td>
+                <td>${r.term || '-'}</td>
+                <td>${r.totalFee ? '$' + r.totalFee.toLocaleString() + ' 元' : '-'}</td>
+                <td>${badgeHtml}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-sm btn-processed ${r.processed ? 'processed' : ''}" onclick="toggleProcessed(${r.id})">
+                            ${r.processed ? '✓ 已處理' : '已處理'}
+                        </button>
+                        <button class="btn-sm btn-note" onclick="openNoteModal(${r.id})">
+                            <i class="fa-solid fa-note-sticky"></i> ${r.note ? '備註(有)' : '備註'}
+                        </button>
+                        <button class="btn-sm btn-edit" onclick="editRecord(${r.id})"><i class="fa-solid fa-pen"></i> 編輯</button>
+                        ${!r.terminated ? 
+                            `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已退租</button>` : 
+                            `<button class="btn-sm btn-restore" onclick="restoreRecord(${r.id})">恢復</button>`
+                        }
+                        <button class="btn-sm btn-delete" onclick="deleteRecord(${r.id})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+</script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>
