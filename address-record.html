@@ -48,20 +48,18 @@
 
         .content-body { padding: 32px; max-width: 1300px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        /* 卡片與表單樣式 */
         .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
         
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-weight: 600; font-size: 0.85rem; color: #475569; }
-        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95ln; outline: none; background: #fff; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; }
         input:focus, select:focus { border-color: #0f172a; }
         
         .btn-primary { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 16px; }
         .btn-primary:hover { background: #1e293b; }
 
-        /* 第二區：狀態儀表板 */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
         .stat-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; border-left: 5px solid #cbd5e1; }
         .stat-card.active { border-left-color: #059669; }
@@ -71,28 +69,30 @@
         .stat-label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
 
-        /* 第三區：資料表格 */
         .table-responsive { width: 100%; overflow-x: auto; }
         .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
         .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; }
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         .data-table tr:hover { background-color: #f8fafc; }
 
-        /* 狀態標籤 */
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
         .badge-active { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #b45309; }
         .badge-expired { background: #fee2e2; color: #991b1b; }
         .badge-terminated { background: #f1f5f9; color: #475569; }
 
-        /* 操作按鈕 */
-        .action-btns { display: flex; gap: 8px; }
+        .action-btns { display: flex; gap: 8px; align-items: center; }
         .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; }
         .btn-notify.notified { background: #059669; color: white; border-color: #059669; }
         .btn-terminate { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .btn-terminate:hover { background: #dc2626; color: white; }
+        .btn-restore { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .btn-restore:hover { background: #0284c7; color: white; }
         .btn-delete { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
         .btn-delete:hover { background: #e2e8f0; color: #0f172a; }
+
+        .batch-del-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .batch-del-btn:hover { background: #b91c1c; }
 
         @media (max-width: 1024px) {
             .form-grid { grid-template-columns: 1fr 1fr; }
@@ -131,7 +131,7 @@
         <!-- 第一區：店長資料輸入區 -->
         <div class="card">
             <div class="card-title">
-                <i class="fa-solid fa-pen-to-square"></i> 1. 新增借址登記資料
+                <span><i class="fa-solid fa-pen-to-square"></i> 1. 新增借址登記資料</span>
             </div>
             <form id="addressForm" onsubmit="addRecord(event)">
                 <div class="form-grid">
@@ -205,12 +205,14 @@
         <!-- 第三區：詳細資料清單 -->
         <div class="card">
             <div class="card-title">
-                <i class="fa-solid fa-table-list"></i> 2. 借址登記清單與管理
+                <span><i class="fa-solid fa-table-list"></i> 2. 借址登記清單與管理</span>
+                <button class="batch-del-btn" onclick="deleteSelectedRecords()"><i class="fa-solid fa-trash-can"></i> 刪除所選項目</button>
             </div>
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
                             <th>據點</th>
                             <th>編號</th>
                             <th>公司名稱</th>
@@ -262,11 +264,10 @@
     }
 
     // 自動計算租期狀態
-    // 傳入格式 "2025/09/05-2026/09/04" 或含空白
     function calculateStatus(termStr, isTerminated) {
         if (isTerminated) return 'terminated';
 
-        parts = termStr.split('-');
+        const parts = termStr.split('-');
         if (parts.length < 2) return 'active';
 
         const endDateStr = parts[1].trim();
@@ -331,12 +332,45 @@
         }
     }
 
-    // 刪除紀錄
+    // 恢復承租狀態（點錯退租時可還原）
+    function restoreRecord(id) {
+        const records = getRecords();
+        const record = records.find(r => r.id === id);
+        if (record) {
+            record.terminated = false;
+            saveRecords(records);
+        }
+    }
+
+    // 單筆刪除紀錄
     function deleteRecord(id) {
         if (confirm('確定要永久刪除這筆登記資料嗎？')) {
             let records = getRecords();
             records = records.filter(r => r.id !== id);
             saveRecords(records);
+        }
+    }
+
+    // 全選/取消全選核取方塊
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    // 批量刪除所選項目
+    function deleteSelectedRecords() {
+        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('請先勾選要刪除的項目！');
+            return;
+        }
+
+        if (confirm(`確定要刪除選中的 ${selectedCheckboxes.length} 筆登記資料嗎？`)) {
+            const idsToDelete = Array.from(selectedCheckboxes).map(cb => parseInt(cb.dataset.id));
+            let records = getRecords();
+            records = records.filter(r => !idsToDelete.includes(r.id));
+            saveRecords(records);
+            document.getElementById('selectAll').checked = false;
         }
     }
 
@@ -354,7 +388,6 @@
         records.forEach(r => {
             const status = calculateStatus(r.term, r.terminated);
 
-            // 統計數據 (若已退租，不計入承租中/到期/逾期，只算在已退租)
             if (r.terminated) {
                 countTerminated++;
             } else {
@@ -363,7 +396,6 @@
                 if (status === 'expired') countExpired++;
             }
 
-            // 組合狀態標籤與樣式
             let badgeHtml = '';
             if (r.terminated) {
                 badgeHtml = '<span class="badge badge-terminated">已退租</span>';
@@ -377,6 +409,7 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td><input type="checkbox" class="row-checkbox" data-id="${r.id}"></td>
                 <td><strong>${r.branch}</strong></td>
                 <td>${r.recordId}</td>
                 <td>${r.companyName}</td>
@@ -389,7 +422,10 @@
                         <button class="btn-sm btn-notify ${r.notified ? 'notified' : ''}" onclick="toggleNotify(${r.id})">
                             ${r.notified ? '✓ 已通知' : '已通知'}
                         </button>
-                        ${!r.terminated ? `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已退租</button>` : ''}
+                        ${!r.terminated ? 
+                            `<button class="btn-sm btn-terminate" onclick="terminateRecord(${r.id})">已退租</button>` : 
+                            `<button class="btn-sm btn-restore" onclick="restoreRecord(${r.id})">恢復承租</button>`
+                        }
                         <button class="btn-sm btn-delete" onclick="deleteRecord(${r.id})"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </td>
@@ -397,7 +433,6 @@
             tbody.appendChild(tr);
         });
 
-        // 更新統計數據
         document.getElementById('stat-active').innerText = countActive;
         document.getElementById('stat-warning').innerText = countWarning;
         document.getElementById('stat-expired').innerText = countExpired;
