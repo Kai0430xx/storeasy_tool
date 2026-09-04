@@ -75,15 +75,27 @@
         .stat-card.expired { border-left-color: #dc2626; }
         .stat-card.terminated { border-left-color: #64748b; }
         
-        /* 被選中的篩選卡片樣式 */
         .stat-card.selected-filter { box-shadow: 0 0 0 2px #0f172a; background-color: #f8fafc; }
 
         .stat-label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        
+        /* 表格設定：允許公司名稱換行，其餘欄位與按鈕絕對不變形、不換行 */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; }
+        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; text-align: left; white-space: nowrap; }
+        
+        /* 專門設定「公司名稱」欄位 (第 4 欄) 可以自動換行 */
+        .data-table th:nth-child(4), .data-table td:nth-child(4) { 
+            white-space: normal; 
+            word-break: break-all; 
+            min-width: 180px; 
+        }
+
+        /* 設定操作管理欄位固定寬度，確保按鈕整齊 */
+        .data-table th:last-child, .data-table td:last-child { width: 230px; }
+
         .data-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
         .data-table tr:hover { background-color: #f8fafc; }
 
@@ -93,8 +105,8 @@
         .badge-expired { background: #fee2e2; color: #991b1b; }
         .badge-terminated { background: #f1f5f9; color: #475569; }
 
-        .action-btns { display: flex; gap: 6px; align-items: center; }
-        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; }
+        .action-btns { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; transition: all 0.2s; white-space: nowrap; }
         .btn-notify.notified { background: #059669; color: white; border-color: #059669; }
         .btn-edit { background: #fef3c7; color: #b45309; border-color: #fde68a; }
         .btn-edit:hover { background: #f59e0b; color: white; }
@@ -202,7 +214,7 @@
             </form>
         </div>
 
-        <!-- 第二區：狀態儀表板 (點擊可篩選下方清單) -->
+        <!-- 第二區：狀態儀表板 -->
         <div class="stats-grid">
             <div class="stat-card active selected-filter" filter-type="active_all" onclick="setFilter('active_all')">
                 <span class="stat-label">承租中 (含到期/逾期)</span>
@@ -232,15 +244,15 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                            <th>據點</th>
-                            <th>編號</th>
+                            <th style="width: 45px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                            <th style="width: 100px;">據點</th>
+                            <th style="width: 80px;">編號</th>
                             <th>公司名稱</th>
-                            <th>聯繫電話</th>
-                            <th>租期區間</th>
-                            <th>費用總額</th>
-                            <th>狀態判定</th>
-                            <th>操作管理</th>
+                            <th style="width: 110px;">聯繫電話</th>
+                            <th style="width: 180px;">租期區間</th>
+                            <th style="width: 100px;">費用總額</th>
+                            <th style="width: 130px;">狀態判定</th>
+                            <th style="width: 230px;">操作管理</th>
                         </tr>
                     </thead>
                     <tbody id="recordTableBody">
@@ -254,8 +266,8 @@
 </main>
 
 <script>
-    let editingId = null; // 記錄目前正在編輯的 ID
-    let currentFilter = 'active_all'; // 預設篩選：承租中（未退租）
+    let editingId = null;
+    let currentFilter = 'active_all';
 
     document.addEventListener("DOMContentLoaded", function() {
         try {
@@ -323,16 +335,13 @@
         }
     }
 
-    // 切換篩選條件
     function setFilter(filterType) {
         currentFilter = filterType;
         
-        // 更新卡片外框高亮樣式
         document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('selected-filter'));
         const selectedCard = document.querySelector(`[filter-type="${filterType}"]`);
         if (selectedCard) selectedCard.classList.add('selected-filter');
 
-        // 更新表格標題文字
         const titles = {
             'active_all': '承租中 (含到期/逾期)',
             'warning': '即將到期 (30天內)',
@@ -344,7 +353,6 @@
         renderRecords();
     }
 
-    // 處理表單送出（新增或儲存修改）
     function handleFormSubmit(event) {
         event.preventDefault();
 
@@ -482,7 +490,6 @@
         let countExpired = 0;
         let countTerminated = 0;
 
-        // 計算各狀態總數（卡片上的數字保持全域總計）
         records.forEach(r => {
             const status = calculateStatus(r.term, r.terminated);
             if (r.terminated) {
@@ -499,7 +506,6 @@
         document.getElementById('stat-expired').innerText = countExpired;
         document.getElementById('stat-terminated').innerText = countTerminated;
 
-        // 根據目前點選的卡片過濾表格資料
         const filteredRecords = records.filter(r => {
             const status = calculateStatus(r.term, r.terminated);
             if (currentFilter === 'active_all') return !r.terminated;
