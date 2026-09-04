@@ -466,7 +466,7 @@
             if (r.terminated) {
                 countTerminated++;
             } else {
-                if (status === 'active') countActive++;
+                countActive++; // 只要未退租，無論是一般、即將到期或已逾期，皆計入承租中總數
                 if (status === 'warning') countWarning++;
                 if (status === 'expired') countExpired++;
             }
