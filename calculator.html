@@ -48,7 +48,7 @@
 
         .content-body { padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
         
-        /* 讓快速導覽列具有黏性定位並固定在頂部 */
+        /* 快速導覽列釘選於頂部 */
         .nav-bar { 
             background: #fff; 
             border-radius: 12px; 
@@ -60,7 +60,7 @@
             flex-wrap: wrap; 
             align-items: center; 
             position: sticky; 
-            top: 73px; /* 剛好貼在主標題 header 的下方 */
+            top: 73px; 
             z-index: 30; 
         }
         .nav-bar span { font-weight: bold; color: #0f172a; margin-right: 8px; }
@@ -70,6 +70,7 @@
         .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; scroll-margin-top: 140px; }
         .card-title { font-size: 1.1rem; font-weight: bold; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .form-group { margin-bottom: 16px; }
         label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; color: #475569; }
         input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; }
@@ -90,6 +91,7 @@
             .content-body { padding: 16px; }
             .version { display: none; }
             .nav-bar { top: 60px; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -109,74 +111,131 @@
     </header>
 
     <div class="content-body">
-        <!-- 快捷錨點導覽列 (已設定隨頁面捲動釘選於上方) -->
+        <!-- 快捷錨點導覽列 -->
         <div class="nav-bar">
             <span>📌 快速導航：</span>
-            <a href="#tool-1" class="nav-link">租金與押金計算</a>
-            <a href="#tool-2" class="nav-link">合約到期日試算</a>
+            <a href="#tool-1" class="nav-link">1. 租金折扣試算</a>
+            <a href="#tool-2" class="nav-link">2. 額外折扣試算</a>
         </div>
 
-        <!-- 小工具 1：租金與押金計算 -->
+        <!-- 小工具 1：租金折扣 -->
         <div class="card" id="tool-1">
             <div class="card-title">
-                <i class="fa-solid fa-calculator"></i> 1. 租金與押金總額試算
+                <i class="fa-solid fa-percent"></i> 1. 租金折扣試算 (含月租與首付)
             </div>
             
-            <div class="form-group">
-                <label>每月租金 (NTD)：</label>
-                <input type="number" id="t1-fee" placeholder="例如: 3500" oninput="calcTool1()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>原價每月租金 (NTD)：</label>
+                    <input type="number" id="t1-fee" placeholder="例如: 3500" oninput="calcTool1()">
+                </div>
+                <div class="form-group">
+                    <label>期別折扣選擇：</label>
+                    <select id="t1-discount" onchange="calcTool1()">
+                        <option value="0.95">季繳 (95折)</option>
+                        <option value="0.90">半年繳 (9折)</option>
+                        <option value="0.85">年繳 (85折)</option>
+                        <option value="0.80">年繳 (8折)</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>承租月數：</label>
-                <input type="number" id="t1-months" value="1" min="1" oninput="calcTool1()">
-            </div>
-
-            <div class="form-group">
-                <label>押金月數：</label>
-                <input type="number" id="t1-deposit-months" value="1" min="0" oninput="calcTool1()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>原本折扣 (選填，如直接給特定折數或金額)：</label>
+                    <input type="number" id="t1-custom-discount" placeholder="例如: 輸入 0.9 或指定折扣" oninput="calcTool1()">
+                </div>
+                <div class="form-group">
+                    <label>承租月數 (選填)：</label>
+                    <input type="number" id="t1-months" placeholder="例如: 3, 6, 12" min="1" oninput="calcTool1()">
+                </div>
             </div>
 
             <table class="result-table">
                 <tr>
-                    <th>租金小計</th>
-                    <td id="t1-res-rent">$0 元</td>
+                    <th>試算每月金額 (個位數四捨五入至0)</th>
+                    <td id="t1-res-monthly" style="color: #0284c7; font-size: 1.05rem;">$0 元</td>
                 </tr>
                 <tr>
-                    <th>押金小計</th>
-                    <td id="t1-res-deposit">$0 元</td>
+                    <th>原本折扣省下的金額</th>
+                    <td id="t1-res-saved">-</td>
                 </tr>
                 <tr>
-                    <th>首付總金額 (含押租金)</th>
-                    <td id="t1-res-total" style="font-size: 1.1rem; color: #dc2626;">$0 元</td>
+                    <th>租金總額 (月租 × 承租月數)</th>
+                    <td id="t1-res-rent">-</td>
+                </tr>
+                <tr>
+                    <th>保險文書處理費 (固定 $200)</th>
+                    <td id="t1-res-doc">-</td>
+                </tr>
+                <tr>
+                    <th>保證金 (1個月折後租金)</th>
+                    <td id="t1-res-deposit">-</td>
+                </tr>
+                <tr>
+                    <th>總金額 (首付總計)</th>
+                    <td id="t1-res-total" style="font-size: 1.1rem; color: #dc2626;">-</td>
                 </tr>
             </table>
         </div>
 
-        <!-- 小工具 2：天數與合約到期預估 -->
+        <!-- 小工具 2：額外折扣 -->
         <div class="card" id="tool-2">
             <div class="card-title">
-                <i class="fa-solid fa-calendar-days"></i> 2. 合約到期日與天數試算
+                <i class="fa-solid fa-tags"></i> 2. 額外折扣試算 (專案/特殊優惠)
             </div>
             
-            <div class="form-group">
-                <label>合約起始日：</label>
-                <input type="date" id="t2-start" onchange="calcTool2()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>原價每月租金 (NTD)：</label>
+                    <input type="number" id="t2-fee" placeholder="例如: 3500" oninput="calcTool2()">
+                </div>
+                <div class="form-group">
+                    <label>承租月數：</label>
+                    <input type="number" id="t2-months" value="1" min="1" oninput="calcTool2()">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>承租幾個月：</label>
-                <input type="number" id="t2-months" value="1" min="1" oninput="calcTool2()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>期別折扣選擇：</label>
+                    <select id="t2-discount" onchange="calcTool2()">
+                        <option value="0.95">季繳 (95折)</option>
+                        <option value="0.90">半年繳 (9折)</option>
+                        <option value="0.85">年繳 (85折)</option>
+                        <option value="0.80">年繳 (8折)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>額外折扣 (僅折租金，例: 0.9 或折價金額)：</label>
+                    <input type="number" id="t2-extra-discount" placeholder="例如: 0.95 或輸入折減金額" oninput="calcTool2()">
+                </div>
             </div>
 
             <table class="result-table">
                 <tr>
-                    <th>預估到期日</th>
-                    <td id="t2-res-end">-</td>
+                    <th>折後每月租金</th>
+                    <td id="t2-res-monthly" style="color: #0284c7; font-size: 1.05rem;">$0 元</td>
                 </tr>
                 <tr>
-                    <th>總承租天數</th>
-                    <td id="t2-res-days">-</td>
+                    <th>總共折價了多少 (相比原價)</th>
+                    <td id="t2-res-saved" style="color: #16a34a;">$0 元</td>
+                </tr>
+                <tr>
+                    <th>租金總額</th>
+                    <td id="t2-res-rent">$0 元</td>
+                </tr>
+                <tr>
+                    <th>保險文書處理費 ($200)</th>
+                    <td id="t2-res-doc">$200 元</td>
+                </tr>
+                <tr>
+                    <th>保證金 (1個月折後租金)</th>
+                    <td id="t2-res-deposit">$0 元</td>
+                </tr>
+                <tr>
+                    <th>總金額 (首付總計)</th>
+                    <td id="t2-res-total" style="font-size: 1.1rem; color: #dc2626;">$0 元</td>
                 </tr>
             </table>
         </div>
@@ -203,53 +262,117 @@
         if (aside) aside.classList.toggle('mobile-open');
     }
 
-    // 初始化填入今天的日期給工具2
+    // 金額個位數四捨五入至 0 (例如 342 -> 340, 346 -> 350)
+    function roundToTen(num) {
+        return Math.round(num / 10) * 10;
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
-        const today = new Date().toISOString().split('T')[0];
-        const t2StartInput = document.getElementById('t2-start');
-        if (t2StartInput && !t2StartInput.value) {
-            t2StartInput.value = today;
-        }
         calcTool1();
         calcTool2();
     });
 
-    // 小工具 1 邏輯
+    // 小工具 1 邏輯：租金折扣
     function calcTool1() {
         const fee = parseFloat(document.getElementById('t1-fee').value) || 0;
-        const months = parseInt(document.getElementById('t1-months').value) || 1;
-        const depMonths = parseInt(document.getElementById('t1-deposit-months').value) || 1;
+        const baseRate = parseFloat(document.getElementById('t1-discount').value) || 0.95;
+        const customDiscVal = parseFloat(document.getElementById('t1-custom-discount').value);
+        const months = parseInt(document.getElementById('t1-months').value);
 
-        const rentTotal = fee * months;
-        const depositTotal = fee * depMonths;
-        const grandTotal = rentTotal + depositTotal;
+        if (fee <= 0) {
+            document.getElementById('t1-res-monthly').innerText = '$0 元';
+            document.getElementById('t1-res-saved').innerText = '-';
+            document.getElementById('t1-res-rent').innerText = '-';
+            document.getElementById('t1-res-doc').innerText = '-';
+            document.getElementById('t1-res-deposit').innerText = '-';
+            document.getElementById('t1-res-total').innerText = '-';
+            return;
+        }
 
-        document.getElementById('t1-res-rent').innerText = '$' + rentTotal.toLocaleString() + ' 元';
-        document.getElementById('t1-res-deposit').innerText = '$' + depositTotal.toLocaleString() + ' 元';
-        document.getElementById('t1-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
+        // 計算折後每月租金 (套用下拉選單或自訂折扣，個位數四捨五入到十位)
+        let effectiveRate = baseRate;
+        if (!isNaN(customDiscVal)) {
+            if (customDiscVal < 1) {
+                effectiveRate = customDiscVal; // 若輸入如 0.9
+            } else if (customDiscVal < fee) {
+                // 若直接輸入折價後的金額或特定邏輯
+                effectiveRate = customDiscVal / fee;
+            }
+        }
+
+        let monthlyFinal = roundToTen(fee * effectiveRate);
+        document.getElementById('t1-res-monthly').innerText = '$' + monthlyFinal.toLocaleString() + ' 元';
+
+        // 原本折扣省下的金額 (若有填原價與折扣)
+        let standardMonthly = roundToTen(fee * baseRate);
+        let savedPerMonth = fee - standardMonthly;
+        if (!isNaN(customDiscVal) && customDiscVal < fee) {
+            savedPerMonth = fee - monthlyFinal;
+        }
+        document.getElementById('t1-res-saved').innerText = savedPerMonth > 0 ? '$' + (savedPerMonth * (months || 1)).toLocaleString() + ' 元 (共)' : '無';
+
+        // 若有填寫承租月數，計算總額
+        if (!isNaN(months) && months > 0) {
+            const rentTotal = monthlyFinal * months;
+            const docFee = 200; // 固定保險文書處理費
+            const deposit = monthlyFinal; // 1個月保證金
+            const grandTotal = rentTotal + docFee + deposit;
+
+            document.getElementById('t1-res-rent').innerText = '$' + rentTotal.toLocaleString() + ' 元 (' + months + '個月)';
+            document.getElementById('t1-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元';
+            document.getElementById('t1-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元 (1個月)';
+            document.getElementById('t1-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
+        } else {
+            document.getElementById('t1-res-rent').innerText = '未填寫承租月數';
+            document.getElementById('t1-res-doc').innerText = '-';
+            document.getElementById('t1-res-deposit').innerText = '-';
+            document.getElementById('t1-res-total').innerText = '-';
+        }
     }
 
-    // 小工具 2 邏輯
+    // 小工具 2 邏輯：額外折扣 (僅折租金)
     function calcTool2() {
-        const startDateVal = document.getElementById('t2-start').value;
+        const fee = parseFloat(document.getElementById('t2-fee').value) || 0;
         const months = parseInt(document.getElementById('t2-months').value) || 1;
+        const baseRate = parseFloat(document.getElementById('t2-discount').value) || 0.95;
+        const extraDisc = parseFloat(document.getElementById('t2-extra-discount').value) || 0;
 
-        if (!startDateVal) return;
+        if (fee <= 0) {
+            document.getElementById('t2-res-monthly').innerText = '$0 元';
+            document.getElementById('t2-res-saved').innerText = '$0 元';
+            document.getElementById('t2-res-rent').innerText = '$0 元';
+            document.getElementById('t2-res-doc').innerText = '$200 元';
+            document.getElementById('t2-res-deposit').innerText = '$0 元';
+            document.getElementById('t2-res-total').innerText = '$0 元';
+            return;
+        }
 
-        let startDate = new Date(startDateVal);
-        let endDate = new Date(startDate);
-        endDate.setMonth(endDate.getMonth() + months);
+        // 先算期別折扣，再疊加額外折扣 (僅折租金)
+        let monthlyBase = fee * baseRate;
+        let monthlyFinal = monthlyBase;
 
-        // 計算總天數差異
-        const diffTime = Math.abs(endDate - startDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (extraDisc > 0) {
+            if (extraDisc < 1) {
+                monthlyFinal = monthlyBase * extraDisc; // 若輸入如 0.9 係數
+            } else {
+                monthlyFinal = monthlyBase - extraDisc; // 若輸入折減金額
+            }
+        }
+        monthlyFinal = roundToTen(Math.max(0, monthlyFinal));
 
-        const y = endDate.getFullYear();
-        const m = String(endDate.getMonth() + 1).padStart(2, '0');
-        const d = String(endDate.getDate()).padStart(2, '0');
+        // 總折價金額 (與原價相比)
+        const totalSaved = (fee - monthlyFinal) * months;
+        const rentTotal = monthlyFinal * months;
+        const docFee = 200;
+        const deposit = monthlyFinal;
+        const grandTotal = rentTotal + docFee + deposit;
 
-        document.getElementById('t2-res-end').innerText = `${y}/${m}/${d}`;
-        document.getElementById('t2-res-days').innerText = `${diffDays} 天`;
+        document.getElementById('t2-res-monthly').innerText = '$' + monthlyFinal.toLocaleString() + ' 元';
+        document.getElementById('t2-res-saved').innerText = '$' + totalSaved.toLocaleString() + ' 元';
+        document.getElementById('t2-res-rent').innerText = '$' + rentTotal.toLocaleString() + ' 元 (' + months + '個月)';
+        document.getElementById('t2-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元';
+        document.getElementById('t2-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元';
+        document.getElementById('t2-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
     }
 </script>
 
