@@ -478,7 +478,7 @@
                 
                 if (term !== 'none') {
                     rent += calcPrice * months; 
-                    fee += (calcPrice >= 3000 ? 150 : 80) * months; 
+                    fee += (item.price1 >= 3000 ? 150 : 80) * months; 
                     deposit += (months <= 2 ? item.price1 * 2 : item.price1);
                 }
             });
