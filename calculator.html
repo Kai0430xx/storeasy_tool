@@ -117,6 +117,7 @@
             <span>📌 快速導航：</span>
             <a href="#tool-1" class="nav-link">1. 租金折扣</a>
             <a href="#tool-2" class="nav-link">2. 額外折扣</a>
+            <a href="#tool-3" class="nav-link">3. 刷卡總金額</a>
         </div>
 
         <!-- 小工具 1：租金折扣 -->
@@ -240,6 +241,81 @@
                 </tr>
             </table>
         </div>
+
+        <!-- 小工具 3：刷卡總金額 -->
+        <div class="card" id="tool-3">
+            <div class="card-title">
+                <i class="fa-solid fa-credit-card"></i> 3. 刷卡總金額試算
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>原價每月租金：</label>
+                    <input type="number" id="t3-fee" placeholder="例如: 5000" oninput="calcTool3()">
+                </div>
+                <div class="form-group">
+                    <label>承租月數：</label>
+                    <input type="number" id="t3-months" value="6" min="1" oninput="calcTool3()">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>期別方案折扣：</label>
+                    <select id="t3-discount" onchange="calcTool3()">
+                        <option value="0.95">季繳 (95折)</option>
+                        <option value="0.90" selected>半年繳 (9折)</option>
+                        <option value="0.85">年繳 (85折)</option>
+                        <option value="0.80">年繳 (8折)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>活動改用折數 (選填，優先計算)：</label>
+                    <input type="number" id="t3-custom-discount" placeholder="例如: 0.8 (若無則不填)" step="0.01" oninput="calcTool3()">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>保證金選項：</label>
+                    <select id="t3-deposit-option" onchange="calcTool3()">
+                        <option value="yes" selected>含保證金 (新租/補繳)</option>
+                        <option value="no">無保證金 (續約戶)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>刷卡%數 (預設 2.2%，即 0.022)：</label>
+                    <input type="number" id="t3-card-rate" value="2.2" step="0.1" placeholder="例如: 2.2" oninput="calcTool3()">
+                </div>
+            </div>
+
+            <table class="result-table">
+                <tr>
+                    <th>租金總額 (含折扣)</th>
+                    <td id="t3-res-rent" style="color: #b45309;">$0 元</td>
+                </tr>
+                <tr>
+                    <th>保險文書處理費</th>
+                    <td id="t3-res-doc">$0 元</td>
+                </tr>
+                <tr>
+                    <th>保證金</th>
+                    <td id="t3-res-deposit">$0 元</td>
+                </tr>
+                <tr>
+                    <th>未刷卡前總金額 (租金+保費+保證金)</th>
+                    <td id="t3-res-subtotal">$0 元</td>
+                </tr>
+                <tr>
+                    <th>金融處理費 (刷卡手續費)</th>
+                    <td id="t3-res-card-fee" style="color: #0284c7;">$0 元</td>
+                </tr>
+                <tr>
+                    <th>刷卡總金額應付總額</th>
+                    <td id="t3-res-total" style="font-size: 1.1rem; color: #dc2626;">$0 元</td>
+                </tr>
+            </table>
+        </div>
     </div>
 </main>
 
@@ -286,6 +362,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         calcTool1();
         calcTool2();
+        calcTool3();
     });
 
     // 小工具 1 邏輯：租金折扣
@@ -391,6 +468,67 @@
         document.getElementById('t2-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元';
         document.getElementById('t2-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元 (' + (months >= 3 ? '1' : '2') + '個月原價)';
         document.getElementById('t2-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
+    }
+    // 在網頁載入時多執行一次小工具 3 的初始化
+    document.addEventListener("DOMContentLoaded", function() {
+        calcTool1();
+        calcTool2();
+        calcTool3();
+    });
+
+    // 小工具 3 邏輯：刷卡總金額試算
+    function calcTool3() {
+        const fee = parseFloat(document.getElementById('t3-fee').value) || 0;
+        const months = parseInt(document.getElementById('t3-months').value) || 1;
+        const baseRate = parseFloat(document.getElementById('t3-discount').value) || 0.90;
+        const customDiscVal = parseFloat(document.getElementById('t3-custom-discount').value);
+        const depositOption = document.getElementById('t3-deposit-option').value;
+        const cardRateInput = parseFloat(document.getElementById('t3-card-rate').value);
+        
+        // 刷卡%數預設 2.2% (即 0.022)
+        const cardRate = (!isNaN(cardRateInput) ? cardRateInput : 2.2) / 100;
+
+        if (fee <= 0) {
+            document.getElementById('t3-res-rent').innerText = '$0 元';
+            document.getElementById('t3-res-doc').innerText = '$0 元';
+            document.getElementById('t3-res-deposit').innerText = '$0 元';
+            document.getElementById('t3-res-subtotal').innerText = '$0 元';
+            document.getElementById('t3-res-card-fee').innerText = '$0 元';
+            document.getElementById('t3-res-total').innerText = '$0 元';
+            return;
+        }
+
+        // 1. 租金計算：若有填寫活動折數優先，否則依方案折扣，並四捨五入至十位數
+        let effectiveRate = (!isNaN(customDiscVal) && customDiscVal > 0) ? customDiscVal : baseRate;
+        let monthlyFinal = roundToTen(fee * effectiveRate);
+        let rentTotal = monthlyFinal * months;
+
+        // 2. 保險文書處理費
+        const docFee = getDocFee(fee, months);
+
+        // 3. 保證金（可勾選有無）
+        let deposit = 0;
+        if (depositOption === 'yes') {
+            deposit = getDeposit(fee, months);
+        }
+
+        // 4. 未刷卡前總金額 (現金/匯款基準)
+        let subtotal = rentTotal + docFee + deposit;
+
+        // 5. 金融處理費（全部金額 × 刷卡比例，四捨五入）
+        // 依照需求：「全部的金額再去*1.22(默認的如果有更改依更改的)」-> 這裡對應您提到的卡費比例計算
+        let cardFee = Math.round(subtotal * cardRate);
+
+        // 6. 刷卡總金額應付總額
+        let grandTotal = subtotal + cardFee;
+
+        // 渲染至畫面
+        document.getElementById('t3-res-rent').innerText = '$' + rentTotal.toLocaleString() + ' 元 (' + months + '個月)';
+        document.getElementById('t3-res-doc').innerText = '$' + docFee.toLocaleString() + ' 元';
+        document.getElementById('t3-res-deposit').innerText = '$' + deposit.toLocaleString() + ' 元' + (depositOption === 'no' ? ' (續約無保證金)' : '');
+        document.getElementById('t3-res-subtotal').innerText = '$' + subtotal.toLocaleString() + ' 元';
+        document.getElementById('t3-res-card-fee').innerText = '$' + cardFee.toLocaleString() + ' 元 (' + (cardRate * 100) + '%)';
+        document.getElementById('t3-res-total').innerText = '$' + grandTotal.toLocaleString() + ' 元';
     }
 </script>
 <script src="sidebar.js"></script>
