@@ -111,6 +111,7 @@
                 <button class="tab-btn" onclick="switchTab(event, 'tab-renew')">4. APP月租續約/退租</button>
                 <button class="tab-btn" onclick="switchTab(event, 'tab-card')">5. 悠遊卡設定(部分據點)</button>
                 <button class="tab-btn" onclick="switchTab(event, 'tab-faq')">6. 常見問題與排障</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-faq')">7. 日常維護</button>
             </div>
 
             <!-- 1. APP承租與開櫃 -->
@@ -463,6 +464,75 @@
                 </div>
             </div>
         </div>
+    <!-- 7. 日常維護 -->
+<div id="tab-maintenance" class="tab-content" style="display: none;">
+    <div class="card">
+        <h3>🔧 7. 新據點測試與日常維護</h3>
+
+        <!-- 第一區：新據點測試 -->
+        <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 16px;">一、新據點開幕前置作業流程</h4>
+        <ul class="steps-list">
+            <li><b>網頁開倉測試</b>：測試是否能透過網頁正常開倉，並確認對應編號與櫃位是否相符。<br>
+                <span style="font-size: 0.85rem;">🔗 測試網址：<a href="http://customer.storeasy.com.tw/qss_storage_list.aspx?qss_ino=501" target="_blank" style="color: #0284c7;">http://customer.storeasy.com.tw/qss_storage_list.aspx?qss_ino=501</a></span><br>
+                <span style="color: #d97706;">💡 提示：登入電話請輸入店長自己的手機號碼，帳號為 ERP 帳號；若無法登入請回報 Dora 協助處理。</span>
+            </li>
+            <li><b>規格核對</b>：確認現場的輸出價格、型號是否與 App 顯示完全相符。</li>
+            <li><b>現場影像留存</b>：拍攝現場照片與輸出物（<b>多角度、橫式拍攝，可參考群組相簿範例</b>）並上傳至群組相簿備查。</li>
+            <li><b>商家驗證</b>：進行合作商家驗證（視各據點實際需求辦理）。</li>
+            <li><b>位置回報</b>：記錄現場定位經緯度，並回報給 Dora 建檔。</li>
+            <li><b>權限申請</b>：向 IT 公務機申請並開通該據點的監視器調閱權限。</li>
+            <li><b>鑰匙領取</b>：妥善領取與保管該據點各櫃型之實體應急鑰匙。</li>
+        </ul>
+
+        <!-- 第二區：日常維護與巡檢 -->
+        <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 24px;">二、日常巡檢與維護清潔規範</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;">
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="font-weight: bold; color: #b45309; margin-bottom: 8px;">🧹 外觀與標示維護</div>
+                <p style="font-size: 0.9rem; color: #334155; margin: 0; line-height: 1.5;">
+                    定期清潔櫃體本體、檢查貼紙與輸出物是否清晰完整、維持螢幕外觀清潔，並保持周邊環境整潔。
+                </p>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="font-weight: bold; color: #b45309; margin-bottom: 8px;">🚪 櫃門與鎖具狀態</div>
+                <p style="font-size: 0.9rem; color: #334155; margin: 0; line-height: 1.5;">
+                    檢查櫃門密合度與電子鎖扣功能是否正常，並隨時留意有無人為破壞或惡意毀損痕跡。
+                </p>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="font-weight: bold; color: #b45309; margin-bottom: 8px;">📍 周邊環境與動線</div>
+                <p style="font-size: 0.9rem; color: #334155; margin: 0; line-height: 1.5;">
+                    確保通道動線順暢、照明充足，注意現場是否有潮濕、高溫、異物堆積或受周邊施工影響之情形。
+                </p>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="font-weight: bold; color: #b45309; margin-bottom: 8px;">📶 網路連線與通訊</div>
+                <p style="font-size: 0.9rem; color: #334155; margin: 0; line-height: 1.5;">
+                    確認後台連線狀態、訊號品質與傳輸穩定度，避免因網路中斷導致開櫃指令失效。
+                </p>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="font-weight: bold; color: #b45309; margin-bottom: 8px;">⚡ 電源與供電系統</div>
+                <p style="font-size: 0.9rem; color: #334155; margin: 0; line-height: 1.5;">
+                    定期檢視供電電壓是否穩定、面板指示燈號是否正常，以及不斷電備援系統是否處於待命狀態。
+                </p>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div style="font-weight: bold; color: #b45309; margin-bottom: 8px;">📹 螢幕顯示與監視器</div>
+                <p style="font-size: 0.9rem; color: #334155; margin: 0; line-height: 1.5;">
+                    測試機台畫面觸控操作是否流暢；同步檢查監視器鏡頭角度、畫面清晰度及錄影系統是否正常運作。
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
     </main>
 
     <script>
