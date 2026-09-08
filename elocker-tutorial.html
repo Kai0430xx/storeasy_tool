@@ -281,8 +281,12 @@
             <!-- 6. 常見問題與排障 -->
             <div id="tab-faq" class="tab-content">
                 <div class="card">
-                    <h3>🛠️ 快存櫃全方位客服與異常處理標準手冊 (SOP)</h3>
-                    
+                    <h3>🛠️ 快存櫃客服與異常處理</h3>
+
+                    <div style="margin-top: 12px; margin-bottom: 20px;">
+                        <input type="text" id="faq-search-input" oninput="filterFaqItems()" placeholder="🔍 快速搜尋問題或關鍵字..." style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none;">
+                    </div>
+    
                     <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 10px;">一、 App 註冊、登入與身分驗證問題</h4>
                     <div class="faq-item">
                         <div class="faq-q">1. 外國旅客無台灣門號無法註冊</div>
@@ -327,83 +331,83 @@
                         <div class="faq-a"><b>處理方式：</b>客服核對據點、櫃號及承租電話（必要時輔以現場特徵或監視器畫面確認身分）後，於後台直接執行強制開櫃。</div>
                     </div>
 
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">三、 現場誤用 / 誤開未退租櫃位之處理（重大情境）</h4>
-                    <div class="faq-item" style="background: #fffbeb; border-color: #fde68a;">
-                        <div class="faq-q" style="color: #b45309;">⚠️ 情境：櫃門未關或前一手未退租，新客人誤以為空櫃而將物品放入，導致系統無此客人的租賃資料。</div>
-                        <div class="faq-a">
-                            <b>標準處理 SOP：</b><br>
-                            1. <b>詢問與記錄</b>：先與客人詳細核對並記錄其「實際放物品的時間」、「放置內容」及「外觀穿著」。<br>
-                            2. <b>調閱監視器</b>：調閱監視器畫面，確認確實是由該新客人在該時段放入。<br>
-                            3. <b>重新正確承租</b>：請客人透過 App 或機台<span style="color: #dc2626; font-weight: bold;">重新承租一個同尺寸的正確空櫃</span>（計算其實際占用時間與費用）。<br>
-                            4. <b>付款與核對</b>：待客人完成新訂單付款並確認後。<br>
-                            5. <b>協助取物與歸位</b>：由後台或店長協助將誤用之原櫃位打開，讓客人將物品取出，轉放到新承租的正確櫃位中；舊櫃由店長進行清空與後台狀態重置。
-                        </div>
-                    </div>
+    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">三、 現場誤用 / 誤開未退租櫃位之處理（重大情境）</h4>
+    <div class="faq-item" style="background: #fffbeb; border-color: #fde68a;">
+        <div class="faq-q" style="color: #b45309;">⚠️ 情境：櫃門未關或前一手未退租，新客人誤以為空櫃而將物品放入，導致系統無此客人的租賃資料。</div>
+        <div class="faq-a">
+            <b>標準處理 SOP：</b><br>
+            1. <b>詢問與記錄</b>：先與客人詳細核對並記錄其「實際放物品的時間」、「放置內容」及「外觀穿著」。<br>
+            2. <b>調閱監視器</b>：調閱監視器畫面，確認確實是由該新客人在該時段放入。<br>
+            3. <b>重新正確承租</b>：請客人透過 App 或機台<span style="color: #dc2626; font-weight: bold;">重新承租一個同尺寸的正確空櫃</span>（計算其實際占用時間與費用）。<br>
+            4. <b>付款與核對</b>：待客人完成新訂單付款並確認後。<br>
+            5. <b>協助取物與歸位</b>：由後台或店長協助將誤用之原櫃位打開，讓客人將物品取出，轉放到新承租的正確櫃位中；舊櫃由店長進行清空與後台狀態重置。
+        </div>
+    </div>
 
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">四、 租期、單次存取與退租機制</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 誤解「時租/日租」為多次存取</div>
-                        <div class="faq-a">
-                            • <b>機台租用</b>：嚴格屬於「單次存取」，中途開門即視同結束租期。<br>
-                            • <b>App 租用</b>：期限內雖可無限次開櫃，但取完物品後必須手動在 App 點選「退租」。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 忘記手動按退租導致持續計費</div>
-                        <div class="faq-a"><b>處理方式：</b>請客人確認物品是否已全部取出；若確認為空櫃，告知客人可先忽略逾期通知，後續由店長巡店確認後台協助標退，不需額外補繳。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 退租按鈕反白或轉圈圈無法點擊</div>
-                        <div class="faq-a"><b>處理方式：</b>提醒客人將櫃門確實關上後<span style="color: #dc2626; font-weight: bold;">等待 20 秒</span>再按退租；若系統延遲，返回前一頁或重啟 App 即可。</div>
-                    </div>
+    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">四、 租期、單次存取與退租機制</h4>
+    <div class="faq-item">
+        <div class="faq-q">1. 誤解「時租/日租」為多次存取</div>
+        <div class="faq-a">
+            • <b>機台租用</b>：嚴格屬於「單次存取」，中途開門即視同結束租期。<br>
+            • <b>App 租用</b>：期限內雖可無限次開櫃，但取完物品後必須手動在 App 點選「退租」。
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">2. 忘記手動按退租導致持續計費</div>
+        <div class="faq-a"><b>處理方式：</b>請客人確認物品是否已全部取出；若確認為空櫃，告知客人可先忽略逾期通知，後續由店長巡店確認後台協助標退，不需額外補繳。</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">3. 退租按鈕反白或轉圈圈無法點擊</div>
+        <div class="faq-a"><b>處理方式：</b>提醒客人將櫃門確實關上後<span style="color: #dc2626; font-weight: bold;">等待 20 秒</span>再按退租；若系統延遲，返回前一頁或重啟 App 即可。</div>
+    </div>
 
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">五、 逾期費、滯納金與計費爭議</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 逾期未取被改收「原價時租/日租 + 滯納金」</div>
-                        <div class="faq-a">
-                            • <b>向客人說明規則</b>：優惠價僅限於正常租期內與到期前主動透過 App 點選延時；逾期後自動恢復原價計算並產生滯納金。<br>
-                            • <b>彈性處理機制</b>：若為初次使用或特殊情況，可經主管同意後提供<span style="color: #d97706; font-weight: bold;">“特別協助一次”</span>，幫客人重新核算為較合理的原價日租與滯納金，透過 APP 發送補繳通知，繳清後完成退租。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 逾期未繳清無法重新承租</div>
-                        <div class="faq-a"><b>處理方式：</b>必須先透過 App 收到補繳通知並完成上一筆逾期金額繳納，系統解鎖後才能重新承租新櫃。</div>
-                    </div>
+    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">五、 逾期費、滯納金與計費爭議</h4>
+    <div class="faq-item">
+        <div class="faq-q">1. 逾期未取被改收「原價時租/日租 + 滯納金」</div>
+        <div class="faq-a">
+            • <b>向客人說明規則</b>：優惠價僅限於正常租期內與到期前主動透過 App 點選延時；逾期後自動恢復原價計算並產生滯納金。<br>
+            • <b>彈性處理機制</b>：若為初次使用或特殊情況，可經主管同意後提供<span style="color: #d97706; font-weight: bold;">“特別協助一次”</span>，幫客人重新核算為較合理的原價日租與滯納金，透過 APP 發送補繳通知，繳清後完成退租。
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">2. 逾期未繳清無法重新承租</div>
+        <div class="faq-a"><b>處理方式：</b>必須先透過 App 收到補繳通知並完成上一筆逾期金額繳納，系統解鎖後才能重新承租新櫃。</div>
+    </div>
 
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">六、 退費、發票與折讓單流程</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 非櫃體故障的退費限制</div>
-                        <div class="faq-a">
-                            • <b>原則</b>：非櫃體本身故障（如買錯尺寸、用不到、提早退租）原則上<span style="color: #dc2626; font-weight: bold;">不予退費</span>。<br>
-                            • 若剩餘租期超過 24 小時（針對特定長約）或初次使用的善意例外，才可專案呈報主管申請退款（原付款管道刷退，或悠遊卡需索取存摺封面匯款）。
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 重複扣款或系統異常扣款</div>
-                        <div class="faq-a"><b>處理方式：</b>請客人提供租賃紀錄截圖、信用卡末四碼或 Line Pay 訂單編號畫面。後台核對確認後，安排於 7 個工作天內刷退或匯款。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 統編/發票開立與重開（折讓單）</div>
-                        <div class="faq-a"><b>處理方式：</b>若結帳忘記勾選統編需更改，必須作廢重開。請客人提供正確公司名稱、統編、Email，並配合<span style="color: #dc2626; font-weight: bold;">回覆「同意開立折讓單」</span>，才能由會計進行後續重開發票與退差額作業。</div>
-                    </div>
+    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">六、 退費、發票與折讓單流程</h4>
+    <div class="faq-item">
+        <div class="faq-q">1. 非櫃體故障的退費限制</div>
+        <div class="faq-a">
+            • <b>原則</b>：非櫃體本身故障（如買錯尺寸、用不到、提早退租）原則上<span style="color: #dc2626; font-weight: bold;">不予退費</span>。<br>
+            • 若剩餘租期超過 24 小時（針對特定長約）或初次使用的善意例外，才可專案呈報主管申請退款（原付款管道刷退，或悠遊卡需索取存摺封面匯款）。
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">2. 重複扣款或系統異常扣款</div>
+        <div class="faq-a"><b>處理方式：</b>請客人提供租賃紀錄截圖、信用卡末四碼或 Line Pay 訂單編號畫面。後台核對確認後，安排於 7 個工作天內刷退或匯款。</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">3. 統編/發票開立與重開（折讓單）</div>
+        <div class="faq-a"><b>處理方式：</b>若結帳忘記勾選統編需更改，必須作廢重開。請客人提供正確公司名稱、統編、Email，並配合<span style="color: #dc2626; font-weight: bold;">回覆「同意開立折讓單」</span>，才能由會計進行後續重開發票與退差額作業。</div>
+    </div>
 
-                    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">七、 預約、尺寸、據點與動線指引</h4>
-                    <div class="faq-item">
-                        <div class="faq-q">1. 能否提前線上預約櫃位？</div>
-                        <div class="faq-a"><b>處理方式：</b>明確告知快存櫃<span style="color: #dc2626; font-weight: bold;">無法提前預約</span>，皆採「現場操作、當下起租」制，建議出發前查看 App 即時空櫃率。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">2. 大型行李箱尺寸對應</div>
-                        <div class="faq-a"><b>處理方式：</b>29 吋以上大型行李箱建議租用 S3 或 M/L 型（視各據點櫃型而定）；App 與櫃體皆有長寬高尺寸標示，<span style="color: #dc2626; font-weight: bold;">非櫃體問題無法因放不下而退費</span>。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">3. 車站與場館內部動線迷路</div>
-                        <div class="faq-a"><b>處理方式：</b>立即提供官方準備好的動線影片連結（如北車 Z2 出口、南港車站各連通道影片），或線上文字引導。</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-q">4. 營業時間與小巨蛋活動配合</div>
-                        <div class="faq-a"><b>處理方式：</b>小巨蛋據點若當天有活動，會配合活動散場時間延後關門，以場館實際關門時間為主；若需絕對 24 小時存取，建議改租「信義逸仙」等 24 小時據點。</div>
-                    </div>
+    <h4 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 20px;">七、 預約、尺寸、據點與動線指引</h4>
+    <div class="faq-item">
+        <div class="faq-q">1. 能否提前線上預約櫃位？</div>
+        <div class="faq-a"><b>處理方式：</b>明確告知快存櫃<span style="color: #dc2626; font-weight: bold;">無法提前預約</span>，皆採「現場操作、當下起租」制，建議出發前查看 App 即時空櫃率。</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">2. 大型行李箱尺寸對應</div>
+        <div class="faq-a"><b>處理方式：</b>29 吋以上大型行李箱建議租用 S3 或 M/L 型（視各據點櫃型而定）；App 與櫃體皆有長寬高尺寸標示，<span style="color: #dc2626; font-weight: bold;">非櫃體問題無法因放不下而退費</span>。</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">3. 車站與場館內部動線迷路</div>
+        <div class="faq-a"><b>處理方式：</b>立即提供官方準備好的動線影片連結（如北車 Z2 出口、南港車站各連通道影片），或線上文字引導。</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">4. 營業時間與小巨蛋活動配合</div>
+        <div class="faq-a"><b>處理方式：</b>小巨蛋據點若當天有活動，會配合活動散場時間延後關門，以場館實際關門時間為主；若需絕對 24 小時存取，建議改租「信義逸仙」等 24 小時據點。</div>
+    </div>
 
                 </div>
             </div>
