@@ -463,6 +463,22 @@
                 overlay.classList.remove('active');
             }
         }
+        function filterFaqItems() {
+        const input = document.getElementById('faq-search-input');
+        if (!input) return;
+    
+        const filter = input.value.trim().toLowerCase();
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(function(item) {
+            const text = item.innerText.toLowerCase();
+            if (text.includes(filter)) {
+                item.style.display = ""; // 顯示符合的項目
+            } else {
+                item.style.display = "none"; // 隱藏不符合的項目
+            }
+        });
+    }
     </script>
     <script src="sidebar.js"></script>
 </body>
