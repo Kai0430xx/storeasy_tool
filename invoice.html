@@ -502,7 +502,6 @@
             document.getElementById('v-i-bank-branch').innerText = document.getElementById('i-bank-branch').value;
             document.getElementById('v-i-bank-account').innerText = document.getElementById('i-bank-account').value || '________________________';
 
-            // 調整表格標題與欄位顯示文字
             if (taxMode === 'exclusive') {
                 document.getElementById('v-i-table-title').innerText = '倉位租金(未稅) & 保證金明細';
                 document.getElementById('th-col-untax').innerText = '未稅小計';
@@ -519,7 +518,7 @@
             let tbodyFees = document.getElementById('v-i-fees');
             let itemsHtml = '', feesHtml = '';
             
-            let totalRentDisplay = 0, totalFeeDisplay = 0, totalDeposit = 0, grandExtraTotal = 0;
+            let totalRentDisplay = 0, totalInsuranceDisplay = 0, totalDeposit = 0, grandOtherDisplay = 0;
 
             keys.forEach(function(idx) {
                 let item = selectedInvoiceItems[idx];
@@ -545,12 +544,10 @@
 
                 let unTax = 0, tax = 0, rentDisplay = 0;
                 if (taxMode === 'exclusive') {
-                    // 金額本身不含稅，需外加 5%
                     unTax = baseRent;
                     tax = Math.round(baseRent * 0.05);
                     rentDisplay = baseRent + tax;
                 } else {
-                    // 金額本身含稅，內含 5%
                     rentDisplay = baseRent;
                     unTax = Math.round(baseRent / 1.05);
                     tax = baseRent - unTax;
@@ -558,7 +555,6 @@
 
                 let lineTotal = rentDisplay + deposit;
                 totalRentDisplay += rentDisplay;
-                totalFeeDisplay += insuranceBase; // 保險文書若也視為外加或內含，此處同步計算
                 totalDeposit += deposit;
 
                 let dateRangeStr = (item.startDate && item.endDate) ? (item.startDate.replace(/-/g,'/') + ' - ' + item.endDate.replace(/-/g,'/')) : '未填租期';
@@ -577,30 +573,47 @@
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; color: #b45309; white-space: nowrap;">' + lineTotal.toLocaleString() + '</td>' +
                 '</tr>';
 
-                let lFee = item.lateFee || 0, pFee = item.packingFee || 0, mFee = item.movingFee || 0, oFee = item.otherFee || 0;
-                let extraBaseSum = lFee + insuranceBase + pFee + mFee + oFee;
-                let exUnTax = 0, exTax = 0, extraDisplay = 0;
+                // 計算保險文書處理費的稅金與含稅總計
+                let insUnTax = 0, insTax = 0, insDisplay = 0;
                 if (taxMode === 'exclusive') {
-                    exUnTax = extraBaseSum;
-                    exTax = Math.round(extraBaseSum * 0.05);
-                    extraDisplay = extraBaseSum + exTax;
+                    insUnTax = insuranceBase;
+                    insTax = Math.round(insuranceBase * 0.05);
+                    insDisplay = insuranceBase + insTax;
                 } else {
-                    extraDisplay = extraBaseSum;
-                    exUnTax = Math.round(extraBaseSum / 1.05);
-                    exTax = extraBaseSum - exUnTax;
+                    insDisplay = insuranceBase;
+                    insUnTax = Math.round(insuranceBase / 1.05);
+                    insTax = insuranceBase - insUnTax;
                 }
-                grandExtraTotal += extraDisplay;
+                totalInsuranceDisplay += insDisplay;
+
+                let lFee = item.lateFee || 0, pFee = item.packingFee || 0, mFee = item.movingFee || 0, oFee = item.otherFee || 0;
+                let otherBaseSum = lFee + pFee + mFee + oFee;
+                let othUnTax = 0, othTax = 0, otherDisplay = 0;
+                if (taxMode === 'exclusive') {
+                    othUnTax = otherBaseSum;
+                    othTax = Math.round(otherBaseSum * 0.05);
+                    otherDisplay = otherBaseSum + othTax;
+                } else {
+                    otherDisplay = otherBaseSum;
+                    othUnTax = Math.round(otherBaseSum / 1.05);
+                    othTax = otherBaseSum - othUnTax;
+                }
+                grandOtherDisplay += otherDisplay;
+
+                let rowExtraSum = insDisplay + otherDisplay;
+                let rowExtraUnTax = insUnTax + othUnTax;
+                let rowExtraTax = insTax + othTax;
 
                 feesHtml += '<tr>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + item.code + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + lFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + insuranceBase.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + insDisplay.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + pFee.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + mFee.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + oFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + exUnTax.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + exTax.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + extraDisplay.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + rowExtraUnTax.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + rowExtraTax.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + rowExtraSum.toLocaleString() + '</td>' +
                 '</tr>';
             });
 
@@ -609,10 +622,10 @@
 
             document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentDisplay.toLocaleString();
             document.getElementById('v-i-deposit').innerText = 'NT$ ' + totalDeposit.toLocaleString();
-            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeDisplay.toLocaleString();
-            document.getElementById('v-i-extra-total').innerText = 'NT$ ' + grandExtraTotal.toLocaleString();
+            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalInsuranceDisplay.toLocaleString();
+            document.getElementById('v-i-extra-total').innerText = 'NT$ ' + grandOtherDisplay.toLocaleString();
             
-            let grandTotal = totalRentDisplay + totalDeposit + grandExtraTotal; // 注意保證金免稅
+            let grandTotal = totalRentDisplay + totalDeposit + totalInsuranceDisplay + grandOtherDisplay;
             document.getElementById('v-i-total').innerText = grandTotal.toLocaleString();
 
             alert('會計版請款單已成功生成！');
