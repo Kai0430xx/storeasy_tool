@@ -153,6 +153,12 @@
                     <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
                     <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
                     <div class="form-group"><label>統一編號</label><input type="text" id="i-taxid" placeholder="統編"></div>
+                    <div class="form-group"><label>稅別模式</label>
+                        <select id="i-tax-mode" style="background: #fef3c7; font-weight: bold; color: #92400e;">
+                            <option value="inclusive">含稅 (金額已包含 5% 稅)</option>
+                            <option value="exclusive">未稅 / 稅外加 (金額外加 5% 稅)</option>
+                        </select>
+                    </div>
                     <div class="form-group"><label>匯款分行</label>
                         <select id="i-bank-branch">
                             <option value="南門分行">南門分行</option>
@@ -229,7 +235,7 @@
                     <div style="grid-column: span 2;"><strong>分店地址：</strong> <span id="v-i-address">---</span></div>
                 </div>
 
-                <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;">倉位租金(含稅) &amp; 保證金明細</div>
+                <div style="margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: #334155;" id="v-i-table-title">倉位租金(含稅) & 保證金明細</div>
                 <table>
                     <thead>
                         <tr style="background-color: #f8fafc; text-align: center;">
@@ -238,9 +244,9 @@
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">原價租金</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">優惠租金</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">承租月份</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">未稅小計</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">稅金</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">含稅小計</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;" id="th-col-untax">未稅小計</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;" id="th-col-tax">稅金</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;" id="th-col-inccost">含稅小計</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">保證金</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">租期</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">小計</th>
@@ -263,7 +269,7 @@
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">其它</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">未稅小計</th>
                             <th style="border: 1px solid #cbd5e1; padding: 10px;">稅金</th>
-                            <th style="border: 1px solid #cbd5e1; padding: 10px;">含稅小計</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 10px;">總計</th>
                         </tr>
                     </thead>
                     <tbody id="v-i-fees" style="text-align: center;">
@@ -458,19 +464,19 @@
                             '</div>' +
                         '</div>' +
                         '<div>' +
-                            '<label style="font-size: 0.75rem; color: #64748b;">滯納金 (含稅)</label>' +
+                            '<label style="font-size: 0.75rem; color: #64748b;">滯納金</label>' +
                             '<input type="number" value="' + (item.lateFee || 0) + '" min="0" oninput="selectedInvoiceItems[' + idx + '].lateFee = Number(this.value)||0" style="padding: 6px 8px; font-size: 0.85rem;">' +
                         '</div>' +
                         '<div>' +
-                            '<label style="font-size: 0.75rem; color: #64748b;">包材費 (含稅)</label>' +
+                            '<label style="font-size: 0.75rem; color: #64748b;">包材費</label>' +
                             '<input type="number" value="' + (item.packingFee || 0) + '" min="0" oninput="selectedInvoiceItems[' + idx + '].packingFee = Number(this.value)||0" style="padding: 6px 8px; font-size: 0.85rem;">' +
                         '</div>' +
                         '<div>' +
-                            '<label style="font-size: 0.75rem; color: #64748b;">搬運費 (含稅)</label>' +
+                            '<label style="font-size: 0.75rem; color: #64748b;">搬運費</label>' +
                             '<input type="number" value="' + (item.movingFee || 0) + '" min="0" oninput="selectedInvoiceItems[' + idx + '].movingFee = Number(this.value)||0" style="padding: 6px 8px; font-size: 0.85rem;">' +
                         '</div>' +
                         '<div>' +
-                            '<label style="font-size: 0.75rem; color: #64748b;">其它費 (含稅)</label>' +
+                            '<label style="font-size: 0.75rem; color: #64748b;">其它費</label>' +
                             '<input type="number" value="' + (item.otherFee || 0) + '" min="0" oninput="selectedInvoiceItems[' + idx + '].otherFee = Number(this.value)||0" style="padding: 6px 8px; font-size: 0.85rem;">' +
                         '</div>' +
                     '</div>' +
@@ -481,6 +487,8 @@
         function generateInvoice() {
             const keys = Object.keys(selectedInvoiceItems);
             if (keys.length === 0) { alert('請至少勾選一個項目！'); return; }
+
+            const taxMode = document.getElementById('i-tax-mode').value; // 'inclusive' 或 'exclusive'
 
             document.getElementById('v-i-date').innerText = document.getElementById('inv-date').value;
             document.getElementById('v-i-client').innerText = document.getElementById('i-client').value || '未填寫';
@@ -494,11 +502,24 @@
             document.getElementById('v-i-bank-branch').innerText = document.getElementById('i-bank-branch').value;
             document.getElementById('v-i-bank-account').innerText = document.getElementById('i-bank-account').value || '________________________';
 
+            // 調整表格標題與欄位顯示文字
+            if (taxMode === 'exclusive') {
+                document.getElementById('v-i-table-title').innerText = '倉位租金(未稅) & 保證金明細';
+                document.getElementById('th-col-untax').innerText = '未稅小計';
+                document.getElementById('th-col-tax').innerText = '稅金 (5%)';
+                document.getElementById('th-col-inccost').innerText = '總計';
+            } else {
+                document.getElementById('v-i-table-title').innerText = '倉位租金(含稅) & 保證金明細';
+                document.getElementById('th-col-untax').innerText = '未稅小計';
+                document.getElementById('th-col-tax').innerText = '稅金';
+                document.getElementById('th-col-inccost').innerText = '含稅小計';
+            }
+
             let tbodyItems = document.getElementById('v-i-items');
             let tbodyFees = document.getElementById('v-i-fees');
             let itemsHtml = '', feesHtml = '';
             
-            let totalRentInc = 0, totalFeeInc = 0, totalDeposit = 0, grandExtraTotal = 0;
+            let totalRentDisplay = 0, totalFeeDisplay = 0, totalDeposit = 0, grandExtraTotal = 0;
 
             keys.forEach(function(idx) {
                 let item = selectedInvoiceItems[idx];
@@ -518,17 +539,28 @@
                     termMonths = term === '3' ? 3 : term === '6' ? 6 : (term.startsWith('12') ? 12 : 1);
                 }
 
-                let rentSubtotal = monthlyRate * termMonths;
-                let insuranceFee = (item.price1 >= 3000 ? 150 : 80) * termMonths;
+                let baseRent = monthlyRate * termMonths;
+                let insuranceBase = (item.price1 >= 3000 ? 150 : 80) * termMonths;
                 let deposit = item.depositOption === 'yes' ? (termMonths <= 2 ? (item.price1 * 2) : item.price1) : 0;
-                let lineTotal = rentSubtotal + deposit;
 
-                totalRentInc += rentSubtotal;
-                totalFeeInc += insuranceFee;
+                let unTax = 0, tax = 0, rentDisplay = 0;
+                if (taxMode === 'exclusive') {
+                    // 金額本身不含稅，需外加 5%
+                    unTax = baseRent;
+                    tax = Math.round(baseRent * 0.05);
+                    rentDisplay = baseRent + tax;
+                } else {
+                    // 金額本身含稅，內含 5%
+                    rentDisplay = baseRent;
+                    unTax = Math.round(baseRent / 1.05);
+                    tax = baseRent - unTax;
+                }
+
+                let lineTotal = rentDisplay + deposit;
+                totalRentDisplay += rentDisplay;
+                totalFeeDisplay += insuranceBase; // 保險文書若也視為外加或內含，此處同步計算
                 totalDeposit += deposit;
 
-                let unTax = Math.round(rentSubtotal / 1.05);
-                let tax = rentSubtotal - unTax;
                 let dateRangeStr = (item.startDate && item.endDate) ? (item.startDate.replace(/-/g,'/') + ' - ' + item.endDate.replace(/-/g,'/')) : '未填租期';
 
                 itemsHtml += '<tr>' +
@@ -539,38 +571,48 @@
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + termMonths + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + unTax.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + tax.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + rentSubtotal.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + rentDisplay.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + deposit.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; font-size: 0.65rem; white-space: nowrap;">' + dateRangeStr + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; color: #b45309; white-space: nowrap;">' + lineTotal.toLocaleString() + '</td>' +
                 '</tr>';
 
                 let lFee = item.lateFee || 0, pFee = item.packingFee || 0, mFee = item.movingFee || 0, oFee = item.otherFee || 0;
-                let itemExtraSum = lFee + insuranceFee + pFee + mFee + oFee;
-                grandExtraTotal += (lFee + pFee + mFee + oFee);
-                let exFee = Math.round(itemExtraSum / 1.05), taxFee = itemExtraSum - exFee;
+                let extraBaseSum = lFee + insuranceBase + pFee + mFee + oFee;
+                let exUnTax = 0, exTax = 0, extraDisplay = 0;
+                if (taxMode === 'exclusive') {
+                    exUnTax = extraBaseSum;
+                    exTax = Math.round(extraBaseSum * 0.05);
+                    extraDisplay = extraBaseSum + exTax;
+                } else {
+                    extraDisplay = extraBaseSum;
+                    exUnTax = Math.round(extraBaseSum / 1.05);
+                    exTax = extraBaseSum - exUnTax;
+                }
+                grandExtraTotal += extraDisplay;
 
                 feesHtml += '<tr>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + item.code + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + lFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + insuranceFee.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + insuranceBase.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + pFee.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + mFee.toLocaleString() + '</td>' +
                     '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + oFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + exFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + taxFee.toLocaleString() + '</td>' +
-                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + itemExtraSum.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + exUnTax.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; white-space: nowrap;">' + exTax.toLocaleString() + '</td>' +
+                    '<td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; white-space: nowrap;">' + extraDisplay.toLocaleString() + '</td>' +
                 '</tr>';
             });
 
             tbodyItems.innerHTML = itemsHtml;
             tbodyFees.innerHTML = feesHtml;
 
-            document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentInc.toLocaleString();
+            document.getElementById('v-i-subtotal').innerText = 'NT$ ' + totalRentDisplay.toLocaleString();
             document.getElementById('v-i-deposit').innerText = 'NT$ ' + totalDeposit.toLocaleString();
-            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeInc.toLocaleString();
+            document.getElementById('v-i-fee-total').innerText = 'NT$ ' + totalFeeDisplay.toLocaleString();
             document.getElementById('v-i-extra-total').innerText = 'NT$ ' + grandExtraTotal.toLocaleString();
-            let grandTotal = totalRentInc + totalFeeInc + totalDeposit + grandExtraTotal;
+            
+            let grandTotal = totalRentDisplay + totalDeposit + grandExtraTotal; // 注意保證金免稅
             document.getElementById('v-i-total').innerText = grandTotal.toLocaleString();
 
             alert('會計版請款單已成功生成！');
@@ -583,15 +625,17 @@
             let clientName = document.getElementById('i-client').value || '客戶';
             let branchName = document.getElementById('i-branch').value || '分店';
             let dateStr = document.getElementById('inv-date').value;
+            const taxMode = document.getElementById('i-tax-mode').value;
 
             let wsData = [
                 ["收多易迷你倉庫 - 會計版請款單明細表"],
                 ["請款日期", dateStr, "分店名稱", branchName],
                 ["客戶名稱", clientName, "客戶電話", document.getElementById('i-client-phone').value || '---'],
                 ["公司抬頭", document.getElementById('i-company').value || '---', "統一編號", document.getElementById('i-taxid').value || '---'],
+                ["稅別模式", taxMode === 'exclusive' ? '未稅 / 稅外加' : '含稅'],
                 [],
                 ["【倉位租金及保證金明細】"],
-                ["倉位編號", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅小計", "保證金", "租期範圍", "小計 (NT$)"]
+                ["倉位編號", "材積", "原價租金", "優惠租金", "承租月份", "未稅小計", "稅金", "含稅/總計小計", "保證金", "租期範圍", "小計 (NT$)"]
             ];
 
             keys.forEach(function(idx) {
@@ -610,11 +654,21 @@
                     termMonths = Math.max(1, Math.round(diffDays / 30));
                 }
 
-                let rentSub = monthlyRate * termMonths;
+                let baseRent = monthlyRate * termMonths;
                 let dep = item.depositOption === 'yes' ? (termMonths <= 2 ? (item.price1 * 2) : item.price1) : 0;
-                let unTax = Math.round(rentSub / 1.05);
-                let tax = rentSub - unTax;
-                let dateStr = (item.startDate && item.endDate) ? (item.startDate + '至' + item.endDate) : '未填租期';
+                
+                let unTax = 0, tax = 0, rentDisplay = 0;
+                if (taxMode === 'exclusive') {
+                    unTax = baseRent;
+                    tax = Math.round(baseRent * 0.05);
+                    rentDisplay = baseRent + tax;
+                } else {
+                    rentDisplay = baseRent;
+                    unTax = Math.round(baseRent / 1.05);
+                    tax = baseRent - unTax;
+                }
+
+                let dateStrRange = (item.startDate && item.endDate) ? (item.startDate + '至' + item.endDate) : '未填租期';
 
                 wsData.push([
                     item.code, 
@@ -624,10 +678,10 @@
                     termMonths, 
                     unTax, 
                     tax, 
-                    rentSub, 
+                    rentDisplay, 
                     dep, 
-                    dateStr, 
-                    rentSub + dep
+                    dateStrRange, 
+                    rentDisplay + dep
                 ]);
             });
 
@@ -646,7 +700,7 @@
 
             ws['!cols'] = [
                 {wch: 14}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 10}, 
-                {wch: 12}, {wch: 10}, {wch: 12}, {wch: 12}, {wch: 24}, {wch: 14}
+                {wch: 12}, {wch: 10}, {wch: 14}, {wch: 12}, {wch: 24}, {wch: 14}
             ];
 
             XLSX.utils.book_append_sheet(wb, ws, "請款單明細");
