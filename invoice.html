@@ -153,6 +153,12 @@
                     <div class="form-group"><label>客戶聯繫電話</label><input type="text" id="i-client-phone" placeholder="輸入客電"></div>
                     <div class="form-group"><label>公司抬頭</label><input type="text" id="i-company" placeholder="抬頭"></div>
                     <div class="form-group"><label>統一編號</label><input type="text" id="i-taxid" placeholder="統編"></div>
+                    <div class="form-group"><label>匯款分行</label>
+                        <select id="i-bank-branch">
+                            <option value="南門分行">南門分行</option>
+                            <option value="新莊分行">新莊分行</option>
+                        </select>
+                    </div>
                     <div class="form-group"><label>銀行帳號</label><input type="text" id="i-bank-account" placeholder="請輸入匯款帳號"></div>
                 </div>
 
@@ -276,7 +282,7 @@
 
                 <div class="notes-box">
                     <div style="font-weight: bold; color: #1e293b; margin-bottom: 4px;">付款資料：</div>
-                    <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 南門分行 ｜ 帳號：<span id="v-i-bank-account" style="font-weight: bold; color: #b45309;">________________________</span></div>
+                    <div>戶名：收多易股份有限公司 ｜ 銀行代碼：013 國泰世華 <span id="v-i-bank-branch" style="font-weight: bold; color: #1e293b;">南門分行</span> ｜ 帳號：<span id="v-i-bank-account" style="font-weight: bold; color: #b45309;">________________________</span></div>
                     <div>支票付款抬頭請開：收多易股份有限公司</div>
                     <div style="color: #dc2626; font-weight: 600; margin-top: 4px;">請於請款日起7個工作日內完成入款</div>
                 </div>
@@ -485,6 +491,7 @@
             document.getElementById('v-i-client-phone').innerText = document.getElementById('i-client-phone').value || '---';
             document.getElementById('v-i-address').innerText = document.getElementById('i-address').value || '---';
             document.getElementById('v-i-tel').innerText = document.getElementById('i-tel').value || '---';
+            document.getElementById('v-i-bank-branch').innerText = document.getElementById('i-bank-branch').value;
             document.getElementById('v-i-bank-account').innerText = document.getElementById('i-bank-account').value || '________________________';
 
             let tbodyItems = document.getElementById('v-i-items');
