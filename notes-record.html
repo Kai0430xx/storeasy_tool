@@ -177,6 +177,7 @@
                         <select id="branchSelect" onchange="checkBranchInput(this)">
                             <option value="">-- 請選擇或自訂據點 --</option>
                             <option value="NEW_BRANCH">➕ 自訂新據點...</option>
+                            <option value="DELETE_BRANCH" style="color: #dc2626; font-weight: bold;">🗑️ 刪除自訂據點...</option>
                         </select>
                         <input type="text" id="branchCustom" placeholder="請輸入新據點名稱" style="display: none; margin-top: 6px;">
                     </div>
@@ -297,7 +298,7 @@
             <button class="modal-close" onclick="closeDeleteCategoryModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">請勾選想要刪除的自訂分類（預設分類無法刪除）：</p>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">請勾選想要刪除的自訂分類：</p>
             <div id="deleteCategoryList" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding: 4px;">
                 <!-- 動態勾選清單 -->
             </div>
@@ -353,8 +354,7 @@
         const select = document.getElementById('categorySelect');
         const filterSelect = document.getElementById('filterCategory');
         
-        let defaultCats = ['合約交辦', '設備維修', '客戶特殊需求', '其他雜項'];
-        let allCatsSet = new Set([...defaultCats, ...customCategories]);
+        let allCatsSet = new Set(customCategories);
         
         let html = `<option value="">-- 請選擇或自訂分類 --</option>`;
         let filterHtml = `<option value="">📂 所有分類</option>`;
@@ -375,7 +375,6 @@
     function initBranchDropdown() {
         const select = document.getElementById('branchSelect');
         
-        // 從倉位資料自動抓取現有分店
         let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
         let systemBranches = [...new Set(storageData.map(item => item.branch))].filter(Boolean);
         
@@ -595,7 +594,7 @@
         let category = selectCat;
         if (selectCat === 'NEW_CUSTOM' && customCatInput) {
             category = customCatInput;
-            if (!['合約交辦', '設備維修', '客戶特殊需求', '其他雜項'].includes(category) && !customCategories.includes(category)) {
+            if (!customCategories.includes(category)) {
                 customCategories.push(category);
                 localStorage.setItem('storeasy_notes_categories', JSON.stringify(customCategories));
                 initCategoryDropdown();
@@ -672,11 +671,14 @@
         if ([...catSelect.options].some(o => o.value === record.category)) {
             catSelect.value = record.category;
             document.getElementById('categoryCustom').style.display = 'none';
-        } else {
+        } else if (record.category) {
             catSelect.value = 'NEW_CUSTOM';
             const customInput = document.getElementById('categoryCustom');
             customInput.style.display = 'block';
             customInput.value = record.category;
+        } else {
+            catSelect.value = '';
+            document.getElementById('categoryCustom').style.display = 'none';
         }
 
         document.getElementById('subject').value = record.subject || '';
