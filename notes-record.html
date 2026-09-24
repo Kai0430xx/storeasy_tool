@@ -174,18 +174,17 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>據點名稱：</label>
-                        <input type="text" id="branch" placeholder="例如: 台北車站店">
+                        <select id="branchSelect" onchange="checkBranchInput(this)">
+                            <option value="">-- 請選擇或自訂據點 --</option>
+                            <option value="NEW_BRANCH">➕ 自訂新據點...</option>
+                        </select>
+                        <input type="text" id="branchCustom" placeholder="請輸入新據點名稱" style="display: none; margin-top: 6px;">
                     </div>
                     <div class="form-group">
                         <label>分類 (可下拉選擇或直接輸入新增)：</label>
                         <select id="categorySelect" onchange="checkCategoryInput(this)">
                             <option value="">-- 請選擇或自訂分類 --</option>
-                            <option value="合約交辦">合約交辦</option>
-                            <option value="設備維修">設備維修</option>
-                            <option value="客戶特殊需求">客戶特殊需求</option>
-                            <option value="其他雜項">其他雜項</option>
                             <option value="NEW_CUSTOM">➕ 自訂新分類...</option>
-                            <option value="DELETE_CUSTOM" style="color: #dc2626; font-weight: bold;">🗑️ 刪除自訂分類...</option>
                         </select>
                         <input type="text" id="categoryCustom" placeholder="請輸入新分類名稱" style="display: none; margin-top: 6px;">
                     </div>
@@ -309,11 +308,31 @@
     </div>
 </div>
 
+<!-- 刪除自訂據點彈跳視窗 Modal -->
+<div class="modal" id="deleteBranchModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span><i class="fa-solid fa-trash"></i> 刪除自訂據點</span>
+            <button class="modal-close" onclick="closeDeleteBranchModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">請勾選想要刪除的自訂據點（從系統倉位匯入的分店無法在此刪除）：</p>
+            <div id="deleteBranchList" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding: 4px;">
+                <!-- 動態勾選清單 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" onclick="confirmDeleteCustomBranches()" style="background-color: #dc2626; margin-top: 0; padding: 8px 16px;">確認刪除所選據點</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let editingId = null; 
     let currentFilter = 'active_all'; 
     let activeNoteId = null; 
     let customCategories = JSON.parse(localStorage.getItem('storeasy_notes_categories')) || [];
+    let customBranches = JSON.parse(localStorage.getItem('storeasy_notes_branches')) || [];
 
     document.addEventListener("DOMContentLoaded", function() {
         try {
@@ -326,6 +345,7 @@
             console.error("Initialization error:", e);
         }
         initCategoryDropdown();
+        initBranchDropdown();
         renderRecords();
     });
 
@@ -352,6 +372,27 @@
         filterSelect.innerHTML = filterHtml;
     }
 
+    function initBranchDropdown() {
+        const select = document.getElementById('branchSelect');
+        
+        // 從倉位資料自動抓取現有分店
+        let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+        let systemBranches = [...new Set(storageData.map(item => item.branch))].filter(Boolean);
+        
+        let allBranchesSet = new Set([...systemBranches, ...customBranches]);
+        
+        let html = `<option value="">-- 請選擇或自訂據點 --</option>`;
+        allBranchesSet.forEach(b => {
+            html += `<option value="${b}">${b}</option>`;
+        });
+        html += `<option value="NEW_BRANCH">➕ 自訂新據點...</option>`;
+        if (customBranches.length > 0) {
+            html += `<option value="DELETE_BRANCH" style="color: #dc2626; font-weight: bold;">🗑️ 刪除自訂據點...</option>`;
+        }
+
+        select.innerHTML = html;
+    }
+
     function checkCategoryInput(select) {
         const customInput = document.getElementById('categoryCustom');
         if (select.value === 'NEW_CUSTOM') {
@@ -360,8 +401,24 @@
         } else if (select.value === 'DELETE_CUSTOM') {
             customInput.style.display = 'none';
             customInput.value = '';
-            select.value = ''; // 重置選單
+            select.value = ''; 
             openDeleteCategoryModal();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    }
+
+    function checkBranchInput(select) {
+        const customInput = document.getElementById('branchCustom');
+        if (select.value === 'NEW_BRANCH') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else if (select.value === 'DELETE_BRANCH') {
+            customInput.style.display = 'none';
+            customInput.value = '';
+            select.value = ''; 
+            openDeleteBranchModal();
         } else {
             customInput.style.display = 'none';
             customInput.value = '';
@@ -401,6 +458,42 @@
             initCategoryDropdown();
             closeDeleteCategoryModal();
             alert('自訂分類已刪除成功！');
+        }
+    }
+
+    function openDeleteBranchModal() {
+        const listContainer = document.getElementById('deleteBranchList');
+        if (customBranches.length === 0) {
+            listContainer.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">目前沒有任何自訂據點可刪除</span>';
+        } else {
+            listContainer.innerHTML = customBranches.map(b => `
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                    <input type="checkbox" class="del-branch-chk" value="${b}" style="width: 16px; height: 16px; accent-color: #dc2626;">
+                    <span>${b}</span>
+                </label>
+            `).join('');
+        }
+        document.getElementById('deleteBranchModal').classList.add('active');
+    }
+
+    function closeDeleteBranchModal() {
+        document.getElementById('deleteBranchModal').classList.remove('active');
+    }
+
+    function confirmDeleteCustomBranches() {
+        const checkedBoxes = document.querySelectorAll('.del-branch-chk:checked');
+        if (checkedBoxes.length === 0) {
+            alert('請至少勾選一個要刪除的據點！');
+            return;
+        }
+
+        if (confirm(`確定要刪除選中的 ${checkedBoxes.length} 個自訂據點嗎？`)) {
+            const branchesToDelete = Array.from(checkedBoxes).map(cb => cb.value);
+            customBranches = customBranches.filter(b => !branchesToDelete.includes(b));
+            localStorage.setItem('storeasy_notes_branches', JSON.stringify(customBranches));
+            initBranchDropdown();
+            closeDeleteBranchModal();
+            alert('自訂據點已刪除成功！');
         }
     }
 
@@ -483,10 +576,22 @@
     function handleFormSubmit(event) {
         event.preventDefault();
 
-        const branch = document.getElementById('branch').value.trim();
+        const selectBranch = document.getElementById('branchSelect').value;
+        const customBranchInput = document.getElementById('branchCustom').value.trim();
+        let branch = selectBranch;
+        if (selectBranch === 'NEW_BRANCH' && customBranchInput) {
+            branch = customBranchInput;
+            let storageData = JSON.parse(localStorage.getItem('storeasy_storage_data')) || [];
+            let systemBranches = [...new Set(storageData.map(item => item.branch))].filter(Boolean);
+            if (!systemBranches.includes(branch) && !customBranches.includes(branch)) {
+                customBranches.push(branch);
+                localStorage.setItem('storeasy_notes_branches', JSON.stringify(customBranches));
+                initBranchDropdown();
+            }
+        }
+
         const selectCat = document.getElementById('categorySelect').value;
         const customCatInput = document.getElementById('categoryCustom').value.trim();
-        
         let category = selectCat;
         if (selectCat === 'NEW_CUSTOM' && customCatInput) {
             category = customCatInput;
@@ -538,6 +643,7 @@
 
         saveRecords(records);
         document.getElementById('notesForm').reset();
+        document.getElementById('branchCustom').style.display = 'none';
         document.getElementById('categoryCustom').style.display = 'none';
     }
 
@@ -547,7 +653,20 @@
         if (!record) return;
 
         editingId = id;
-        document.getElementById('branch').value = record.branch || '';
+        
+        const branchSelect = document.getElementById('branchSelect');
+        if ([...branchSelect.options].some(o => o.value === record.branch)) {
+            branchSelect.value = record.branch;
+            document.getElementById('branchCustom').style.display = 'none';
+        } else if (record.branch) {
+            branchSelect.value = 'NEW_BRANCH';
+            const customBranchInput = document.getElementById('branchCustom');
+            customBranchInput.style.display = 'block';
+            customBranchInput.value = record.branch;
+        } else {
+            branchSelect.value = '';
+            document.getElementById('branchCustom').style.display = 'none';
+        }
         
         const catSelect = document.getElementById('categorySelect');
         if ([...catSelect.options].some(o => o.value === record.category)) {
@@ -576,6 +695,7 @@
     function cancelEdit() {
         editingId = null;
         document.getElementById('notesForm').reset();
+        document.getElementById('branchCustom').style.display = 'none';
         document.getElementById('categoryCustom').style.display = 'none';
         document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> 1. 新增其他事項紀錄`;
         document.getElementById('submit-btn').innerHTML = `<i class="fa-solid fa-plus"></i> 確認新增紀錄`;
