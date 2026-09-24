@@ -185,6 +185,7 @@
                             <option value="客戶特殊需求">客戶特殊需求</option>
                             <option value="其他雜項">其他雜項</option>
                             <option value="NEW_CUSTOM">➕ 自訂新分類...</option>
+                            <option value="DELETE_CUSTOM" style="color: #dc2626; font-weight: bold;">🗑️ 刪除自訂分類...</option>
                         </select>
                         <input type="text" id="categoryCustom" placeholder="請輸入新分類名稱" style="display: none; margin-top: 6px;">
                     </div>
@@ -289,6 +290,25 @@
     </div>
 </div>
 
+<!-- 刪除自訂分類彈跳視窗 Modal -->
+<div class="modal" id="deleteCategoryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span><i class="fa-solid fa-trash"></i> 刪除自訂分類</span>
+            <button class="modal-close" onclick="closeDeleteCategoryModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">請勾選想要刪除的自訂分類（預設分類無法刪除）：</p>
+            <div id="deleteCategoryList" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding: 4px;">
+                <!-- 動態勾選清單 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" onclick="confirmDeleteCustomCategories()" style="background-color: #dc2626; margin-top: 0; padding: 8px 16px;">確認刪除所選分類</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let editingId = null; 
     let currentFilter = 'active_all'; 
@@ -324,6 +344,9 @@
             filterHtml += `<option value="${cat}">${cat}</option>`;
         });
         html += `<option value="NEW_CUSTOM">➕ 自訂新分類...</option>`;
+        if (customCategories.length > 0) {
+            html += `<option value="DELETE_CUSTOM" style="color: #dc2626; font-weight: bold;">🗑️ 刪除自訂分類...</option>`;
+        }
 
         select.innerHTML = html;
         filterSelect.innerHTML = filterHtml;
@@ -334,9 +357,50 @@
         if (select.value === 'NEW_CUSTOM') {
             customInput.style.display = 'block';
             customInput.focus();
+        } else if (select.value === 'DELETE_CUSTOM') {
+            customInput.style.display = 'none';
+            customInput.value = '';
+            select.value = ''; // 重置選單
+            openDeleteCategoryModal();
         } else {
             customInput.style.display = 'none';
             customInput.value = '';
+        }
+    }
+
+    function openDeleteCategoryModal() {
+        const listContainer = document.getElementById('deleteCategoryList');
+        if (customCategories.length === 0) {
+            listContainer.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">目前沒有任何自訂分類可刪除</span>';
+        } else {
+            listContainer.innerHTML = customCategories.map(cat => `
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                    <input type="checkbox" class="del-cat-chk" value="${cat}" style="width: 16px; height: 16px; accent-color: #dc2626;">
+                    <span>${cat}</span>
+                </label>
+            `).join('');
+        }
+        document.getElementById('deleteCategoryModal').classList.add('active');
+    }
+
+    function closeDeleteCategoryModal() {
+        document.getElementById('deleteCategoryModal').classList.remove('active');
+    }
+
+    function confirmDeleteCustomCategories() {
+        const checkedBoxes = document.querySelectorAll('.del-cat-chk:checked');
+        if (checkedBoxes.length === 0) {
+            alert('請至少勾選一個要刪除的分類！');
+            return;
+        }
+
+        if (confirm(`確定要刪除選中的 ${checkedBoxes.length} 個自訂分類嗎？`)) {
+            const catsToDelete = Array.from(checkedBoxes).map(cb => cb.value);
+            customCategories = customCategories.filter(cat => !catsToDelete.includes(cat));
+            localStorage.setItem('storeasy_notes_categories', JSON.stringify(customCategories));
+            initCategoryDropdown();
+            closeDeleteCategoryModal();
+            alert('自訂分類已刪除成功！');
         }
     }
 
@@ -426,7 +490,7 @@
         let category = selectCat;
         if (selectCat === 'NEW_CUSTOM' && customCatInput) {
             category = customCatInput;
-            if (!customCategories.includes(category)) {
+            if (!['合約交辦', '設備維修', '客戶特殊需求', '其他雜項'].includes(category) && !customCategories.includes(category)) {
                 customCategories.push(category);
                 localStorage.setItem('storeasy_notes_categories', JSON.stringify(customCategories));
                 initCategoryDropdown();
