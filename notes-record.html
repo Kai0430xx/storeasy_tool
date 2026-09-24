@@ -177,7 +177,6 @@
                         <select id="branchSelect" onchange="checkBranchInput(this)">
                             <option value="">-- 請選擇或自訂據點 --</option>
                             <option value="NEW_BRANCH">➕ 自訂新據點...</option>
-                            <option value="DELETE_BRANCH" style="color: #dc2626; font-weight: bold;">🗑️ 刪除自訂據點...</option>
                         </select>
                         <input type="text" id="branchCustom" placeholder="請輸入新據點名稱" style="display: none; margin-top: 6px;">
                     </div>
@@ -456,7 +455,6 @@
             localStorage.setItem('storeasy_notes_categories', JSON.stringify(customCategories));
             initCategoryDropdown();
             closeDeleteCategoryModal();
-            alert('自訂分類已刪除成功！');
         }
     }
 
@@ -492,7 +490,6 @@
             localStorage.setItem('storeasy_notes_branches', JSON.stringify(customBranches));
             initBranchDropdown();
             closeDeleteBranchModal();
-            alert('自訂據點已刪除成功！');
         }
     }
 
@@ -623,7 +620,6 @@
                 }
             }
             cancelEdit();
-        }
         } else {
             const newRecord = {
                 id: Date.now(),
